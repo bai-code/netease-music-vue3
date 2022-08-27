@@ -2,6 +2,9 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+
+import '@/utils/normalize.css' // 重置样式
+
 import ElementPlus from '@/ElementPlus/index' // 使用element-plus
 
 import axios from '@/Axios/index' // 导入axios

@@ -1,0 +1,46 @@
+// 全局样式
+
+.positions(@top) {
+  position: absolute;
+  top: @top;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.pointer {
+  cursor: pointer;
+}
+
+.flex(@justify,@align) {
+  display: flex;
+  justify-content: @justify;
+  align-items: @align;
+}
+
+.bgSrc(@url,@left,@top) {
+  background-image: url(@url);
+  background-repeat: no-repeat;
+  background-position: @left @top;
+}
+
+.overflow{
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.overflowMul(@num){
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: @num;
+}
+
+// 取消个别默认样式
+
+ul{
+	list-style: none;
+}
+
+a{
+	text-decoration: none;
+}
