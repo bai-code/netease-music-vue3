@@ -4,17 +4,41 @@ import Home from '../views/Home/Home.vue'
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home
+    redirect: '/home'
+  },
+  {
+    path: '/home',
+    name: 'home',
+    component: Home,
+    redirect: { name: 'podcast' },
+    children: [
+      {
+        path: 'find-music',
+        name: 'find-music',
+        component: () => import('../views/FindMusic/find-music.vue')
+      },
+      {
+        path: 'podcast',
+        name: 'podcast',
+        component: () => import('../views/Podcast/podcast.vue')
+      },
+      {
+        path: 'video',
+        name: 'video',
+        component: () => import('@/views/Video/video.vue')
+      },
+      {
+        path: 'attention',
+        name: 'attention',
+        component: () => import('@/views/Attention/attention.vue')
+      },
+      {
+        path: 'personal-fm',
+        name: 'personal-fm',
+        component: () => import('@/views/PersonalFM/personal-fm.vue')
+      }
+    ]
   }
-  // {
-  //   path: '/about',
-  //   name: 'About',
-  //   // route level code-splitting
-  //   // this generates a separate chunk (about.[hash].js) for this route
-  //   // which is lazy-loaded when the route is visited.
-  //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  // }
 ]
 
 const router = createRouter({

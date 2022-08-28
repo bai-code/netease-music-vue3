@@ -26,14 +26,12 @@
 import { ref, onMounted, computed, onBeforeUnmount } from 'vue'
 import { useStore } from 'vuex'
 
-const info = {
-  phone: 13735544745,
-  password: 'bgf1580087304'
-}
 const store = useStore()
 const isSpread = ref(false) // 是否展开
 const inputRef = ref()
 const timer = ref()
+const inputValue = ref('')
+
 const userInfo = computed(() => {
   return store.state.userinfo.userInfo
 })
@@ -63,11 +61,6 @@ const selectItem = (e) => {
   console.log(e.target)
   inputBlur()
 }
-
-store.dispatch('userinfo/userLogin', info)
-// console.log(userInfo.value.nickname)
-
-const inputValue = ref('')
 
 const restaurants = ref([])
 const querySearch = (queryString, cb) => {
@@ -131,12 +124,14 @@ onMounted(() => {
       .flex(flex-start,center);
       div.avatar-bg {
         padding: 2px;
-        box-shadow: border-box;
+        box-sizing: border-box;
         background: #fff;
         border-radius: 50%;
+        height: 37px;
+        width: 37px;
         img {
-          height: 40px;
-          width: 40px;
+          height: 35px;
+          width: 35px;
           border-radius: 50%;
           vertical-align: middle;
         }
@@ -150,6 +145,7 @@ onMounted(() => {
         p {
           color: @contrastColor;
           height: 20px;
+          font-size: 14px;
           line-height: 20px;
           &:hover {
             text-decoration: underline;
