@@ -123,12 +123,11 @@ onMounted(() => {
     &.avatar {
       .flex(flex-start,center);
       div.avatar-bg {
-        padding: 2px;
-        box-sizing: border-box;
         background: #fff;
         border-radius: 50%;
         height: 37px;
         width: 37px;
+        .flex(center,center);
         img {
           height: 35px;
           width: 35px;

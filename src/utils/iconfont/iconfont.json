@@ -1,0 +1,79 @@
+{
+  "id": "3541824",
+  "name": "netease-music-220723",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "网易音乐图标",
+  "glyphs": [
+    {
+      "icon_id": "2674928",
+      "name": "箭头 右",
+      "font_class": "arrow-right",
+      "unicode": "e62d",
+      "unicode_decimal": 58925
+    },
+    {
+      "icon_id": "2118488",
+      "name": "皇冠_king",
+      "font_class": "vip",
+      "unicode": "e655",
+      "unicode_decimal": 58965
+    },
+    {
+      "icon_id": "4933375",
+      "name": "人物-人",
+      "font_class": "renwu-ren",
+      "unicode": "e749",
+      "unicode_decimal": 59209
+    },
+    {
+      "icon_id": "18828410",
+      "name": "播放",
+      "font_class": "play1",
+      "unicode": "e615",
+      "unicode_decimal": 58901
+    },
+    {
+      "icon_id": "22227207",
+      "name": "开始",
+      "font_class": "daochu1024-15",
+      "unicode": "e616",
+      "unicode_decimal": 58902
+    },
+    {
+      "icon_id": "145438",
+      "name": "搜索",
+      "font_class": "sousuo",
+      "unicode": "e62f",
+      "unicode_decimal": 58927
+    },
+    {
+      "icon_id": "7425",
+      "name": "暂停",
+      "font_class": "pause",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
+      "icon_id": "688097",
+      "name": "上一首 上一个",
+      "font_class": "prev",
+      "unicode": "e78a",
+      "unicode_decimal": 59274
+    },
+    {
+      "icon_id": "688128",
+      "name": "下一个 下一首",
+      "font_class": "next",
+      "unicode": "e7a5",
+      "unicode_decimal": 59301
+    },
+    {
+      "icon_id": "4954913",
+      "name": "开始",
+      "font_class": "play",
+      "unicode": "e650",
+      "unicode_decimal": 58960
+    }
+  ]
+}

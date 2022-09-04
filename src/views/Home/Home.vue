@@ -24,20 +24,30 @@ import HomeAside from './home-aside.vue'
 
 <style lang="less" scoped>
 .el-container.home-container{
-  height: 500px;
+  height: 550px;
   width: 950px;
   box-shadow: 0 5px 10px @boxShadowColor,
               5px 0 10px @boxShadowColor,
               0 -5px 10px @boxShadowColor,
               -5px 0 10px @boxShadowColor;
-  border-radius: 5px;
-  .positions(50px);
+  border-radius: 3px;
+  overflow: hidden;
+  .positions(50px,50%);
   .el-header.home-h{
     background-color: @bgColor;
   }
   .el-container.home-c{
+    height: calc(100% - 120px);
     .el-aside{
       border-right: 1px solid @borderColor;
+    }
+    .el-main.home-m{
+      position: relative;
+      height: 100%;
+      overflow-y: scroll;
+      box-sizing: border-box;
+      padding-top: 20px;
+      background: #fff;
     }
   }
   .el-footer.home-f{

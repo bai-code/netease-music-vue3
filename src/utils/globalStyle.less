@@ -1,9 +1,9 @@
 // 全局样式
 
-.positions(@top) {
+.positions(@top,@left) {
   position: absolute;
   top: @top;
-  left: 50%;
+  left: @left;
   transform: translateX(-50%);
 }
 .pointer {
@@ -22,13 +22,13 @@
   background-position: @left @top;
 }
 
-.overflow{
+.overflow {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-.overflowMul(@num){
+.overflowMul(@num) {
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -37,10 +37,11 @@
 
 // 取消个别默认样式
 
-ul{
-	list-style: none;
+ul {
+  list-style: none;
+  padding-left: 0;
 }
 
-a{
-	text-decoration: none;
+a {
+  text-decoration: none;
 }

@@ -23,7 +23,7 @@ export default {
     }
   },
   actions: {
-    async userLogin({ state, commit }, { phone, password }) {
+    async userLogin({ commit }, { phone, password }) {
       const { token, profile } = await $axios.get(`/login/cellphone?phone=${phone}&password=${password}`)
       if (token) {
         const { avatarUrl, nickname } = profile

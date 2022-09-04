@@ -17,5 +17,6 @@ module.exports = {
     'space-before-function-paren': ["error", "never"],
     'no-tabs':['error',{ allowIndentationTabs: true }],
     'object-curly-spacing': ["error", "always"],
+    "no-unused-vars": ["error", { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }]
   }
 }

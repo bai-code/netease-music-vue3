@@ -1,5 +1,6 @@
 import { createStore } from 'vuex'
 import userinfo from './userInfo'
+import $axios from '@/Axios/index.js'
 
 export default createStore({
   state: {
@@ -11,8 +12,12 @@ export default createStore({
     }
   },
   actions: {
-    userLogin() {
-      console.log('2222222')
+    async getInfo(temp, { path }) {
+      const res = await $axios.get(`${path}`)
+      if (res.code === 200) {
+        return res
+      }
+      return {}
     }
   },
   modules: {
