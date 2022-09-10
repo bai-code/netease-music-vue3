@@ -13,7 +13,7 @@ import NavTitleSelect from '@/components/nav-title-select.vue'
 import Recommendation from '@/views/FindMusic/recommendation.vue'
 import SongList from '@/views/FindMusic/song-list.vue'
 
-const activeIndex = ref(0)
+const activeIndex = ref(1)
 
 // 标题区域
 const titleList = shallowRef([
@@ -62,6 +62,10 @@ div.nav-title {
     height: 36px;
     background: #fff;
     top: -36px;
+  }
+  .nav-title-select{
+    position: relative;
+    left: -10px;
   }
 }
 </style>

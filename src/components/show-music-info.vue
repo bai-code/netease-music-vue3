@@ -1,7 +1,7 @@
 <template>
-  <div class="show-item-info" ref="domRef">
-    <div class="image pointer" :style="{ height: domH }">
-      <img v-lazy="musicInfo.picUrl" alt="" />
+  <div class="show-item-info" :style="{ height: imgWH, width: imgWH }">
+    <div class="image pointer" >
+      <img v-lazy="musicInfo[showImgName]" alt="" />
       <div class="play-count" v-if="musicInfo.playCount">
         <i class="iconfont icon-play1"></i>
         <span>{{ showPlayCount }}</span>
@@ -17,12 +17,32 @@
 </template>
 
 <script setup>
-import { defineProps, computed, ref, onMounted } from 'vue'
+import { defineProps, computed } from 'vue'
 const props = defineProps({
   musicInfo: {
     type: Object,
-    reqiure: true,
-    default: () => {}
+    reqiured: true,
+    default: () => {
+      return {
+        picUrl: '',
+        name: '',
+        playCount: ''
+      }
+    }
+  },
+  showImgName: {
+    type: String,
+    default: 'picUrl'
+  },
+  imgWH: {
+    type: [String, Number],
+    default: '200px',
+    validator: (res) => {
+      if (typeof res === 'number') {
+        return res + 'px'
+      }
+      return res
+    }
   }
 })
 
@@ -36,12 +56,6 @@ const showPlayCount = computed(() => {
   return playCount
 })
 
-const domRef = ref()
-const domH = ref(0)
-
-onMounted(() => {
-  domH.value = domRef.value.offsetWidth + 'px'
-})
 </script>
 
 <style lang="less" scoped>

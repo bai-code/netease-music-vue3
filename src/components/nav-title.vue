@@ -1,7 +1,7 @@
 <template>
-  <div class="nav-title pointer">
-    <span>{{ titleText }}</span>
-    <i class="iconfont icon-arrow-right"></i>
+  <div class="nav-title ">
+    <span class="pointer">{{ titleText }}</span>
+    <i class="iconfont icon-arrow-right pointer"></i>
   </div>
 </template>
 
@@ -17,7 +17,6 @@ defineProps({
 
 <style lang="less" scoped>
 div.nav-title {
-  // .flex(flex-start,center);
   font-size: 18px;
   font-weight: bolder;
   margin: 10px 0 15px;

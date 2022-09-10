@@ -32,7 +32,7 @@ import HomeAside from './home-aside.vue'
               -5px 0 10px @boxShadowColor;
   border-radius: 3px;
   overflow: hidden;
-  .positions(50px,50%);
+  .positions(0px,50%);
   .el-header.home-h{
     background-color: @bgColor;
   }

@@ -9,12 +9,12 @@
   <div class="recommend-music">
     <NavTitle titleText="推荐音乐" />
     <div class="container">
-      <ShowMusicInfo :musicInfo="todayInfo">
+      <ShowMusicInfo :musicInfo="todayInfo" imgWH='18%' >
         <template #date-re>
           <span class="today">{{ today }}</span>
         </template>
       </ShowMusicInfo>
-      <ShowMusicInfo v-for="item in recommendList" :key="item.id" :musicInfo="item" />
+      <ShowMusicInfo v-for="item in recommendList" :key="item.id" :musicInfo="item" imgWH='18%' />
     </div>
   </div>
 
@@ -169,10 +169,10 @@ div.recommend-music {
       font-size: 24px;
       color: @contrastColor;
     }
-    .show-item-info {
-      width: 18%;
-      // overflow: hidden;
-    }
+    // .show-item-info {
+    //   width: 18%;
+    //   // overflow: hidden;
+    // }
   }
 }
 
@@ -229,4 +229,5 @@ div.new-songs {
     }
   }
 }
+
 </style>

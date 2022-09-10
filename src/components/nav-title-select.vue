@@ -18,13 +18,10 @@ defineProps({
 })
 
 const emits = defineEmits(['changeIndex'])
-// const itemIndex = ref(null)
 const selectItem = (index) => {
   emits('changeIndex', index)
 }
-// onMounted(() => {
-//   itemIndex.value = props.activeIndex
-// })
+
 </script>
 
 <style lang="less" scoped>
@@ -36,17 +33,15 @@ ul.nav-title-select {
     &.active {
       font-size: 18px;
       font-weight: bolder;
-      // border-bottom: 2px solid @bgColor;
-      // border-bottom-width: 80%;
       position: relative;
       &::after{
         content: '';
         position: absolute;
-        width: 70%;
+        width: 80%;
         background: @bgColor;
         height: 2px;
         bottom: 0;
-        left: 15%;
+        left: 10%;
       }
     }
   }
