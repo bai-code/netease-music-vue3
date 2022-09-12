@@ -6,6 +6,13 @@
   "description": "网易音乐图标",
   "glyphs": [
     {
+      "icon_id": "7594807",
+      "name": "24gl-folderPlus",
+      "font_class": "folder",
+      "unicode": "eabe",
+      "unicode_decimal": 60094
+    },
+    {
       "icon_id": "2674928",
       "name": "箭头 右",
       "font_class": "arrow-right",
@@ -36,7 +43,7 @@
     {
       "icon_id": "22227207",
       "name": "开始",
-      "font_class": "daochu1024-15",
+      "font_class": "hover",
       "unicode": "e616",
       "unicode_decimal": 58902
     },
