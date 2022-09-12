@@ -15,7 +15,7 @@
       </template>
     </NavTitleSlot>
     <!-- 表格 -->
-    <el-table :data="tableData[activeIndex]" style="width: 100%" :lazy="true" v-loading="isLoading">
+    <el-table :data="tableData[activeIndex]" style="width: 100%" :lazy="true" v-loading="isLoading" @row-dblclick="playMusic">
       <el-table-column type="#" width="50">
         <template #default="scope">
           <span class="index">{{ scope.row.index }}</span>
@@ -101,6 +101,11 @@ watchEffect(() => {
     getTableDataList(titleList[activeIndex.value].type)
   }
 })
+
+const playMusic = (row) => {
+  store.dispatch('getMusicInfo', { id: row.id })
+  console.log(row)
+}
 </script>
 
 <style lang="less" scoped>

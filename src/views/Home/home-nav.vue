@@ -85,7 +85,14 @@ const loadAll = () => {
   ]
 }
 
-const handleSelect = (item) => {
+const handleSelect = async(item) => {
+  const text = item.textContent
+  if (text === '退出登录') {
+    const flag = await store.dispatch('userInfo/userLogout')
+    if (flag) {
+      console.log('退出登录')
+    }
+  }
   console.log(item)
 }
 
@@ -164,6 +171,7 @@ onMounted(() => {
           border-radius: 3px;
           top: 35px;
           background: @contrastColor;
+          z-index: 9999;
           &:before,
           &:after {
             content: '';

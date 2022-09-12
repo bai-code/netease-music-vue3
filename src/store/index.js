@@ -2,13 +2,33 @@ import { createStore } from 'vuex'
 import userinfo from './userInfo'
 import $axios from '@/Axios/index.js'
 
+const audio = new Audio()
+
 export default createStore({
   state: {
-    nickname: 211
+    musicInfo: {
+      url: '',
+      level: 'exhigh',
+      md5: ''
+    }
   },
   mutations: {
-    saveUserInfo(state, payload) {
-      state.nickname += payload
+    saveMusicInfo(state, playload) {
+      const temp = state.musicInfo
+      for (const prop in playload) {
+        temp[prop] = playload[prop]
+      }
+    },
+    addAudioAttr(state, playload) {
+      for (const prop in playload) {
+        audio[prop] = playload[prop]
+      }
+    },
+    play() {
+      audio.play()
+    },
+    pause() {
+      audio.pause()
     }
   },
   actions: {
@@ -18,6 +38,16 @@ export default createStore({
         return res
       }
       return {}
+    },
+    async getMusicInfo({ commit }, { id, level = 'standard' /* 默认标准音质 */ }) {
+      const { code, data = [] } = await $axios.get(`/song/url/v1?id=${id}&level=${level}`)
+      if (code === 200) {
+        const { url, md5, level } = data[0]
+        commit('saveMusicInfo', { url, md5, level })
+        commit('addAudioAttr', { src: url })
+        commit('play')
+      }
+      console.log(data)
     }
   },
   modules: {
