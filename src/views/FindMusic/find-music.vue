@@ -12,9 +12,10 @@ import { ref, shallowRef } from 'vue'
 import NavTitleSelect from '@/components/nav-title-select.vue'
 import Recommendation from '@/views/FindMusic/recommendation.vue'
 import SongList from '@/views/FindMusic/song-list.vue'
+import RankingList from '@/views/FindMusic/ranking-list.vue'
 import LatestMusic from '@/views/FindMusic/latest-music.vue'
 
-const activeIndex = ref(4)
+const activeIndex = ref(2)
 
 // 标题区域
 const titleList = shallowRef([
@@ -31,7 +32,7 @@ const titleList = shallowRef([
   {
     id: 2,
     text: '排行榜',
-    cmp: Recommendation
+    cmp: RankingList
   },
   {
     id: 3,

@@ -11,20 +11,45 @@
         <img :src="userInfo.avatarUrl" alt="" />
       </div>
       <div class="userInfo">
-        <p class="overflow pointer" @click="spreadControls">{{ userInfo.nickname }}</p>
+        <p class="overflow pointer" @click="spreadControls" v-if="userInfo.token">{{ userInfo.nickname }}</p>
+        <p class="overflow pointer" @click="loginIn" v-else>{{ userInfo.nickname }}</p>
         <input type="text" @focus="inputFocus" @blur="inputBlur" ref="inputRef" class="_useIsSpread" />
-        <ul class="control" v-if="userInfo.token && isSpread" @click.capture="selectItem">
+        <ul class="control" v-if="userInfo.token && isSpread">
           <li class="pointer">用户信息</li>
-          <li class="pointer">退出登录</li>
+          <li class="pointer" @click="logout">退出登录</li>
         </ul>
       </div>
     </el-col>
   </el-row>
+
+  <!-- 登录弹窗 -->
+  <Teleport to="body">
+    <el-dialog v-model="dialogVisible" width="50%" :before-close="handleClose">
+      <template #header>
+        <div class="dialog-header">登录</div>
+      </template>
+      <el-form ref="ruleFormRef" :model="ruleForm" status-icon :rules="rules" label-width="120px" class="demo-ruleForm">
+        <el-form-item label="手机号：" prop="phone">
+          <el-input v-model="ruleForm.phone" type="text" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="密码：" prop="password">
+          <el-input v-model="ruleForm.password" type="password" autocomplete="off" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="resetForm(ruleFormRef)">重置</el-button>
+          <el-button type="primary" @click="submitForm(ruleFormRef)">登录</el-button>
+        </span>
+      </template>
+    </el-dialog>
+  </Teleport>
 </template>
 
 <script setup>
-import { ref, onMounted, computed, onBeforeUnmount } from 'vue'
+import { ref, onMounted, computed, onBeforeUnmount, reactive } from 'vue'
 import { useStore } from 'vuex'
+import { ElMessageBox, ElMessage } from 'element-plus'
 
 const store = useStore()
 const isSpread = ref(false) // 是否展开
@@ -36,6 +61,10 @@ const userInfo = computed(() => {
   return store.state.userinfo.userInfo
 })
 
+const handleSelect = (item) => {
+  console.log(item)
+}
+
 const inputFocus = () => {
   isSpread.value = true
 }
@@ -43,6 +72,10 @@ const inputBlur = () => {
   timer.value = setTimeout(() => {
     isSpread.value = false
   }, 150)
+}
+
+const loginIn = () => {
+  dialogVisible.value = true
 }
 const spreadControls = () => {
   if (isSpread.value) {
@@ -57,9 +90,13 @@ onBeforeUnmount(() => {
   timer.value = null
 })
 
-const selectItem = (e) => {
-  console.log(e.target)
-  inputBlur()
+const logout = async () => {
+  const flag = await store.dispatch('userinfo/userLogout')
+  ElMessage({
+    type: flag ? 'success' : 'error',
+    message: flag ? '退出登录成功' : '退出登录失败'
+  })
+  // console.log(flag)
 }
 
 const restaurants = ref([])
@@ -85,15 +122,83 @@ const loadAll = () => {
   ]
 }
 
-const handleSelect = async(item) => {
-  const text = item.textContent
-  if (text === '退出登录') {
-    const flag = await store.dispatch('userInfo/userLogout')
-    if (flag) {
-      console.log('退出登录')
+// 登录
+const dialogVisible = ref(false)
+
+const handleClose = (done) => {
+  ElMessageBox.confirm('Are you sure to close this dialog?')
+    .then(() => {
+      done()
+    })
+    .catch(() => {
+      // catch error
+    })
+}
+
+// form表单区域
+// const formRef = ref()
+
+const ruleFormRef = ref()
+
+const validatePhone = (rule, value, callback) => {
+  if (value === '') {
+    callback(new Error('请输入手机号码！！！'))
+  } else {
+    if (ruleForm.phone !== '') {
+      if (!ruleFormRef.value) return
+      const reg = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/
+      if (!reg.test(value)) {
+        callback(new Error('号码有误'))
+      } else {
+        callback()
+      }
+    }
+    callback()
+  }
+}
+const validatePassword = (rule, value, callback) => {
+  if (value === '') {
+    callback(new Error('请输入密码'))
+  } else {
+    const reg = /\w{6,16}/
+    if (!reg.test(value)) {
+      callback(new Error('密码不符合规范'))
+    } else {
+      callback()
     }
   }
-  console.log(item)
+}
+
+const ruleForm = reactive({
+  phone: '13735544745',
+  password: 'bgf1580087304'
+})
+
+const rules = reactive({
+  phone: [{ validator: validatePhone, trigger: 'blur' }, { required: true }],
+  password: [{ validator: validatePassword, trigger: 'blur' }, { required: true }]
+})
+
+const submitForm = (formEl) => {
+  if (!formEl) return
+  formEl.validate(async (valid) => {
+    if (valid) {
+      const flag = await store.dispatch('userinfo/userLogin', ruleForm)
+      ElMessage({
+        type: flag ? 'success' : 'error',
+        message: flag ? '登录成功' : 'error'
+      })
+    } else {
+      console.log('error submit!')
+      return false
+    }
+  })
+  dialogVisible.value = false
+}
+
+const resetForm = (formEl) => {
+  if (!formEl) return
+  formEl.resetFields()
 }
 
 onMounted(() => {
@@ -194,6 +299,15 @@ onMounted(() => {
         }
       }
     }
+  }
+}
+.el-dialog {
+  border-radius: 5px !important;
+  div.dialog-header {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bolder;
+    letter-spacing: 5px;
   }
 }
 </style>

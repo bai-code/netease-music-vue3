@@ -4,11 +4,13 @@ import avatarUrl from '@/static/temp-avatar.png'
 
 const userinfo = JSON.parse(localStorage.getItem('userinfo'))
 
-const userInfo = userinfo || {
+const tempUserInfo = {
   avatarUrl,
   nickname: '未登录',
   token: ''
 }
+
+const userInfo = userinfo || tempUserInfo
 
 export default {
   namespaced: true,
@@ -24,8 +26,9 @@ export default {
   },
   actions: {
     async userLogin({ commit }, { phone, password }) {
-      const { token, profile } = await $axios.get(`/login/cellphone?phone=${phone}&password=${password}`)
+      const { token, profile, cookie } = await $axios.get(`/login/cellphone?phone=${phone}&password=${password}`)
       if (token) {
+        console.log(profile, cookie)
         const { avatarUrl, nickname } = profile
         commit('saveInfo', { token, avatarUrl, nickname })
         return true
@@ -35,9 +38,12 @@ export default {
 
       // console.log(avatarUrl, nickname)
     },
-    async userLogout() {
-      const res = await $axios.get('/logout')
-      console.log(res)
+    async userLogout({ commit }) {
+      const { code } = await $axios.get('/logout')
+      if (code === 200) {
+        commit('saveInfo', tempUserInfo)
+      }
+      return code === 200
     }
   }
 }
