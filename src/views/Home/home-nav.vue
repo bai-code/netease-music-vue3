@@ -125,16 +125,6 @@ const loadAll = () => {
 // 登录
 const dialogVisible = ref(false)
 
-const handleClose = (done) => {
-  ElMessageBox.confirm('Are you sure to close this dialog?')
-    .then(() => {
-      done()
-    })
-    .catch(() => {
-      // catch error
-    })
-}
-
 // form表单区域
 // const formRef = ref()
 
@@ -199,6 +189,26 @@ const submitForm = (formEl) => {
 const resetForm = (formEl) => {
   if (!formEl) return
   formEl.resetFields()
+}
+
+const handleClose = (done) => {
+  let flag = false
+  for (const prop in ruleForm) {
+    if (ruleForm[prop]) {
+      flag = true
+    }
+  }
+  if (!flag) {
+    done()
+    return
+  }
+  ElMessageBox.confirm('已经填写账号/ 密码，是否关闭？？？？')
+    .then(() => {
+      done()
+    })
+    .catch(() => {
+      // catch error
+    })
 }
 
 onMounted(() => {
