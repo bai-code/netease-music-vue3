@@ -194,6 +194,7 @@ const submitForm = (formEl) => {
     }
   })
   dialogVisible.value = false
+  formEl.resetFields()
 }
 
 const resetForm = (formEl) => {
