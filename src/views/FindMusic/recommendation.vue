@@ -9,12 +9,12 @@
   <div class="recommend-music">
     <NavTitle titleText="推荐音乐" />
     <div class="container">
-      <ShowMusicInfo :musicInfo="todayInfo" imgWH='18%' >
+      <ShowMusicInfo :musicInfo="todayInfo" imgWH="18%">
         <template #date-re>
           <span class="today">{{ today }}</span>
         </template>
       </ShowMusicInfo>
-      <ShowMusicInfo v-for="item in recommendList" :key="item.id" :musicInfo="item" imgWH='18%' />
+      <ShowMusicInfo v-for="item in recommendList" :key="item.id" :musicInfo="item" imgWH="18%" />
     </div>
   </div>
 
@@ -114,7 +114,7 @@ const mvList = ref([])
 async function getMVList() {
   const { result } = await store.dispatch('getInfo', { path: '/personalized/mv' })
   const filterList = result.splice(0, 3)
-  mvList.value = jointSinger(filterList, 'author')
+  mvList.value = jointSinger({ musicList: filterList, str: 'author' })
   // console.log(mvList.value)
   // console.log(result)
 }
@@ -122,7 +122,7 @@ async function getMVList() {
 const newSongList = ref()
 async function getNewSongList() {
   const { result = [] } = await store.dispatch('getInfo', { path: '/personalized/newsong?limit=12' })
-  const res = jointSinger(result, 'singer', 'song')
+  const res = jointSinger({ musicList: result, value: 'song' })
   // console.log(res)
   newSongList.value = res
   // console.log(result)
@@ -169,10 +169,6 @@ div.recommend-music {
       font-size: 24px;
       color: @contrastColor;
     }
-    // .show-item-info {
-    //   width: 18%;
-    //   // overflow: hidden;
-    // }
   }
 }
 
@@ -229,5 +225,4 @@ div.new-songs {
     }
   }
 }
-
 </style>

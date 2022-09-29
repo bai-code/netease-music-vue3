@@ -7,37 +7,42 @@
       </div>
     </div>
     <transition name="fade" mode="out-in">
-      <component :is="activeCmpName" />
+      <keep-alive>
+        <component :is="activeCmpName" />
+      </keep-alive>
     </transition>
   </div>
 </template>
 
 <script setup>
-import { ref, shallowRef } from 'vue'
+import { ref, computed } from 'vue'
 import NewSongExpress from '@/views/FindMusic/latest-music/newsong-express.vue'
 import NewDisc from '@/views/FindMusic/latest-music/new-disc.vue'
 
 // import { useStore } from 'vuex'
 // const store = useStore()
 
-const cmpIndex = ref('0')
+const cmpIndex = ref('1')
 
-const activeCmpName = shallowRef(NewSongExpress) // 活跃的组件
+// const activeCmpName = ref(NewSongExpress) // 活跃的组件
+
+const activeCmpName = computed(() => {
+  if (cmpIndex.value === '0') {
+    return NewSongExpress
+  } else {
+    return NewDisc
+  }
+})
 
 const switchCmp = (e) => {
   const index = e.target.dataset.index
-  if (index === '0') {
-    activeCmpName.value = NewSongExpress
-  } else {
-    activeCmpName.value = NewDisc
-  }
   cmpIndex.value = index
 }
 </script>
 
 <style lang="less" scoped>
 div.latest-music {
-  overflow: hidden;
+  // overflow: hidden;
   div.switch-cmp {
     position: relative;
     height: 30px;
@@ -56,6 +61,9 @@ div.latest-music {
         }
       }
     }
+  }
+  div.cmp-container {
+    height: 100%;
   }
   .fade-enter-from {
     transform: translateY(600px);

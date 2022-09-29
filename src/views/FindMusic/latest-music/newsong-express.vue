@@ -3,7 +3,7 @@
     <NavTitleSlot :titleList="titleList" v-model:activeIndex="activeIndex">
       <template #controls>
         <div class="controls">
-          <div class="play-all pointer">
+          <div class="play-all pointer" @click="playAllMusic">
             <i class="iconfont icon-play"></i>
             <span class="play-a">播放全部</span>
           </div>
@@ -15,16 +15,19 @@
       </template>
     </NavTitleSlot>
     <!-- 表格 -->
-    <el-table :data="tableData[activeIndex]" style="width: 100%" :lazy="true" v-loading="isLoading" @row-dblclick="playMusic">
+    <el-table :data="tableData[activeIndex]" style="width: 100%" v-loading="isLoading" @row-dblclick="playMusic" :row-class-name="setRow">
       <el-table-column type="#" width="50">
         <template #default="scope">
-          <span class="index">{{ scope.row.index }}</span>
+          <span class="index" v-if="activeClassIndex + 1 != scope.row.index">{{ scope.row.index }}</span>
+          <span class="" v-else>
+            <i class="iconfont icon-yangshengqi"></i>
+          </span>
         </template>
       </el-table-column>
       <el-table-column prop="album" width="80">
         <template #default="scope">
           <!-- <span>{{ scope.row.album }}</span> -->
-          <el-image :src="scope.row.album.picUrl" loading="lazy" class="pointer">
+          <el-image :src="scope.row.album.blurPicUrl || scope.row.album.picUrl" loading="lazy" class="pointer" >
             <template #error>
               <span class="icon-c">
                 <i class="iconfont icon-hover"></i>
@@ -42,14 +45,15 @@
 </template>
 
 <script setup>
-import { shallowReactive, shallowRef, ref, watchEffect } from 'vue'
+import { shallowReactive, ref, watchEffect } from 'vue'
 import { useStore } from 'vuex'
 import NavTitleSlot from '@/components/nav-title-slot.vue'
-import { jointSinger } from '@/utils/plugins.js'
+import { jointSinger, playAndCommit } from '@/utils/plugins.js'
 
 const store = useStore()
 const activeIndex = ref(0)
 const isLoading = ref(false)
+const activeClassIndex = ref(-1)
 
 const titleList = shallowReactive([
   {
@@ -84,15 +88,23 @@ const titleList = shallowReactive([
   }
 ])
 
-const tableData = shallowRef([])
+const tableData = ref([])
 
 async function getTableDataList(type) {
   isLoading.value = true
+  console.log(isLoading.value)
   const { data = [] } = await store.dispatch('getInfo', { path: `/top/song?type=${type}` })
   // const filterData = jointSinger(data)
-  tableData.value[activeIndex.value] = jointSinger(data, 'singer', null, true, true)
+  tableData.value[activeIndex.value] = jointSinger({ musicList: data, needIndex: true, transTime: true })
   isLoading.value = false
-  console.log(data)
+  console.log(tableData.value, isLoading.value)
+}
+
+// 设置活跃项的class类名
+const setRow = ({ rowIndex }) => {
+  if (rowIndex === activeClassIndex.value) {
+    return 'row-active'
+  }
 }
 
 watchEffect(() => {
@@ -100,11 +112,16 @@ watchEffect(() => {
     tableData.value[activeIndex.value] = []
     getTableDataList(titleList[activeIndex.value].type)
   }
+  activeClassIndex.value = store.getters.findCurrentPageIndex(tableData.value[activeIndex.value])
 })
 
 const playMusic = (row) => {
-  store.dispatch('getMusicInfo', { id: row.id })
-  console.log(row)
+  playAndCommit({ store, musicList: tableData.value[activeIndex.value], musicInfo: row })
+}
+// 播放 所有音乐
+const playAllMusic = () => {
+  const row = tableData.value[activeIndex.value][0]
+  playMusic(row)
 }
 </script>
 
@@ -160,6 +177,10 @@ div.newsong-express {
             color: @bgColor;
           }
         }
+      }
+      .row-active {
+        background: @hoverColor;
+        color: @bgColor;
       }
 
       .cell {
