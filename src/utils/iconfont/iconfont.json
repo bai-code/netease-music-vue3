@@ -6,6 +6,55 @@
   "description": "网易音乐图标",
   "glyphs": [
     {
+      "icon_id": "595349",
+      "name": "评论",
+      "font_class": "comment",
+      "unicode": "e607",
+      "unicode_decimal": 58887
+    },
+    {
+      "icon_id": "1621094",
+      "name": "分享",
+      "font_class": "share",
+      "unicode": "e6fb",
+      "unicode_decimal": 59131
+    },
+    {
+      "icon_id": "2076196",
+      "name": "赞",
+      "font_class": "zan",
+      "unicode": "e870",
+      "unicode_decimal": 59504
+    },
+    {
+      "icon_id": "577406",
+      "name": "向左1",
+      "font_class": "arrow-left",
+      "unicode": "e779",
+      "unicode_decimal": 59257
+    },
+    {
+      "icon_id": "351760",
+      "name": "加号",
+      "font_class": "add",
+      "unicode": "e614",
+      "unicode_decimal": 58900
+    },
+    {
+      "icon_id": "10273624",
+      "name": "loading",
+      "font_class": "loading",
+      "unicode": "e891",
+      "unicode_decimal": 59537
+    },
+    {
+      "icon_id": "1010",
+      "name": "扬声器",
+      "font_class": "yangshengqi",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
       "icon_id": "7594807",
       "name": "24gl-folderPlus",
       "font_class": "folder",

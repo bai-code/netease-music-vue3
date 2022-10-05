@@ -23,7 +23,7 @@
       </ul>
     </div>
 
-    <div class="show-music-list">
+    <div class="show-music-list" v-loading="isLoading">
       <ShowMusicInfo v-for="list in showMusicList" :key="list.id" :musicInfo="list" showImgName="coverImgUrl" imgWH="22%" />
     </div>
     <div class="pagination" v-show="isShow">
@@ -45,12 +45,13 @@ const pagesize = ref(100) // 每页显示个数
 const total = ref(0) // 总计
 const domRef = ref()
 const isShow = ref(false)
+const isLoading = ref(false)
 
 const tagList = reactive([])
 async function getTagsList() {
   const { tags = [] } = await store.dispatch('getInfo', { path: '/playlist/hot' })
   tagList.push(...tags)
-  console.log(tagList)
+  // console.log(tagList)
 }
 
 const showTitleInfo = ref({})
@@ -69,17 +70,15 @@ async function getSongTitleInfo(cate) {
 async function getSongList(cate, offset) {
   const len = songList[activeIndex.value] && songList[activeIndex.value].length
   const start = offset * pagesize.value
-  console.log(len, start)
   // 如果需要的数据 在 songlist 范围内，或者总数数量去掉开始值 小于 每页数量 都不用请求
   if (len > start || (total.value && total.value <= start + pagesize.value)) {
     showMusicList.value = songList[activeIndex.value].slice(start, start + pagesize.value)
     return
   }
-  console.log(len, start)
-  // isShow.value = false
+  isLoading.value = true
   const res = await store.dispatch('getInfo', { path: `/top/playlist?cat=${cate}&limit=${pagesize.value}&offset=${start}` })
   if (res && res.playlists) {
-    console.log(songList[activeIndex.value])
+    // console.log(songList[activeIndex.value])
     if (!songList[activeIndex.value]) {
       songList[activeIndex.value] = []
       total.value = res.total
@@ -87,8 +86,9 @@ async function getSongList(cate, offset) {
     songList[activeIndex.value].push(...res.playlists)
     showMusicList.value = res.playlists
     isShow.value = true
-    console.log(res, len, total)
+    // console.log(res, len, total)
   }
+  isLoading.value = false
 }
 
 const changeSelectItem = (index) => {
@@ -104,7 +104,7 @@ const currentChange = (index) => {
   currentPage.value = index
   getSongList(btnText.value, index - 1)
   domRef.value.scrollIntoView(true)
-  console.log(currentPage.value)
+  // console.log(currentPage.value)
 }
 
 const btnText = computed(() => {
@@ -211,6 +211,7 @@ div.song-list {
   div.show-music-list {
     .flex(space-between,flex-start);
     flex-wrap: wrap;
+    min-height: 200px;
   }
   div.pagination {
     .flex(center, center);

@@ -26,9 +26,8 @@ export default {
   },
   actions: {
     async userLogin({ commit }, { phone, password }) {
-      const { token, profile, cookie } = await $axios.get(`/login/cellphone?phone=${phone}&password=${password}`)
+      const { token, profile } = await $axios.get(`/login/cellphone?phone=${phone}&password=${password}`)
       if (token) {
-        console.log(profile, cookie)
         const { avatarUrl, nickname } = profile
         commit('saveInfo', { token, avatarUrl, nickname })
         return true

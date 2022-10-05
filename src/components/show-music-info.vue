@@ -1,6 +1,6 @@
 <template>
-  <div class="show-item-info" :style="{ height: imgWH, width: imgWH }">
-    <div class="image pointer" >
+  <div class="show-music-info" :style="{ height: imgWH, width: imgWH }">
+    <div class="image pointer"  >
       <img v-lazy="musicInfo[showImgName]" alt="" />
       <div class="play-count" v-if="musicInfo.playCount">
         <i class="iconfont icon-play1"></i>
@@ -59,7 +59,7 @@ const showPlayCount = computed(() => {
 </script>
 
 <style lang="less" scoped>
-div.show-item-info {
+div.show-music-info {
   // height: 240px;
   position: relative;
   width: 200px;
