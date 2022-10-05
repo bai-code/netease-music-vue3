@@ -56,13 +56,6 @@ const store = useStore()
 //   console.log(groupTagList)
 // }
 
-// 九条数据
-const categoryTagList = ref([])
-const getVideoCategoryList = async () => {
-  const { data = [] } = await store.dispatch('getInfo', { path: '/video/category/list' })
-  categoryTagList.value = data
-  // console.log(categoryTagList)
-}
 const hasMore = ref(true)
 const videoList = reactive([])
 const isLoading = ref(false)
@@ -73,6 +66,7 @@ const getVideoList = async (id = '58100') => {
   const len = videoList[categoryActiveIndex.value].length
   isLoading.value = true
   const { hasmore, datas = [] } = await store.dispatch('getInfo', { path: `/video/group?id=${id}&offset=${len}` })
+  console.log(datas)
   if (datas.length === 0) {
     isLoading.value = false
     return
@@ -101,7 +95,6 @@ const videoId = computed(() => {
   return categoryTagList.value[categoryActiveIndex.value].id
 })
 
-// Uncaught (in promise) TypeError: Cannot destructure property 'containerEl' of 'el[SCOPE]' as it is undefined.
 // 切换分类
 const categoryActiveIndex = ref(0)
 const changeCategory = (index) => {
@@ -111,16 +104,25 @@ const changeCategory = (index) => {
   if (!videoList[categoryActiveIndex.value]) {
     videoList[categoryActiveIndex.value] = []
     getVideoList(videoId.value)
+    console.log('触发', videoId.value)
   }
+}
+
+// 九条数据
+const categoryTagList = ref([])
+const getVideoCategoryList = async () => {
+  const { data = [] } = await store.dispatch('getInfo', { path: '/video/category/list' })
+  categoryTagList.value = data
+  console.log(categoryTagList.value)
 }
 
 const isMounted = ref(false) // 用于element-plus   load事件
 
 onMounted(() => {
   // getVideoTagList()
-  changeCategory(0)
   isMounted.value = true
   getVideoCategoryList()
+  console.log('挂在')
   // getVideoList(videoId.value)
 })
 

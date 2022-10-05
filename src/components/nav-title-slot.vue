@@ -32,6 +32,7 @@ const changeIndex = (index) => {
 <style lang="less" scoped>
 div.nav-title-slot {
   .flex(space-between,center);
+  margin: 15px 0;
   ul.nav-title {
     .flex(flex-start,center);
     // color: @fontColor;

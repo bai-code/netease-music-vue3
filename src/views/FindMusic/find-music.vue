@@ -6,9 +6,12 @@
     <router-link :to="{ name: 'singer-list' }">歌手</router-link>
     <router-link :to="{ name: 'latest-music' }">最新音乐</router-link>
   </div>
-  <keep-alive>
-    <router-view></router-view>
-  </keep-alive>
+  
+  <router-view v-slot="{ Component }">
+    <keep-alive>
+      <component :is="Component" />
+    </keep-alive>
+  </router-view>
 </template>
 
 <script setup>

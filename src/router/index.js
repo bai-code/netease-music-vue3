@@ -1,8 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 // import Home from '../views/Home/Home.vue'
 import Nav from '@/views/Home/home-nav.vue'
-import Content from '@/views/Home/home-aside.vue'
+import Content from '@/views/Home/home-content.vue'
 import Footer from '@/views/Home/home-footer.vue'
+
+// const musicDetailContent = import('@/views/views-package/music-detail-content.vue')
 
 const routes = [
   {
@@ -13,7 +15,7 @@ const routes = [
     path: '/home',
     name: 'home',
     components: { nav: Nav, content: Content, footer: Footer },
-    // redirect: { name: 'podcast' },
+    redirect: { name: 'find-music' },
     children: [
       {
         path: 'find-music',
@@ -88,7 +90,7 @@ const routes = [
   {
     path: '/music-detail',
     name: 'music-detail',
-    components: { content: Content, footer: Footer }
+    components: { content: () => import('@/views/views-package/music-detail-content.vue'), footer: Footer }
   }
 ]
 

@@ -1,13 +1,18 @@
 <template>
   <el-row type="flex" justify="space-between" align="middle" class="footer-container">
     <el-col :span="6">
-      <div class="music-info">
-        <div class="music-img overflow">
-          <el-image :src="musicInfo.picUrl">
-            <template #placeholder>
-              <img :src="musicInfo.blurPicUrl" alt="" />
-            </template>
-          </el-image>
+      <div class="music-info" v-if="musicInfo.name">
+        <div class="music-img overflow pointer">
+          <el-image :src="musicInfo.picUrl"> </el-image>
+          <div class="mask-layer">
+            <!-- <i class="iconfont icon"></i> -->
+            <div class="arrow-up flexCenter" @click="goMusicDetailPage">
+              <i class="iconfont icon-arrow-up"></i>
+            </div>
+            <!-- <div class="arrow-down">
+              <i class="iconfont icon-arrow-down"></i>
+            </div> -->
+          </div>
         </div>
         <div class="music-name">
           <span class="overflow name">{{ musicInfo.name }}</span>
@@ -49,6 +54,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 
 const store = useStore()
 
@@ -84,6 +90,13 @@ const precentage = computed(() => {
 const currentTime = computed(() => {
   return store.getters.setCurrentTime
 })
+
+const router = useRouter()
+const goMusicDetailPage = () => {
+  const { id } = store.state.musicInfo
+  // console.log(id, router)
+  router.push({ name: 'music-detail', query: { id } })
+}
 </script>
 
 <style lang="less" scoped>
@@ -93,19 +106,47 @@ const currentTime = computed(() => {
   box-sizing: border-box;
   position: absolute;
   bottom: 0;
+  border-top: 1px solid @borderColor;
   width: 100%;
   div.music-info {
     height: 100%;
     display: flex;
     // width: 100%;
+
     div.music-img {
       flex: 0 0 auto;
       height: 50px;
       width: 50px;
       border-radius: 3px;
+      position: relative;
       .el-image {
+        position: absolute;
         width: 100%;
         height: 100%;
+      }
+      div.mask-layer {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        &:hover div.arrow-up {
+          opacity: 1;
+        }
+        div.arrow-up,
+        div.arrow-down {
+          // display: none;
+          position: absolute;
+          width: 100%;
+          opacity: 0;
+          height: 100%;
+          transition: opacity 0.4s ease-in-out;
+          &.arrow-up {
+            background: rgba(0, 0, 0, 0.4);
+            i.iconfont {
+              color: #fff;
+              font-size: 30px;
+            }
+          }
+        }
       }
     }
     div.music-name {
@@ -162,7 +203,7 @@ const currentTime = computed(() => {
         height: 20px;
         &.start-time,
         &.end-time {
-          width: 45px;
+          width: 60px;
           flex: 0 0 auto;
           text-align: center;
           color: @singerColor;

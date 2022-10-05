@@ -99,6 +99,7 @@ const store = createStore({
   actions: {
     async getInfo(temp, { path }) {
       const res = await $axios.get(`${path}`)
+      console.log(res)
       if (res && res.code === 200) {
         return res
       }

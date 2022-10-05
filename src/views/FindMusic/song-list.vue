@@ -164,10 +164,11 @@ div.song-list {
       div.icon-title {
         border: 1px solid @gold;
         width: 100px;
-        height: 30px;
+        height: 26px;
         line-height: 30px;
         border-radius: 30px;
         color: @gold;
+        font-size: 13px;
         .flex(center,center);
         i.iconfont {
           margin-right: 5px;
@@ -176,6 +177,7 @@ div.song-list {
       p {
         color: @contrastColor;
         font-size: 16px;
+        margin-top: 20px;
       }
     }
   }

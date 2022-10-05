@@ -46,7 +46,7 @@ div.latest-music {
   div.switch-cmp {
     position: relative;
     height: 30px;
-    margin: 10px 0;
+    margin: 2px 0;
     .flex(center,center);
     div.cmp {
       border: 2px solid @borderColor;

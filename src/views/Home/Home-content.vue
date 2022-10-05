@@ -1,15 +1,19 @@
 <template>
   <el-container class="home-content">
-    <el-aside width="200px">Aside</el-aside>
-    <el-main>Main</el-main>
+    <el-aside width="200px">
+      <HomeAside />
+    </el-aside>
+    <el-main>
+      <router-view />
+    </el-main>
   </el-container>
 </template>
 
 <script setup>
 // @ is an alias to /src
-import HomeNav from './home-nav.vue'
+// import HomeNav from './home-nav.vue'
 import HomeAside from './home-aside.vue'
-import HomeFooter from './home-footer.vue'
+// import HomeFooter from './home-footer.vue'
 import { useStore } from 'vuex'
 import { onMounted } from 'vue'
 import audio from '@/utils/audio.js'
@@ -27,11 +31,17 @@ onMounted(() => {
   audio.addEventListener('ended', function () {
     store.dispatch('changeMusic', { params: 'next' })
   })
-  // store.dispatch('changeMusic', { params: 'next' })
 })
 </script>
 
 <style lang="less" scoped>
+
+  .el-container.home-content{
+    height: calc(100% - 60px - 70px);
+    .el-aside{
+      border-right: 1px solid @borderColor;
+    }
+  }
 // .el-row.home-content{
 //   // height: 100%;
 // }

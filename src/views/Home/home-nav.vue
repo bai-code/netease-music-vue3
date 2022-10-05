@@ -1,24 +1,30 @@
 <template>
-  <el-row type="flex" justify="space-between" align="middle" class="home-nav" >
+  <el-row type="flex" justify="space-between" align="middle" class="home-nav">
     <el-col :span="5">
-      <div class="logo pointer"></div>
+      <slot name="logo">
+        <div class="logo pointer"></div>
+      </slot>
     </el-col>
     <el-col :span="5">
-      <el-autocomplete v-model="inputValue" :fetch-suggestions="querySearch" :trigger-on-focus="false" clearable class="inline-input" placeholder="请输入歌名/歌手" @select="handleSelect" />
+      <slot name="search">
+        <el-autocomplete v-model="inputValue" :fetch-suggestions="querySearch" :trigger-on-focus="false" clearable class="inline-input" placeholder="请输入歌名/歌手" @select="handleSelect" />
+      </slot>
     </el-col>
     <el-col :span="5" class="avatar">
-      <div class="avatar-bg">
-        <img :src="userInfo.avatarUrl" alt="" />
-      </div>
-      <div class="userInfo">
-        <p class="overflow pointer" @click="spreadControls" v-if="userInfo.token">{{ userInfo.nickname }}</p>
-        <p class="overflow pointer" @click="loginIn" v-else>{{ userInfo.nickname }}</p>
-        <input type="text" @focus="inputFocus" @blur="inputBlur" ref="inputRef" class="_useIsSpread" />
-        <ul class="control" v-if="userInfo.token && isSpread">
-          <li class="pointer">用户信息</li>
-          <li class="pointer" @click="logout">退出登录</li>
-        </ul>
-      </div>
+      <slot name="avatar">
+        <div class="avatar-bg">
+          <img :src="userInfo.avatarUrl" alt="" />
+        </div>
+        <div class="userInfo">
+          <p class="overflow pointer" @click="spreadControls" v-if="userInfo.token">{{ userInfo.nickname }}</p>
+          <p class="overflow pointer" @click="loginIn" v-else>{{ userInfo.nickname }}</p>
+          <input type="text" @focus="inputFocus" @blur="inputBlur" ref="inputRef" class="_useIsSpread" />
+          <ul class="control" v-if="userInfo.token && isSpread">
+            <li class="pointer">用户信息</li>
+            <li class="pointer" @click="logout">退出登录</li>
+          </ul>
+        </div>
+      </slot>
     </el-col>
   </el-row>
 
