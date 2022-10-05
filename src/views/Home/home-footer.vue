@@ -88,7 +88,12 @@ const currentTime = computed(() => {
 
 <style lang="less" scoped>
 .el-row.footer-container {
-  height: 100%;
+  height: 70px;
+  padding: 0 20px;
+  box-sizing: border-box;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
   div.music-info {
     height: 100%;
     display: flex;

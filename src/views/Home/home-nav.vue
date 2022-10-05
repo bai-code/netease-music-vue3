@@ -1,5 +1,5 @@
 <template>
-  <el-row type="flex" justify="space-between" align="middle">
+  <el-row type="flex" justify="space-between" align="middle" class="home-nav" >
     <el-col :span="5">
       <div class="logo pointer"></div>
     </el-col>
@@ -218,8 +218,11 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
-.el-row {
-  height: 100%;
+.el-row.home-nav {
+  height: 60px;
+  padding: 0 20px;
+  box-sizing: border-box;
+  background: @bgColor;
   .el-col {
     div.logo {
       .bgSrc('~@/static/tabbar.png',0,-15px);

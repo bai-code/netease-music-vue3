@@ -1,7 +1,7 @@
 <template>
   <el-row type="flex" class="video-detail" :gutter="20">
     <el-col :span="16" class="video-detail__content">
-      <div class="icon pointer">
+      <div class="icon pointer" @click="$router.back()">
         <i class="iconfont icon-arrow-left"></i>
         <span>视频详情</span>
       </div>
