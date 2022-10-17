@@ -123,7 +123,7 @@ onMounted(() => {
       .bgSrc('~@/static/tabbar.png',0,-15px);
       height: 40px;
     }
-    /deep/.el-autocomplete.inline-input {
+    :deep(.el-autocomplete.inline-input) {
       .el-input__wrapper {
         border-radius: 30px !important;
         background-color: rgba(100, 100, 100, 0.1);

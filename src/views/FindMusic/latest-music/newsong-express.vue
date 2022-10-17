@@ -159,7 +159,7 @@ div.newsong-express {
 
   // 表格
   .el-table {
-    /deep/.el-table__body {
+    :deep(.el-table__body) {
       tr {
         height: 80px;
       }
