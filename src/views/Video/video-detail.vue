@@ -55,7 +55,7 @@
               <span class="count">({{ videoInfo.commentCount }})</span>
             </el-col>
             <div class="textarea">
-              <el-input type="textarea" resize="none" v-model="inputValue" always :rows="4" playholder="接口数据提交异常，提交后间隔一段时间刷新尝试！！！"></el-input>
+              <el-input type="textarea" resize="none" v-model="inputValue" always :rows="4" placeholder="接口数据提交异常，提交后间隔一段时间刷新尝试！！！"></el-input>
               <span :class="[{ error: 140 - inputValue.length < 0 }, 'show-textCount']">{{ 140 - inputValue.length }}</span>
             </div>
             <div class="submit">
