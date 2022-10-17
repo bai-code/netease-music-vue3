@@ -1,6 +1,6 @@
 <template>
   <el-carousel v-if="bannerList.length" :interval="4000" type="card" height="200px" :initial-index="0">
-    <el-carousel-item v-for="banner in bannerList" :key="banner.targetId">
+    <el-carousel-item v-for="banner in bannerList" :key="banner.targetId" @click="playMusic(banner)">
       <img :src="banner.imageUrl" :alt="banner.typeTitle" />
       <span class="mark" :style="{ backgroundColor: banner.titleColor }">{{ banner.typeTitle }}</span>
     </el-carousel-item>
@@ -53,7 +53,7 @@
 
   <!-- 新歌推荐 -->
   <div class="new-songs">
-    <NavTitle titleText="最新音乐" />
+    <NavTitle titleText="最新音乐" @linkPage="linkPage" />
     <div class="container">
       <show-music-info-s v-for="song in newSongList" :key="song.id" :musicInfo="song" />
     </div>
@@ -68,7 +68,8 @@ import ShowMusicInfo from '@/components/show-music-info.vue'
 import datePng from '@/static/tempDateBg.png'
 import ShowMusicInfoS from '@/components/show-music-info-s.vue'
 import ShowMvList from '@/components/show-mv-list.vue'
-import { jointSinger } from '@/utils/plugins.js'
+import { jointSinger, playAndCommit } from '@/utils/plugins.js'
+import { useRouter } from 'vue-router'
 
 const containerRef = ref()
 const store = useStore()
@@ -126,6 +127,30 @@ async function getNewSongList() {
   // console.log(res)
   newSongList.value = res
   // console.log(result)
+}
+const router = useRouter()
+const playMusic = async (info) => {
+  if (info.url) {
+    // 外链跳转
+    window.open(info.url, '_blank')
+  } else {
+    if (info.targetType === 1) {
+      // 播放单首歌曲
+      const { songs = [] } = await store.dispatch('getInfo', { path: `/song/detail?ids=${info.targetId}` })
+      playAndCommit({ store, musicInfo: songs[0] })
+    } else if (info.targetType === 1000) {
+      // 歌单
+      router.push({ name: 'music-list', params: { id: info.targetId }, query: { argu: 'playlist' } })
+    } else {
+      // 新碟首发  数字专辑
+      router.push({ name: 'music-list', params: { id: info.targetId } })
+    }
+  }
+  console.log(info)
+}
+
+const linkPage = () => {
+  router.push({ name: 'latest-music' })
 }
 
 onMounted(() => {

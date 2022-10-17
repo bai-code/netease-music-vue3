@@ -28,6 +28,20 @@ const selectItem = (index) => {
 ul.nav-title-select {
   .flex(flex-start,center);
   padding: 5px 0 10px;
+  background: #fff;
+  position: sticky;
+  box-sizing: border-box;
+  top: 0;
+  z-index: 11;
+  &::after{
+    content: '';
+    height: 20px;
+    background: inherit;
+    top: -20px;
+    left: 0;
+    width: 100%;
+    position: absolute;
+  }
   li {
     padding: 5px 10px;
     &.active {

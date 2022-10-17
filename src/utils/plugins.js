@@ -45,7 +45,7 @@ export const transformTime = (t, isMs = true) => {
   }
   const m = Math.floor(time / 60)
   const s = Math.floor(time % 60)
-  return `${fillNum(m)} : ${fillNum(s)}`
+  return `${fillNum(m)}:${fillNum(s)}`
 }
 
 /**
@@ -59,7 +59,7 @@ export const transformTime = (t, isMs = true) => {
  *
  * @returns  返回数组
  */
-export const jointSinger = ({ musicList = [], str = 'singer', value, needIndex = false, transTime = false, artists = 'artists', params = 'name' }) => {
+export const jointSinger = ({ musicList = [], str = 'singer', value, needIndex = false, transTime = false, artists = 'artists', params = 'name', timeName = 'duration' }) => {
   musicList.forEach((item, index) => {
     if (!value) {
       item[str] = forEachFilter(item[artists], '', params)
@@ -70,7 +70,7 @@ export const jointSinger = ({ musicList = [], str = 'singer', value, needIndex =
       item.index = fillNum(index + 1)
     }
     if (transTime) {
-      item.durationTime = transformTime(item.duration)
+      item.durationTime = transformTime(item[timeName])
     }
   })
   return musicList
@@ -98,5 +98,54 @@ export const playAndCommit = ({ store, musicList = [], /* 传递的数组 */ ind
     store.dispatch('getMusicInfo', { musicInfo })
   }
   store.commit('saveMusicList', { musicList })
-  console.log('提交并播放', musicList[index])
+}
+
+export const computedCount = (count = 0) => {
+  if (count / 100000000 >= 1) {
+    return parseInt(count / 100000000) + '亿'
+  } else if (count / 10000 >= 1) {
+    return parseInt(count / 10000) + '万'
+  } else {
+    return count
+  }
+}
+/**
+ * query  遍历对象需要匹配的某个属性
+ * @param {*} param0 匹配的值
+ * @returns 返回索引
+ */
+export const findItemIndex = ({ musicList = [], query = 'name', params }) => {
+  return musicList.findIndex((item) => {
+    return item[query] === params
+  })
+}
+
+// 判断数据类型
+export const judgeType = (params) => {
+  return Object.prototype.toString.call(params).slice(8, -1).toLowerCase()
+}
+
+/**
+ * query   需要匹配对象的某个属性【array / string】
+ * @param {*} param0 匹配相等的值
+ *         params='name'  嵌套后要取的值
+ * @returns
+ */
+export const filterMusicList = ({ musicList = [], query, params, params1 = 'name' }) => {
+  return musicList.filter((item) => {
+    if (judgeType(query) === 'array') {
+      return query.some((prop) => {
+        if (prop === 'al') {
+          return new RegExp(params, 'i').test(item[prop][params1])
+        }
+        return new RegExp(params, 'i').test(item[prop])
+      })
+    } else {
+      return new RegExp(params, 'i').test(item[query])
+    }
+  })
+  // console.log(judgeType('sfsdf'), musicList, params, query)
+  // return musicList.filter((item) => {
+
+  // })
 }

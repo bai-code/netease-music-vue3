@@ -118,14 +118,14 @@ const getDiscList = async (month, year) => {
   }
   timeout.value = true
   isLoading.value = false
-  console.log(tableDate)
+  // console.log(tableDate)
 }
 
 // const router = useRouter()
 const firstShowMonth = ref(true)
 const load = () => {
   const name = router.currentRoute.value.name
-  console.log(router.currentRoute.value)
+  // console.log(router.currentRoute.value)
   if (name !== 'latest-music') return
   if (isLoading.value || !timeout.value) return
   if (firstShowMonth.value) {
@@ -140,8 +140,6 @@ const load = () => {
     todayMonth -= 1
   }
   getDiscList(todayMonth, todayYear)
-
-  console.log('c=触发一次')
 }
 
 // let tempLoad = function () {}
@@ -170,6 +168,9 @@ onMounted(() => {
 <style lang="less" scoped>
 div.new-disc {
   min-height: 40px;
+  .nav-title-slot{
+    width: calc(100% - 10px);
+  }
   div.recommend-all {
     span {
       &.all {

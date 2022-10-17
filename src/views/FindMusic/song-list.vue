@@ -24,7 +24,7 @@
     </div>
 
     <div class="show-music-list" v-loading="isLoading">
-      <ShowMusicInfo v-for="list in showMusicList" :key="list.id" :musicInfo="list" showImgName="coverImgUrl" imgWH="22%" />
+      <ShowMusicInfo v-for="list in showMusicList" :key="list.id" :musicInfo="list" showImgName="coverImgUrl" imgWH="22%" :isRedirect="true" />
     </div>
     <div class="pagination" v-show="isShow">
       <el-pagination layout="prev, pager, next" :total="total" @current-change="currentChange" :page-count="pagecount" :current-page="currentPage" />
@@ -146,11 +146,11 @@ div.song-list {
       // background-size: 100% 100%;
       left: 0;
       z-index: 1;
-      filter: blur(27px);
+      filter: blur(25px);
     }
     img {
       position: relative;
-      z-index: 99;
+      z-index: 9;
       height: 140px;
       width: 140px;
       border-radius: 5px;
@@ -158,7 +158,7 @@ div.song-list {
     }
     div.show-info {
       position: relative;
-      z-index: 99;
+      z-index: 9;
       flex: 0 0 auto;
       width: calc(100% - 200px);
       div.icon-title {

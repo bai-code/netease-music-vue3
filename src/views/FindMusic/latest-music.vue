@@ -19,9 +19,6 @@ import { ref, computed } from 'vue'
 import NewSongExpress from '@/views/FindMusic/latest-music/newsong-express.vue'
 import NewDisc from '@/views/FindMusic/latest-music/new-disc.vue'
 
-// import { useStore } from 'vuex'
-// const store = useStore()
-
 const cmpIndex = ref('1')
 
 // const activeCmpName = ref(NewSongExpress) // 活跃的组件
@@ -42,7 +39,7 @@ const switchCmp = (e) => {
 
 <style lang="less" scoped>
 div.latest-music {
-  // overflow: hidden;
+  overflow: hidden;
   div.switch-cmp {
     position: relative;
     height: 30px;

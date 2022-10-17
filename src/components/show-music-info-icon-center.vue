@@ -2,7 +2,7 @@
   <div class="show-music-info-icon-center pointer" ref="conRef">
     <div class="image-c" :style="{ width: imgH, height: imgH }" @click="playMusic">
       <!-- <el-image lazy :src="musicInfo.picUrl"></el-image> -->
-      <img v-lazy="musicInfo[showImgName]" alt="" class="el-image" />
+      <img v-lazy="musicInfo[showImgName] || musicInfo.picUrl || ''" alt="" class="el-image" />
       <span class="show-icon">
         <i class="iconfont icon-hover"></i>
       </span>
@@ -27,10 +27,10 @@ const props = defineProps({
     default: 'picUrl'
   }
 })
-const emit = defineEmits(['playMusic'])
+const emits = defineEmits(['playMusic'])
 
 const playMusic = () => {
-  emit('playMusic', props.musicInfo)
+  emits('playMusic', props.musicInfo)
 }
 
 const conRef = ref()

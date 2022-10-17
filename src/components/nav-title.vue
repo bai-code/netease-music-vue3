@@ -1,18 +1,24 @@
 <template>
-  <div class="nav-title ">
+  <div class="nav-title" @click="linkPage">
     <span class="pointer">{{ titleText }}</span>
     <i class="iconfont icon-arrow-right pointer"></i>
   </div>
 </template>
 
 <script setup>
-import { defineProps } from 'vue'
+import { defineProps, defineEmits } from 'vue'
 defineProps({
   titleText: {
     type: String,
     require: true
   }
 })
+
+const emits = defineEmits(['linkPage'])
+
+const linkPage = () => {
+  emits('linkPage')
+}
 </script>
 
 <style lang="less" scoped>

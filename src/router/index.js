@@ -60,11 +60,11 @@ const routes = [
         name: 'video',
         component: () => import('@/views/Video/video.vue')
       },
-      {
-        path: 'video-list',
-        name: 'video-list',
-        component: () => import('@/views/Video/video-detail.vue')
-      },
+      // {
+      //   path: 'video-list',
+      //   name: 'video-list',
+      //   component: () => import('@/views/Video/video-detail.vue')
+      // },
       {
         path: 'attention',
         name: 'attention',
@@ -76,21 +76,36 @@ const routes = [
         component: () => import('@/views/PersonalFM/personal-fm.vue')
       },
       {
-        path: 'music-list/:id',
+        path: 'music-list/:id?',
         name: 'music-list',
         component: () => import('@/views/Music-list/music-list.vue')
+      },
+      {
+        path: 'song-list-package/:pId', // 歌单 playlist  id
+        name: 'song-list-package',
+        component: () => import('@/views/Music-list/song-list-package.vue')
+      },
+      {
+        path: 'song-list-package/:pId/link-userInfo/:userId',
+        name: 'link-userInfo',
+        component: () => import('@/views/Music-list/song-list-package/link-userInfo.vue')
+      },
+      {
+        path: 'login',
+        name: 'login',
+        component: () => import('@/views/Login/login.vue')
       }
     ]
   },
   {
     path: '/video-detail',
     name: 'video-detail',
-    components: { nav: Nav, content: Content }
+    components: { nav: Nav, content: () => import('@/views/Video/video-detail.vue') }
   },
   {
     path: '/music-detail',
     name: 'music-detail',
-    components: { content: () => import('@/views/views-package/music-detail-content.vue'), footer: Footer }
+    components: { footer: Footer }
   }
 ]
 

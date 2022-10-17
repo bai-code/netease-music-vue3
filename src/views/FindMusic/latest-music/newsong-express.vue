@@ -26,7 +26,6 @@
       </el-table-column>
       <el-table-column prop="album" width="80">
         <template #default="scope">
-          <!-- <span>{{ scope.row.album }}</span> -->
           <el-image :src="scope.row.album.blurPicUrl || scope.row.album.picUrl" loading="lazy" class="pointer" >
             <template #error>
               <span class="icon-c">
@@ -127,6 +126,9 @@ const playAllMusic = () => {
 
 <style lang="less" scoped>
 div.newsong-express {
+  .nav-title-slot{
+    width: calc(100% - 10px)
+  }
   div.controls {
     .flex(space-around,center);
     font-size: 12px;

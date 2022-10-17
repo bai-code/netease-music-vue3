@@ -6,6 +6,41 @@
   "description": "网易音乐图标",
   "glyphs": [
     {
+      "icon_id": "4651927",
+      "name": "男",
+      "font_class": "man",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "12661313",
+      "name": "女",
+      "font_class": "woman",
+      "unicode": "e667",
+      "unicode_decimal": 58983
+    },
+    {
+      "icon_id": "4175512",
+      "name": "上箭头",
+      "font_class": "pull-up",
+      "unicode": "eb6e",
+      "unicode_decimal": 60270
+    },
+    {
+      "icon_id": "4175511",
+      "name": "下箭头",
+      "font_class": "pull-down",
+      "unicode": "eb6d",
+      "unicode_decimal": 60269
+    },
+    {
+      "icon_id": "145497",
+      "name": "下载",
+      "font_class": "download",
+      "unicode": "e668",
+      "unicode_decimal": 58984
+    },
+    {
       "icon_id": "14732",
       "name": "向下",
       "font_class": "arrow-down",

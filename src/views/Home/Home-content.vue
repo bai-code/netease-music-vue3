@@ -4,7 +4,11 @@
       <HomeAside />
     </el-aside>
     <el-main>
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <keep-alive>
+          <component :is="Component" />
+        </keep-alive>
+      </router-view>
     </el-main>
   </el-container>
 </template>
@@ -35,13 +39,12 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
-
-  .el-container.home-content{
-    height: calc(100% - 60px - 70px);
-    .el-aside{
-      border-right: 1px solid @borderColor;
-    }
+.el-container.home-content {
+  height: calc(100% - 60px - 70px);
+  .el-aside {
+    border-right: 1px solid @borderColor;
   }
+}
 // .el-row.home-content{
 //   // height: 100%;
 // }

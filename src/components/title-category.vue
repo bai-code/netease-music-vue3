@@ -2,9 +2,7 @@
   <el-row class="container title-category" type="flex" justify="space-between" align="middle">
     <slot name="left">占位</slot>
     <ul class="category">
-      <li :class="[{ active: activeIndex === index }, 'c-item', 'pointer']" v-for="(title, index) in categoryList"
-			:key="title.id"
-			@click="changeCategory(index)">
+      <li :class="[{ active: activeIndex === index }, 'c-item', 'pointer']" v-for="(title, index) in categoryList" :key="title.id" @click="changeCategory(index)">
         {{ title.name }}
       </li>
     </ul>
@@ -13,7 +11,7 @@
 
 <script setup>
 import { defineProps, defineEmits } from 'vue'
-const props = defineProps({
+defineProps({
   categoryList: {
     type: Array,
     required: true
@@ -29,8 +27,6 @@ const emits = defineEmits(['changeCategory'])
 const changeCategory = (index) => {
   emits('changeCategory', index)
 }
-
-console.log(props)
 </script>
 
 <style lang="less" scoped>

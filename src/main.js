@@ -27,11 +27,11 @@ app.component('Loading', Loading)
 
 app.use(LazyLoad, {
   loading,
-  error: tempPng,
-  onerror: (el) => {
-    el.src = tempPng
-    console.log('图片加载失败')
-  }
+  error: tempPng
+  // onerror: (el) => {
+  //   el.src = tempPng
+  //   console.log('图片加载失败')
+  // }
 })
 
 app.mount('#app')

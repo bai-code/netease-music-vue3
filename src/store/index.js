@@ -2,9 +2,10 @@ import { createStore } from 'vuex'
 import userinfo from './userInfo'
 import $axios from '@/Axios/index.js'
 // import { transformTime } from '@/utils/plugins.js'
-import audio, { $audio } from '@/utils/audio.js'
+import { $audio } from '@/utils/audio.js'
 import { transformTime } from '@/utils/plugins.js'
 import comment from './comment.js'
+import { ElMessage } from 'element-plus'
 
 const info = localStorage.getItem('musicInfo')
 const tempMusicInfo = {
@@ -27,6 +28,7 @@ const store = createStore({
     musicList,
     currentTime: 0, // 播放到哪
     precentage: 0, // 进度条
+    durationTime: 100,
     isPlay: false
   },
   getters: {
@@ -40,7 +42,16 @@ const store = createStore({
     },
     setCurrentTime(state) {
       const { currentTime } = state
-      return transformTime(Math.round(currentTime), false)
+      const startTime = transformTime(Math.round(currentTime), false)
+      if (/NaN/.test(startTime)) {
+        return '00:00'
+      } else {
+        return startTime
+      }
+    },
+    setDurationTime(state) {
+      const { durationTime } = state
+      return transformTime(Math.round(durationTime), false)
     },
     findCurrentPageIndex(state) {
       // 计算当前页面是否存在播放的歌曲 添加类名
@@ -66,7 +77,7 @@ const store = createStore({
       const info = state.musicInfo
       for (const prop in info) {
         if (prop === 'picUrl') {
-          info[prop] = (payload.album && payload.album.picUrl) || (payload.ar && payload.al.picUrl) || info[prop]
+          info[prop] = (payload.album && payload.album.picUrl) || (payload.ar && payload.al.picUrl) || (payload.al && payload.al.picUrl) || payload.picUrl || info[prop]
         } else {
           info[prop] = payload[prop] || info[prop]
         }
@@ -81,7 +92,9 @@ const store = createStore({
     },
     saveUpdateTime(state, payload) {
       const { durationTime, currentTime } = payload
-      state.durationTime = durationTime
+      if (durationTime) {
+        state.durationTime = durationTime
+      }
       state.currentTime = currentTime
     },
     changePlayStatus(state, { isPlay }) {
@@ -99,54 +112,71 @@ const store = createStore({
   actions: {
     async getInfo(temp, { path }) {
       const res = await $axios.get(`${path}`)
-      console.log(res)
+      // console.log(res)
       if (res && res.code === 200) {
         return res
       }
       return {}
     },
-    async getMusicInfo({ commit }, { musicInfo = {}, isPlay = true /* 默认播放 */ }) {
+    async getMusicInfo({ commit }, { musicInfo = {}, isPlay = true /* 默认播放 */, isNext = false }) {
       const { id, level = 'standard' } = musicInfo
       // console.log(id, musicInfo)
       if (!id) return
       const { code, data = [] } = await $axios.get(`/song/url/v1?id=${id}&level=${level}`)
       if (code === 200) {
         const { url } = data[0]
-        let oldTime = 0
-        const newMusicInfo = Object.assign({}, musicInfo, { url })
+        if (!url) {
+          if (!isNext) {
+            ElMessage({
+              type: 'error',
+              message: '获取歌曲资源失败'
+            })
+          }
+          return false
+        }
+        const durationTime = transformTime(data[0].time, true)
+        // let oldTime = 0
+        const newMusicInfo = Object.assign({}, musicInfo, { url, durationTime })
         $audio.giveAddress(url, isPlay)
         commit('changePlayStatus', { isPlay })
         commit('savePlayMusicInfo', newMusicInfo)
-        audio.addEventListener('timeupdate', function () {
-          // 减少提交mutation
-          const time = parseInt(this.currentTime)
-          if (oldTime === time) return
-          commit('saveUpdateTime', { currentTime: this.currentTime, durationTime: this.duration })
-          oldTime = time
-        })
+        commit('saveUpdateTime', { durationTime: parseInt(data[0].time / 1000) })
+        return true
       }
       // console.log('获取歌曲地址', data[0], id)
-      // console.log(data)
+      // console.log(data[0])
     },
-    changeMusic({ state, getters, dispatch }, { params = 'next' }) {
+    async changeMusic({ state, getters, dispatch }, { params = 'next' }) {
       const { musicList } = state
       let index = getters.findCurrentPageIndex(musicList)
       const len = musicList.length
       // console.log(index)
-      if (params === 'next') {
-        if (index + 1 >= len) {
-          index = 0
+      let flag = true
+
+      while (flag) {
+        if (params === 'next') {
+          if (index + 1 >= len) {
+            index = 0
+          } else {
+            index += 1
+          }
         } else {
-          index += 1
+          if (index - 1 < 0) {
+            index = len - 1
+          } else {
+            index -= 1
+          }
         }
-      } else {
-        if (index - 1 < 0) {
-          index = len - 1
+        const res = await dispatch('getMusicInfo', { musicInfo: musicList[index], isNext: true })
+        if (res) {
+          flag = false
         } else {
-          index -= 1
+          ElMessage({
+            type: 'error',
+            message: '获取资源失败，自动下一首'
+          })
         }
       }
-      dispatch('getMusicInfo', { musicInfo: musicList[index] })
       // console.log('下一首', index + 1)
     }
   },

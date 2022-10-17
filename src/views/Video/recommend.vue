@@ -38,7 +38,7 @@ const playCount = computed(() => {
 
 const router = useRouter()
 const playVideo = () => {
-  router.push({ name: 'video-list', query: { vid: props.recommendVideoInfo.vid } })
+  router.push({ name: 'video-detail', query: { vid: props.recommendVideoInfo.vid } })
   // console.log(props.recommendVideoInfo)
 }
 </script>

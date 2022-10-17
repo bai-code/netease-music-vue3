@@ -1,6 +1,6 @@
 <template>
-  <div class="show-music-info" :style="{ height: imgWH, width: imgWH }">
-    <div class="image pointer"  >
+  <div class="show-music-info" :style="{ height: imgWH, width: imgWH }" @click="playMusic">
+    <div class="image pointer source">
       <img v-lazy="musicInfo[showImgName]" alt="" />
       <div class="play-count" v-if="musicInfo.playCount">
         <i class="iconfont icon-play1"></i>
@@ -11,6 +11,11 @@
         <i class="iconfont icon-hover"></i>
       </div>
       <slot name="date-re"></slot>
+      <div class="creator" v-if="musicInfo.creator">
+        <i class="iconfont icon-renwu-ren"></i>
+        <span class="nickname">{{ musicInfo.creator.nickname }}</span>
+        <el-image v-if="musicInfo.creator.avatarDetail" :src="musicInfo.creator.avatarDetail.identityIconUrl"></el-image>
+      </div>
     </div>
     <p class="description pointer">{{ musicInfo.name }}</p>
   </div>
@@ -18,6 +23,8 @@
 
 <script setup>
 import { defineProps, computed } from 'vue'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 const props = defineProps({
   musicInfo: {
     type: Object,
@@ -43,19 +50,42 @@ const props = defineProps({
       }
       return res
     }
+  },
+  isRedirect: {
+    type: Boolean
   }
 })
+const store = useStore()
 
 const showPlayCount = computed(() => {
   const playCount = props.musicInfo.playCount
-  if (playCount >= 100000000) {
-    return Math.floor(playCount / 1000000000) + '亿'
-  } else if (playCount >= 10000) {
+  if (playCount > 100000000) {
+    return Math.floor(playCount / 100000000) + '亿'
+  } else if (playCount > 10000) {
     return Math.floor(playCount / 10000) + '万'
   }
   return playCount
 })
 
+const router = useRouter()
+const playMusic = () => {
+  if (props.musicInfo.name === '每日歌曲推荐') {
+    const { token } = store.state.userinfo.userInfo
+    // 判断登录
+    if (!token) {
+      router.push({ name: 'login', query: { redirectTo: 'music-list', argu: 'daily' } })
+    } else {
+      router.push({ name: 'music-list', query: { argu: 'daily' } })
+    }
+  } else {
+    const { id } = props.musicInfo
+    if (props.isRedirect) {
+      router.push({ name: 'song-list-package', params: { pId: id } })
+    } else {
+      router.push({ name: 'music-list', params: { id }, query: { argu: 'playlist' } })
+    }
+  }
+}
 </script>
 
 <style lang="less" scoped>
@@ -66,7 +96,6 @@ div.show-music-info {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-
   div.image {
     flex: 0 0 auto;
     width: 100%;
@@ -75,10 +104,6 @@ div.show-music-info {
     position: relative;
     border-radius: 5px;
     overflow: hidden;
-    &.source::after {
-      bottom: 0;
-      background: linear-gradient(rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0.3) 100%);
-    }
     &:hover div.play-icon {
       opacity: 1;
     }
@@ -89,7 +114,6 @@ div.show-music-info {
     img {
       height: 100%;
       width: 100%;
-      // background: rgba(0 ,0 ,0,0.3);
       border-radius: 5px;
     }
     div.play-count {
@@ -134,6 +158,7 @@ div.show-music-info {
       width: 24%;
       background: #fff;
       border-radius: 50%;
+      z-index: 11;
       .flex(center,center);
       transition: opacity 0.7s;
       & > i {
@@ -141,12 +166,40 @@ div.show-music-info {
         font-size: 16px;
       }
     }
+    div.creator {
+      position: absolute;
+      bottom: 0px;
+      left: 0px;
+      color: #fff;
+      font-size: 12px;
+      width: 100%;
+      height: 40px;
+      padding-left: 10px;
+      box-sizing: border-box;
+      line-height: 50px;
+      // .flex(flex-start, center);
+      background: linear-gradient(rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0.4) 100%);
+      i.iconfont {
+        font-size: 12px;
+        margin-right: 5px;
+      }
+      span.nickname{
+        text-shadow: 0 0 3px #888;
+      }
+      .el-image{
+        height: 15px;
+        width: 15px;
+        border-radius: 50%;
+        vertical-align: middle;
+        margin-left: 5px;
+      }
+    }
   }
   p.description {
     flex: 0 0 auto;
     .overflowMul(2);
     font-size: 13px;
-    line-height: 18px;
+    line-height: 24px;
     margin: 10px 0 20px;
   }
 }

@@ -32,6 +32,12 @@
 	transform: translateX(-@left);
 	// top: @top;
 }
+.posi(@left, @top){
+	position: absolute;
+	top: @top;
+	left: @left;
+	transform: translate(-50%,-50%);
+}
 
 .bgSrc(@src, @left, @top){
 	background-image: url(@src);

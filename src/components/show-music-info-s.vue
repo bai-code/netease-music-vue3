@@ -1,6 +1,6 @@
 <template>
   <div class="show-music-info-s overflow" type="flex" :style="{ height: ch }">
-    <div class="image pointer overflow" :style="{ height: ch, width: ch }">
+    <div class="image pointer overflow" @click="playMusic" :style="{ height: ch, width: ch }">
       <img v-lazy="musicInfo.picUrl" alt="" />
       <span class="icon">
         <i class="iconfont icon-hover"></i>
@@ -18,10 +18,11 @@
 
 <script setup>
 import { defineProps } from 'vue'
-defineProps({
+import { useStore } from 'vuex'
+import { playAndCommit } from '@/utils/plugins'
+const props = defineProps({
   musicInfo: {
     type: Object,
-    // require: true,
     default: () => {
       return {
         picUrl: '',
@@ -30,6 +31,7 @@ defineProps({
       }
     }
   },
+  // 宽高
   ch: {
     type: [String, Number],
     validator: (data) => {
@@ -43,6 +45,11 @@ defineProps({
   }
 })
 
+const store = useStore()
+const playMusic = () => {
+  playAndCommit({ store, musicInfo: props.musicInfo })
+  // console.log(props.musicInfo)
+}
 </script>
 
 <style lang="less" scoped>

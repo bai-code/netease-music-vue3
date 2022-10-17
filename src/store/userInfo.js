@@ -7,7 +7,8 @@ const userinfo = JSON.parse(localStorage.getItem('userinfo'))
 const tempUserInfo = {
   avatarUrl,
   nickname: '未登录',
-  token: ''
+  token: '',
+  userId: ''
 }
 
 const userInfo = userinfo || tempUserInfo
@@ -28,8 +29,8 @@ export default {
     async userLogin({ commit }, { phone, password }) {
       const { token, profile } = await $axios.get(`/login/cellphone?phone=${phone}&password=${password}`)
       if (token) {
-        const { avatarUrl, nickname } = profile
-        commit('saveInfo', { token, avatarUrl, nickname })
+        const { avatarUrl, nickname, userId } = profile
+        commit('saveInfo', { token, avatarUrl, nickname, userId })
         return true
       }
       // commit('saveInfo', userInfo)
