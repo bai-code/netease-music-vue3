@@ -89,12 +89,12 @@ const getVideoList = async (id = '58100') => {
   hasMore.value = hasmore
 
   isLoading.value = false
-  console.log('切换', videoList)
+  // console.log('切换', videoList)
 }
 // 子组件切换图片
 const loadVideo = () => {
   getVideoList(videoId.value)
-  console.log('adsf阿斯蒂芬')
+  console.log('load  加载更多')
 }
 
 const showBtnText = computed(() => {

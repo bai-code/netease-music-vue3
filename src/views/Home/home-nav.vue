@@ -5,9 +5,19 @@
         <div class="logo pointer"></div>
       </slot>
     </el-col>
-    <el-col :span="5">
+    <el-col :span="10">
       <slot name="search">
-        <el-autocomplete v-model="inputValue" :fetch-suggestions="querySearch" :trigger-on-focus="false" clearable class="inline-input" placeholder="请输入歌名/歌手" @select="handleSelect" />
+        <div class="search">
+          <div class="move-back">
+            <span class="pointer" @click="routerGo(-1)">
+              <i class="iconfont icon-arrow-left"></i>
+            </span>
+            <span class="pointer" @click="routerGo(1)">
+              <i class="iconfont icon-arrow-right"></i>
+            </span>
+          </div>
+          <el-autocomplete v-model="inputValue" :fetch-suggestions="querySearch" :trigger-on-focus="false" clearable class="inline-input" placeholder="请输入歌名/歌手" @select="handleSelect" />
+        </div>
       </slot>
     </el-col>
     <el-col :span="5" class="avatar">
@@ -107,6 +117,10 @@ const loadAll = () => {
   ]
 }
 
+const routerGo = () => {
+  console.log(history)
+}
+
 onMounted(() => {
   restaurants.value = loadAll()
 })
@@ -122,6 +136,27 @@ onMounted(() => {
     div.logo {
       .bgSrc('~@/static/tabbar.png',0,-15px);
       height: 40px;
+    }
+    div.search {
+      .flex(flex-start, center);
+      div.move-back {
+        width: 60px;
+        margin-right: 30px;
+        .flex(space-between,center);
+        span {
+          .flex(center,center);
+          padding: 5px;
+          box-sizing: border-box;
+          border-radius: 50%;
+          width: 25px;
+          height: 25px;
+          background: rgba(0, 0, 0, 0.1);
+          i.iconfont {
+            font-size: 12px;
+            color: #ccc;
+          }
+        }
+      }
     }
     :deep(.el-autocomplete.inline-input) {
       .el-input__wrapper {
