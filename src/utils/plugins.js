@@ -91,13 +91,17 @@ export const returnNeedInfo = (info = {}) => {
 }
 
 // index   musicInfo 二选一
-export const playAndCommit = ({ store, musicList = [], /* 传递的数组 */ index /*  当前播放索引 */, musicInfo }) => {
+export const playAndCommit = async ({ store, musicList = [], /* 传递的数组 */ index /*  当前播放索引 */, musicInfo, isPlay = true, isFm = false }) => {
+  let flag = false
   if (index === 0 || index) {
-    store.dispatch('getMusicInfo', { musicInfo: musicList[index] })
+    flag = await store.dispatch('getMusicInfo', { musicInfo: musicList[index], isFm })
   } else {
-    store.dispatch('getMusicInfo', { musicInfo })
+    flag = await store.dispatch('getMusicInfo', { musicInfo, isPlay, isFm })
   }
-  store.commit('saveMusicList', { musicList })
+  if (!isFm && musicList.length > 0) {
+    store.commit('saveMusicList', { musicList })
+  }
+  return flag
 }
 
 export const computedCount = (count = 0) => {

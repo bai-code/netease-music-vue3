@@ -24,20 +24,7 @@
           </div>
         </el-col>
         <el-col :span="10" class="lyric">
-          <div class="show-musicInfo">
-            <h3 class="name">{{ musicInfo.name }}</h3>
-            <p class="singer">{{ musicInfo.singer }}</p>
-          </div>
-          <div class="lyric-content" ref="domContainerRef">
-            <ul :style="{ top: scrollTop }">
-              <li v-for="(lyric, index) in lyricList" :key="index" ref="lyricRef" class="default">
-                <span v-for="(item, i) in lyric" :key="i" :class="{ lyric: i === 1, hidden: i === 0 }">{{ item }}</span>
-                <span class="play-icon pointer" @click="seekPlayTime(lyric[0])">
-                  <i class="iconfont icon-hover"></i>
-                </span>
-              </li>
-            </ul>
-          </div>
+          <LyricCmp :musicInfo="musicInfo" />
         </el-col>
         <el-col :span="7" class="similar-container">
           <div class="similar">
@@ -61,20 +48,18 @@
 <script setup>
 import HomeNav from '@/views/Home/home-nav.vue'
 import { useStore } from 'vuex'
-import { watch, ref, onBeforeUnmount, onActivated, onDeactivated, defineEmits, computed, defineProps, onMounted } from 'vue'
-import audio from '@/utils/audio.js'
+import { watch, ref, onBeforeUnmount, onActivated, onDeactivated, defineEmits, computed } from 'vue'
 import { playAndCommit } from '@/utils/plugins.js'
-const props = defineProps({
-  lyricList: {
-    type: Array
-  },
-  musicDetail: {
-    type: Object,
-    default: () => {
-      return {}
-    }
-  }
-})
+import LyricCmp from '@/components/lyric-cmp.vue'
+
+// defineProps({
+//   musicDetail: {
+//     type: Object,
+//     default: () => {
+//       return {}
+//     }
+//   }
+// })
 
 const emits = defineEmits(['packUp'])
 
@@ -120,54 +105,6 @@ watch(
   }
 )
 
-const isPlay = computed(() => {
-  return store.state.isPlay
-})
-
-// const currentTime = computed(() => {
-//   return store.getters.setCurrentTime
-// })
-const domContainerRef = ref()
-const lyricRef = ref()
-const scrollTop = ref(0)
-
-watch(
-  () => store.getters.setCurrentTime,
-  (newVal) => {
-    props.lyricList.forEach((item, index) => {
-      if (newVal === item[0]) {
-        lyricRef.value.forEach((i) => {
-          if (i.className.indexOf('current') !== -1) {
-            i.classList.remove('current')
-          }
-        })
-        // lyricRef.value[index - 1].classList.remove('current')
-        const top = lyricRef.value[index].offsetTop - 140
-        domContainerRef.value.scrollTop = top < 0 ? 0 : top
-        lyricRef.value[index].classList.add('current')
-      }
-    })
-  }
-)
-// 默认歌词第一项
-onMounted(() => {
-  lyricRef.value[1].classList.add('current')
-})
-
-// 歌曲进度跳转
-const seekPlayTime = (time) => {
-  const t = time.split(':')
-  const m = parseInt(t[0]) * 60
-  const s = parseInt(t[1])
-  audio.currentTime = m + s
-  lyricRef.value.forEach((item) => {
-    item.classList.remove('current')
-  })
-  if (!isPlay.value) {
-    store.commit('play')
-  }
-}
-
 // 触发父元素收起事件
 const packUp = () => {
   emits('packUp')
@@ -200,7 +137,6 @@ watch(
 onBeforeUnmount(() => {
   clearInterval(timer.value)
   timer.value = null
-  // containerHeight.value = 0
 })
 </script>
 

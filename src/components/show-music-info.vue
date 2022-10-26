@@ -199,8 +199,8 @@ div.show-music-info {
     flex: 0 0 auto;
     .overflowMul(2);
     font-size: 13px;
-    line-height: 24px;
-    margin: 10px 0 20px;
+    line-height: 20px;
+    margin: 8px 0 20px;
   }
 }
 </style>

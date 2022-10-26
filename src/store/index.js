@@ -5,9 +5,15 @@ import $axios from '@/Axios/index.js'
 import { $audio } from '@/utils/audio.js'
 import { transformTime } from '@/utils/plugins.js'
 import comment from './comment.js'
+import personalFm from './personal-fm'
 import { ElMessage } from 'element-plus'
+// import { ref } from 'vue'
+
+// const timer = ref(null)
 
 const info = localStorage.getItem('musicInfo')
+// const isPlayFm = localStorage.getItem('isPlayFm') || false
+
 const tempMusicInfo = {
   id: '',
   url: '',
@@ -15,7 +21,9 @@ const tempMusicInfo = {
   singer: '',
   name: '',
   picUrl: '',
-  durationTime: ''
+  durationTime: '',
+  time: '', // 用于歌词部分会有时间超出，对比使用
+  isFmMusic: false
 }
 const musicInfo = Object.assign({}, tempMusicInfo, (info && JSON.parse(info)) || {})
 
@@ -29,7 +37,9 @@ const store = createStore({
     currentTime: 0, // 播放到哪
     precentage: 0, // 进度条
     durationTime: 100,
-    isPlay: false
+    isPlay: false,
+    isClick: false,
+    currentPlayIndex: -1 // 当前播放歌曲索引
   },
   getters: {
     setPrecentage(state) {
@@ -49,10 +59,15 @@ const store = createStore({
         return startTime
       }
     },
-    setDurationTime(state) {
-      const { durationTime } = state
-      return transformTime(Math.round(durationTime), false)
-    },
+    // setDurationTime(state) {
+    //   const { durationTime } = state
+    //   const endTime = transformTime(Math.round(durationTime), false)
+    //   if (/NaN/.test(endTime)) {
+    //     return '88:88'
+    //   } else {
+    //     return endTime
+    //   }
+    // },
     findCurrentPageIndex(state) {
       // 计算当前页面是否存在播放的歌曲 添加类名
       return function (list = []) {
@@ -63,6 +78,7 @@ const store = createStore({
       }
     },
     isNotChange(state) {
+      // 用于foot 页面 是否有上一首下一首
       const { musicList } = state
       if (musicList.length === 0) {
         return true
@@ -79,10 +95,13 @@ const store = createStore({
         if (prop === 'picUrl') {
           info[prop] = (payload.album && payload.album.picUrl) || (payload.ar && payload.al.picUrl) || (payload.al && payload.al.picUrl) || payload.picUrl || info[prop]
         } else {
-          info[prop] = payload[prop] || info[prop]
+          info[prop] = payload[prop] !== '' ? payload[prop] : info[prop]
         }
       }
-      localStorage.setItem('musicInfo', JSON.stringify(info), false)
+      // console.log(info, payload.isFmMusic, judgeType(payload.isFmMusic))
+      if (!payload.isFmMusic) {
+        localStorage.setItem('musicInfo', JSON.stringify(info))
+      }
     },
     // 保存播放列表
     saveMusicList(state, payload) {
@@ -107,6 +126,13 @@ const store = createStore({
     pause(state) {
       $audio.pauseMusic()
       state.isPlay = false
+    },
+    // 歌曲进度跳转
+    seekTime(state, { time }) {
+      $audio.seekTime(time)
+    },
+    DOMClick(state, { flag }) {
+      state.isClick = flag
     }
   },
   actions: {
@@ -118,11 +144,12 @@ const store = createStore({
       }
       return {}
     },
-    async getMusicInfo({ commit }, { musicInfo = {}, isPlay = true /* 默认播放 */, isNext = false }) {
+    async getMusicInfo({ commit, state }, { musicInfo = {}, isPlay = true /* 默认播放 */, isNext = false, isFm = false }) {
       const { id, level = 'standard' } = musicInfo
       // console.log(id, musicInfo)
       if (!id) return
       const { code, data = [] } = await $axios.get(`/song/url/v1?id=${id}&level=${level}`)
+      // console.log(data)
       if (code === 200) {
         const { url } = data[0]
         if (!url) {
@@ -134,26 +161,29 @@ const store = createStore({
           }
           return false
         }
-        const durationTime = transformTime(data[0].time, true)
+        const { time } = data[0]
+        const durationTime = transformTime(time, true)
         // let oldTime = 0
-        const newMusicInfo = Object.assign({}, musicInfo, { url, durationTime })
+        const newMusicInfo = Object.assign({}, musicInfo, { url, durationTime, time, isFmMusic: isFm })
         $audio.giveAddress(url, isPlay)
-        commit('changePlayStatus', { isPlay })
+        // 状态改变再提交
+        if (state.isPlay !== isPlay) {
+          commit('changePlayStatus', { isPlay })
+        }
         commit('savePlayMusicInfo', newMusicInfo)
         commit('saveUpdateTime', { durationTime: parseInt(data[0].time / 1000) })
         return true
       }
       // console.log('获取歌曲地址', data[0], id)
-      // console.log(data[0])
     },
     async changeMusic({ state, getters, dispatch }, { params = 'next' }) {
       const { musicList } = state
       let index = getters.findCurrentPageIndex(musicList)
       const len = musicList.length
       // console.log(index)
-      let flag = true
+      // let flag = true
 
-      while (flag) {
+      const _get = async () => {
         if (params === 'next') {
           if (index + 1 >= len) {
             index = 0
@@ -168,24 +198,47 @@ const store = createStore({
           }
         }
         const res = await dispatch('getMusicInfo', { musicInfo: musicList[index], isNext: true })
-        if (res) {
-          flag = false
-        } else {
+        if (!res) {
           ElMessage({
             type: 'error',
             message: '获取资源失败，自动下一首'
           })
+          return _get()
         }
       }
+      _get()
+      // while (flag) {
+      //   if (params === 'next') {
+      //     if (index + 1 >= len) {
+      //       index = 0
+      //     } else {
+      //       index += 1
+      //     }
+      //   } else {
+      //     if (index - 1 < 0) {
+      //       index = len - 1
+      //     } else {
+      //       index -= 1
+      //     }
+      //   }
+      //   const res = await dispatch('getMusicInfo', { musicInfo: musicList[index], isNext: true })
+      //   console.log('执行')
+      //   if (res) {
+      //     flag = false
+      //   } else {
+      //     ElMessage({
+      //       type: 'error',
+      //       message: '获取资源失败，自动下一首'
+      //     })
+      //   }
+      // }
       // console.log('下一首', index + 1)
     }
   },
   modules: {
     userinfo,
-    comment
+    comment,
+    personalFm
   }
 })
-
-// console.log(store.state, isFirstEnter)
-
 export default store

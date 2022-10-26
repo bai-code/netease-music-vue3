@@ -6,6 +6,20 @@
   "description": "网易音乐图标",
   "glyphs": [
     {
+      "icon_id": "122694",
+      "name": "delete",
+      "font_class": "delete",
+      "unicode": "e69d",
+      "unicode_decimal": 59037
+    },
+    {
+      "icon_id": "6976477",
+      "name": "email",
+      "font_class": "email",
+      "unicode": "e63a",
+      "unicode_decimal": 58938
+    },
+    {
       "icon_id": "4651927",
       "name": "男",
       "font_class": "man",

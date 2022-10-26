@@ -40,9 +40,18 @@ const initMusicResource = () => {
   store.dispatch('getMusicInfo', { musicInfo, isPlay: false })
 }
 
-audio.addEventListener('ended', function () {
-  store.dispatch('changeMusic', { params: 'next' })
-})
+// const isFmMusic = computed(() => {
+// return store.state.musicInfo.isFmMusic
+// })
+
+// audio.addEventListener('ended', async function () {
+//   // console.log('播放结束', isFmMusic.value)
+//   if (isFmMusic.value) {
+//     await store.dispatch('personalFm/getFm', { isPlay: true })
+//   } else {
+//     store.dispatch('changeMusic', { params: 'next' })
+//   }
+// })
 
 audio.addEventListener('timeupdate', function () {
   // 减少提交mutation
@@ -51,6 +60,13 @@ audio.addEventListener('timeupdate', function () {
   store.commit('saveUpdateTime', { currentTime: this.currentTime })
   oldTime.value = time
 })
+
+// 用于处理==》当用户进入fm页面，直接播放，浏览器机制，用户没点击之前不能播放
+// 防止用户在fm页面刷新，产生报错问题
+document.onclick = function () {
+  store.commit('DOMClick', { isClick: true })
+  document.onclick = null
+}
 
 onMounted(() => {
   initMusicResource()
@@ -61,7 +77,7 @@ onMounted(() => {
 
 <style lang="less">
 div.home-container {
-  width:980px;
+  width: 980px;
   height: 550px;
   .positions(20px,50%);
   font-size: 14px;

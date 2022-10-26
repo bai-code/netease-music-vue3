@@ -6,7 +6,10 @@ let volumeCount = 0
 // let timerStart = null
 let timerEnd = null
 
-audio.onerror = function () {}
+audio.onerror = function () {
+  console.log('error')
+}
+// audio.load()
 
 audio.autoplay = false
 // let isError = false
@@ -20,7 +23,9 @@ export const $audio = {
     // audio.volume = 0
     // console.log(audio.paused)
     if (audio.paused) {
+      // audio.oncanplay = () => {
       audio.play()
+      // }
     }
     // timerStart = setInterval(() => {
     //   console.log(volume, volumeCount)
@@ -54,10 +59,14 @@ export const $audio = {
   //   this.playMusic()
   // },
   giveAddress(url, isPlay) {
+    // console.log(url)
     audio.src = url
     if (isPlay) {
       this.playMusic()
     }
+  },
+  seekTime(time) {
+    audio.currentTime = time
   }
   // async getMusicUrl(callback) {
   //   ;(await callback) && callback()

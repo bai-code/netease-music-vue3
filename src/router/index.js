@@ -74,6 +74,17 @@ const routes = [
         path: 'personal-fm',
         name: 'personal-fm',
         component: () => import('@/views/PersonalFM/personal-fm.vue')
+        // beforeEnter(to, from, next) {
+        //   const userinfo = localStorage.getItem('userinfo')
+        //   if (userinfo) {
+        //     const { token } = JSON.parse(userinfo)
+        //     if (!token) {
+        //       next({ name: 'login' })
+        //     } else {
+        //       next()
+        //     }
+        //   }
+        // }
       },
       {
         path: 'music-list/:id?',

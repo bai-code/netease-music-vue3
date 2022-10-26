@@ -1,13 +1,13 @@
 <template>
   <transition name="content">
     <keep-alive>
-      <component :is="showCmp" @packUp="goBackPage" :lyricList="lyricList"></component>
+      <component :is="showCmp" @packUp="goBackPage"></component>
     </keep-alive>
   </transition>
 
   <el-row type="flex" justify="space-between" align="middle" class="footer-container">
     <el-col :span="6" class="info">
-      <div class="container" :style="{bottom:domBottom}">
+      <div class="container" :style="{ bottom: domBottom }">
         <div class="arrow-down pointer" @click="goBackPage">
           <i class="iconfont icon-arrow-down"></i>
         </div>
@@ -16,7 +16,11 @@
             <el-image :src="musicInfo.picUrl"> </el-image>
             <div class="mask-layer">
               <!-- <i class="iconfont icon"></i> -->
-              <div class="arrow-up flexCenter" @click="goMusicDetailPage">
+              <div class="arrow-up-down" v-if="musicInfo.isFmMusic" @click="$router.push({ name: 'personal-fm' })">
+                <i class="iconfont icon-arrow-up"></i>
+                <i class="iconfont icon-arrow-down"></i>
+              </div>
+              <div class="arrow-up flexCenter" @click="goMusicDetailPage" v-else>
                 <i class="iconfont icon-arrow-up"></i>
               </div>
             </div>
@@ -30,7 +34,7 @@
     </el-col>
     <el-col :span="10" class="controls-container">
       <div class="controls">
-        <div class="prev pointer" :class="{ disabled: isNotChange }" @click="changeMusic('prev')">
+        <div class="prev pointer" :class="{ disabled: isNotChange || musicInfo.isFmMusic }" @click="changeMusic('prev')">
           <i class="iconfont icon-prev"></i>
         </div>
         <div class="play-pause" @click="changePlayStatus">
@@ -41,12 +45,14 @@
             <i class="iconfont icon-pause"></i>
           </div>
         </div>
-        <div class="next pointer" :class="{ disabled: isNotChange }" @click="changeMusic('next')">
+        <div class="next pointer" :class="{ disabled: isNotChange && !musicInfo.isFmMusic }" @click="changeMusic('next')">
           <i class="iconfont icon-next"></i>
         </div>
       </div>
       <div class="progress-c">
-        <div class="start-time overflow">{{ currentTime }}</div>
+        <div class="start-time overflow">
+          <span v-if="musicInfo.durationTime">{{ currentTime }}</span>
+        </div>
         <div class="progress">
           <!-- <progress class="progress" :value="musicInfo.progressPrecentage" max="100"></progress> -->
           <el-progress :stroke-width="8" :show-text="false" :percentage="precentage" />
@@ -60,57 +66,28 @@
 </template>
 
 <script setup>
-import { computed, ref, shallowRef, h, watch } from 'vue'
+import { computed, ref, shallowRef, h } from 'vue'
 import { useStore } from 'vuex'
-// import { useRouter } from 'vue-router'
+import audio from '@/utils/audio.js'
+// import { useRoute } from 'vue-router'
 import MusicDetailContent from '@/views/views-package/music-detail-content.vue'
 
-// console.log(MusicDetailContent)
 const showCmp = shallowRef(h('div'))
 const isDetail = ref(false)
-
 const store = useStore()
+// const isFirstClick = ref(true)
 
 const isPlay = computed(() => {
   return store.state.isPlay
 })
 
+// const isPlayFm = computed(() => {
+//   return store.state.isPlayFm
+// })
+
 const isNotChange = computed(() => {
   return store.getters.isNotChange
 })
-
-// 获取歌词
-const lyricList = ref([])
-const getMusicLyric = async (id) => {
-  const {
-    lrc: { lyric }
-  } = await store.dispatch('getInfo', { path: `/lyric?id=${id}` })
-  lyricList.value = lyric
-    .split(/\[/g)
-    .map((item) => {
-      const text = item.split(/\..+\]/)
-      if (text[0] && text[1] !== '\n') {
-        return text
-      }
-    })
-    .filter((item) => {
-      // 用于处理歌词多处空格
-      return !!item
-    })
-  // const res = await store.dispatch('getInfo', { path: `/lyric?id=${id}` })
-  // console.log(res)
-}
-
-watch(
-  () => store.state.musicInfo.id,
-  (newId) => {
-    // getMusicDetail(newId)
-    getMusicLyric(newId)
-  },
-  {
-    immediate: true
-  }
-)
 
 const changePlayStatus = () => {
   if (!store.state.musicInfo.id) return
@@ -119,11 +96,6 @@ const changePlayStatus = () => {
   } else {
     store.commit('pause')
   }
-}
-
-const changeMusic = (params) => {
-  if (isNotChange.value) return
-  store.dispatch('changeMusic', { params })
 }
 
 const musicInfo = computed(() => {
@@ -135,6 +107,20 @@ const precentage = computed(() => {
 })
 const currentTime = computed(() => {
   return store.getters.setCurrentTime
+})
+
+const changeMusic = (params) => {
+  if ((isNotChange.value && !musicInfo.value.isFmMusic) || (musicInfo.value.isFmMusic && params === 'prev')) return
+  if (musicInfo.value.isFmMusic) {
+    store.dispatch('personalFm/getFm', { isPlay: true })
+  } else {
+    store.dispatch('changeMusic', { params })
+  }
+  // console.log(isPlayFm)
+}
+
+audio.addEventListener('ended', function () {
+  changeMusic('next')
 })
 
 const domBottom = ref(0)
@@ -202,27 +188,40 @@ const goMusicDetailPage = () => {
             width: 100%;
             height: 100%;
             border-radius: 5px;
+            box-shadow: 0 0 5px #ccc;
           }
           div.mask-layer {
             position: absolute;
             height: 100%;
             width: 100%;
-            &:hover div.arrow-up {
-              opacity: 1;
+            &:hover {
+              div.arrow-up,
+              div.arrow-up-down {
+                opacity: 1;
+              }
             }
-            div.arrow-up {
+            div.arrow-up-down {
+              // background: rgba(0, 0, 0, 0.4);
+              .flex(center,center);
+              flex-direction: column;
+              i.iconfont {
+                line-height: 24px;
+              }
+            }
+            div.arrow-up,
+            div.arrow-up-down {
               position: absolute;
               width: 100%;
               opacity: 0;
               height: 100%;
               transition: opacity 0.3s ease-in-out;
-              &.arrow-up {
-                background: rgba(0, 0, 0, 0.4);
-                i.iconfont {
-                  color: #fff;
-                  font-size: 30px;
-                }
+              // &.arrow-up {
+              background: rgba(0, 0, 0, 0.4);
+              i.iconfont {
+                color: #fff;
+                font-size: 30px;
               }
+              // }
             }
           }
         }
@@ -244,7 +243,6 @@ const goMusicDetailPage = () => {
           }
         }
       }
-      
     }
   }
 

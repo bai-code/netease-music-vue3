@@ -9,7 +9,7 @@ import { defineComponent } from 'vue'
 export default defineComponent({
   data() {
     return {
-      redirectToPath: {}
+      redirectToPath: ''
     }
   },
   components: {
@@ -17,7 +17,9 @@ export default defineComponent({
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
-      vm.redirectToPath = to.query
+      vm.redirectToPath = to.redirectedFrom && to.redirectedFrom.name
+      // vm.redirectToPath = to.query
+      console.log(to.redirectedFrom, from)
     })
   }
 })

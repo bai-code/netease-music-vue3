@@ -20,7 +20,6 @@ import HomeAside from './home-aside.vue'
 // import HomeFooter from './home-footer.vue'
 import { useStore } from 'vuex'
 import { onMounted } from 'vue'
-import audio from '@/utils/audio.js'
 
 const store = useStore()
 
@@ -28,13 +27,6 @@ const store = useStore()
 onMounted(() => {
   const { musicInfo } = store.state
   store.dispatch('getMusicInfo', { musicInfo, isPlay: false })
-})
-
-// 监听播放完毕自动下一首
-onMounted(() => {
-  audio.addEventListener('ended', function () {
-    store.dispatch('changeMusic', { params: 'next' })
-  })
 })
 </script>
 

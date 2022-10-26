@@ -23,19 +23,26 @@
 </template>
 
 <script setup>
-import { ref, reactive, defineProps } from 'vue'
+import { ref, reactive, onActivated, defineProps } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { ElMessageBox, ElMessage } from 'element-plus'
 
 const props = defineProps({
   redirectToPath: {
-    type: Object
+    type: String
   }
 })
+
 const store = useStore()
+const router = useRouter()
 
 const dialogVisible = ref(true)
+onActivated(() => {
+  // 处理取消后再次进入登录页面弹窗消失
+  dialogVisible.value = true
+})
+
 // form表单区域
 const ruleFormRef = ref()
 
@@ -87,15 +94,14 @@ const submitForm = (formEl) => {
         type: flag ? 'success' : 'error',
         message: flag ? '登录成功' : 'error'
       })
-      const { redirectTo, argu } = props.redirectToPath
-      if (redirectTo) {
-        router.push({ name: redirectTo, query: { argu } })
+      const { redirectToPath } = props
+      if (redirectToPath) {
+        router.push({ name: redirectToPath })
       } else {
         router.back()
       }
     } else {
       console.log('error submit!')
-      return false
     }
   })
   dialogVisible.value = false
@@ -107,7 +113,6 @@ const resetForm = (formEl) => {
   formEl.resetFields()
 }
 
-const router = useRouter()
 const handleClose = (done) => {
   let flag = false
   for (const prop in ruleForm) {
