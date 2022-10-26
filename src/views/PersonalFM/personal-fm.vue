@@ -84,12 +84,8 @@ export default defineComponent({
       return store.state.personalFm.personalFmList
     })
 
-    const showFm = ref([])
+    const showFm = ref([]) // 展示当前播放信息
 
-    // const showFm = computed(() => {
-    //   console.log('切换')
-    //   return personalFmList.value[currentIndex.value] || {}
-    // })
     const isClick = computed(() => {
       return store.state.isClick
     })
@@ -110,29 +106,9 @@ export default defineComponent({
       { immediate: true, deep: true }
     )
 
-    // watch(
-    //   showFm,
-    //   async (newVal) => {
-    //     if (newVal.name) {
-    //       playAndCommit({ store, musicInfo: newVal, isPlay: isClick.value, isFm: true })
-    //       console.log('zhixing')
-    //     }
-    //   },
-    //   { immediate: true, deep: true }
-    // )
-
     const getFm = async () => {
       isLoading.value = true
       await store.dispatch('personalFm/getFm')
-      // const { data = [] } = await store.dispatch('getInfo', { path: `/personal_fm?offset=${offset.value}` })
-      // if (data.length) {
-      //   const packageData = jointSinger({ musicList: data })
-      //   if (personalFmList.length > 2) {
-      //     personalFmList.shift()
-      //   }
-      //   personalFmList.push(...packageData)
-      // }
-      // offset.value += 1
       isLoading.value = false
       // console.log(personalFmList, offset.value)
     }
