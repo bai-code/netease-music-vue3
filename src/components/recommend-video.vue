@@ -1,45 +1,58 @@
 <template>
   <div class="recommend-container">
     <div class="img pointer" @click="playVideo">
-      <img v-if="recommendVideoInfo.coverUrl" v-lazy="recommendVideoInfo.coverUrl" alt="" />
+      <img v-if="recommendInfo.coverUrl || recommendInfo.cover" :src="recommendInfo.coverUrl || recommendInfo.cover" alt="" />
       <div class="play-count">
         <i class="iconfont icon-play1"></i>
-        <span class="count">{{ playCount }}</span>
+        <span class="count">{{ recommendInfo._playCount }}</span>
       </div>
-      <div class="play-time">{{ recommendVideoInfo.duration }}</div>
+      <div class="play-time">{{ recommendInfo.durationTime }}</div>
     </div>
     <div class="info">
-      <p class="description">{{ recommendVideoInfo.title }}</p>
-      <p class="nickname overflow" v-if="recommendVideoInfo.creator">{{ recommendVideoInfo.creator[0].userName }}</p>
+      <p class="description">{{ recommendInfo.title || recommendInfo.name }}</p>
+      <p class="nickname overflow">{{ (recommendInfo.creator && recommendInfo.creator[0].userName) || recommendInfo.singer }}</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, defineProps } from 'vue'
+import { defineProps } from 'vue'
 import { useRouter } from 'vue-router'
+// import { computedCount } from '@/utils/plugins.js'
 
 const props = defineProps({
-  recommendVideoInfo: {
+  recommendInfo: {
     type: Object
+  },
+  isMv: {
+    type: Boolean,
+    default: false
   }
 })
 
-const playCount = computed(() => {
-  const count = props.recommendVideoInfo.playTime
-  if (count > 100000000) {
-    return parseInt(count / 100000000) + '亿'
-  } else if (count > 10000) {
-    return parseInt(count / 10000) + '万'
-  } else {
-    return count
-  }
-})
+// const playCount = computed(() => {
+//   const count = props.recommendInfo.playTime
+//   return computedCount(count)
+//   // if (count > 100000000) {
+//   //   return parseInt(count / 100000000) + '亿'
+//   // } else if (count > 10000) {
+//   //   return parseInt(count / 10000) + '万'
+//   // } else {
+//   //   return count
+//   // }
+// })
 
 const router = useRouter()
 const playVideo = () => {
-  router.push({ name: 'video-detail', query: { vid: props.recommendVideoInfo.vid } })
-  // console.log(props.recommendVideoInfo)
+  const { vid, id } = props.recommendInfo
+  const query = {}
+  if (vid) {
+    query.vid = vid
+  } else {
+    query.mvid = id
+  }
+  router.push({ name: 'video-detail', query })
+  // console.log(props.recommendInfo)
 }
 </script>
 <style lang="less" scoped>

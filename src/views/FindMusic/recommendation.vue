@@ -20,25 +20,10 @@
 
   <!-- 独家放送 -->
   <div class="exclusive">
-    <NavTitle titleText="独家放送" />
+    <NavTitle titleText="独家放送" @linkPage="linkPage('exclusive')" />
     <ul class="exclusive-container" ref="containerRef">
       <li v-for="item in privatecontent" :key="item.id">
-        <el-skeleton animated :loading="loading">
-          <template #template>
-            <el-skeleton-item variant="image" style="width: 100%; height: 100px" />
-            <el-skeleton-item variant="text"></el-skeleton-item>
-            <el-skeleton-item variant="text"></el-skeleton-item>
-          </template>
-          <template #default>
-            <div class="default-content">
-              <img v-lazy="item.picUrl" alt="" :style="{ height: domH }" />
-              <p class="text">{{ item.name }}</p>
-              <span>
-                <i class="iconfont icon-hover"></i>
-              </span>
-            </div>
-          </template>
-        </el-skeleton>
+        <ExclusiveTemplate :videoInfo="item" />
       </li>
     </ul>
   </div>
@@ -53,7 +38,7 @@
 
   <!-- 新歌推荐 -->
   <div class="new-songs">
-    <NavTitle titleText="最新音乐" @linkPage="linkPage" />
+    <NavTitle titleText="最新音乐" @linkPage="linkPage('latest-music')" />
     <div class="container">
       <show-music-info-s v-for="song in newSongList" :key="song.id" :musicInfo="song" />
     </div>
@@ -61,15 +46,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import NavTitle from '@/components/nav-title.vue'
 import ShowMusicInfo from '@/components/show-music-info.vue'
 import datePng from '@/static/tempDateBg.png'
 import ShowMusicInfoS from '@/components/show-music-info-s.vue'
 import ShowMvList from '@/components/show-mv-list.vue'
-import { jointSinger, playAndCommit } from '@/utils/plugins.js'
+import { loopFilterAdd, playAndCommit } from '@/utils/plugins.js'
 import { useRouter } from 'vue-router'
+import ExclusiveTemplate from '@/components/exclusive-template.vue'
 
 const containerRef = ref()
 const store = useStore()
@@ -96,6 +82,7 @@ const todayInfo = {
 
 const today = new Date().getDate()
 
+// 独家放送请求数据
 const privatecontent = ref([])
 const loading = ref(true)
 async function getprivatecontent() {
@@ -105,17 +92,24 @@ async function getprivatecontent() {
   // console.log(privatecontent)
 }
 
+// const playExclusive = (item) => {
+//   if (item.id) {
+//     router.push({ name: 'video-detail', query: { mvid: item.id } })
+//   }
+//   // console.log(item)
+// }
+
 // 计算图片原始尺寸对应高度
-const domH = computed(() => {
-  const domW = containerRef.value.offsetWidth * 0.33
-  return parseInt((399 * domW) / 1080) + 30 + 'px'
-})
+// const domH = computed(() => {
+//   const domW = containerRef.value.offsetWidth * 0.33
+//   return parseInt((399 * domW) / 1080) + 30 + 'px'
+// })
 
 const mvList = ref([])
 async function getMVList() {
   const { result } = await store.dispatch('getInfo', { path: '/personalized/mv' })
   const filterList = result.splice(0, 3)
-  mvList.value = jointSinger({ musicList: filterList, str: 'author' })
+  mvList.value = loopFilterAdd({ musicList: filterList, str: 'author' })
   // console.log(mvList.value)
   // console.log(result)
 }
@@ -123,7 +117,7 @@ async function getMVList() {
 const newSongList = ref()
 async function getNewSongList() {
   const { result = [] } = await store.dispatch('getInfo', { path: '/personalized/newsong?limit=12' })
-  const res = jointSinger({ musicList: result, value: 'song' })
+  const res = loopFilterAdd({ musicList: result, value: 'song' })
   // console.log(res)
   newSongList.value = res
   // console.log(result)
@@ -149,8 +143,8 @@ const playMusic = async (info) => {
   console.log(info)
 }
 
-const linkPage = () => {
-  router.push({ name: 'latest-music' })
+const linkPage = (name) => {
+  router.push({ name })
 }
 
 onMounted(() => {
@@ -203,33 +197,37 @@ div.exclusive {
     .flex(space-between,flex-start);
     & > li {
       width: 32%;
-    }
-  }
-  div.default-content {
-    position: relative;
-    img {
-      width: 100%;
-      border-radius: 5px;
-    }
-    p.text {
-      font-size: 14px;
-      .overflowMul(3);
-    }
-    & > span {
-      position: absolute;
-      left: 10px;
-      top: 8px;
-      height: 25px;
-      width: 25px;
-      .flex(center,center);
-      color: #fff;
-      background: rgba(70, 70, 70, 0.4);
-      border-radius: 50%;
-      i.iconfont {
-        font-size: 12px;
+      :deep(div.image){
+        width: 100%;
+        height: 120px;
       }
     }
   }
+  // div.default-content {
+  //   position: relative;
+  //   img {
+  //     width: 100%;
+  //     border-radius: 5px;
+  //   }
+  //   p.text {
+  //     font-size: 14px;
+  //     .overflowMul(3);
+  //   }
+  //   & > span {
+  //     position: absolute;
+  //     left: 10px;
+  //     top: 8px;
+  //     height: 25px;
+  //     width: 25px;
+  //     .flex(center,center);
+  //     color: #fff;
+  //     background: rgba(70, 70, 70, 0.4);
+  //     border-radius: 50%;
+  //     i.iconfont {
+  //       font-size: 12px;
+  //     }
+  //   }
+  // }
 }
 
 div.recommend-mv {

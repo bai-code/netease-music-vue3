@@ -1,20 +1,20 @@
 <template>
   <el-row class="show-video-comment">
     <el-col :span="3" class="img-content">
-      <img :src="videoInfo.user.avatarUrl" alt="" class="el-image" />
+      <img :src="comment.user.avatarUrl" alt="" class="el-image" />
     </el-col>
     <el-col :span="21" class="comment">
       <!-- 评论 -->
       <div class="comment">
-        <div class="nickname">{{ videoInfo.user.nickname }}</div>
-        <div class="img" v-if="videoInfo.user.vipRights">
-          <img v-if="videoInfo.user.vipRights.associator" v-lazy="videoInfo.user.vipRights.associator.iconUrl" alt="" />
+        <div class="nickname">{{ comment.user.nickname }}</div>
+        <div class="img" v-if="comment.user.vipRights">
+          <img v-if="comment.user.vipRights.associator" v-lazy="comment.user.vipRights.associator.iconUrl" alt="" />
         </div>
-        <div class="content">：{{ videoInfo.content }}</div>
+        <div class="content">：{{ comment.content }}</div>
       </div>
 
-      <ul class="reply" v-if="videoInfo.beReplied.length">
-        <li v-for="info in videoInfo.beReplied" :key="info.beRepliedCommentId">
+      <ul class="reply" v-if="comment.beReplied.length">
+        <li v-for="info in comment.beReplied" :key="info.beRepliedCommentId">
           <span class="nickname">@{{ info.user.nickname }}：</span>
           <span class="ct">{{ info.content }}</span>
         </li>
@@ -43,14 +43,14 @@
 import { computed, defineProps } from 'vue'
 
 const props = defineProps({
-  videoInfo: {
+  comment: {
     type: Object
   }
 })
 
 const publishTime = computed(() => {
-  const d = props.videoInfo.time
-  const timeStr = props.videoInfo.timeStr
+  const d = props.comment.time
+  const timeStr = props.comment.timeStr
   const date = timeStr + ' ' + new Date(d).toLocaleTimeString().substr(0, 5)
   return date
 })

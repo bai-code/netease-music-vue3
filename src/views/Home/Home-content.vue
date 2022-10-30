@@ -36,6 +36,12 @@ onMounted(() => {
   .el-aside {
     border-right: 1px solid @borderColor;
   }
+  .el-main {
+    padding: 20px 0 20px 20px;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
 }
 // .el-row.home-content{
 //   // height: 100%;

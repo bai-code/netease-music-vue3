@@ -57,7 +57,7 @@
 import { watchEffect, ref, reactive, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
-import { jointSinger, fillNum, playAndCommit } from '@/utils/plugins.js'
+import { loopFilterAdd, fillNum, playAndCommit } from '@/utils/plugins.js'
 
 const musicList = reactive([])
 const isLoading = ref(false)
@@ -76,7 +76,7 @@ watchEffect(async () => {
     isDaily.value = true
     const { data, code } = await store.dispatch('getInfo', { path: '/recommend/songs' })
     if (code === 200) {
-      musicList.push(...jointSinger({ musicList: data.dailySongs, artists: 'ar' }))
+      musicList.push(...loopFilterAdd({ musicList: data.dailySongs, artists: 'ar' }))
     }
     // console.log(res)
   } else {
@@ -88,10 +88,10 @@ watchEffect(async () => {
       const {
         playlist: { tracks }
       } = await store.dispatch('getInfo', { path: `/playlist/detail?id=${id}` })
-      musicList.push(...jointSinger({ musicList: tracks, artists: 'ar' }))
+      musicList.push(...loopFilterAdd({ musicList: tracks, artists: 'ar' }))
     } else {
       const { songs = [] } = await store.dispatch('getInfo', { path: `/album?id=${id}` })
-      musicList.push(...jointSinger({ musicList: songs, artists: 'ar' }))
+      musicList.push(...loopFilterAdd({ musicList: songs, artists: 'ar' }))
     }
   }
   isLoading.value = false

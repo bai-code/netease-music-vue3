@@ -98,7 +98,7 @@
 import { watch, ref, computed, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
-import { computedCount, jointSinger, findItemIndex, playAndCommit, filterMusicList } from '@/utils/plugins.js'
+import { computedCount, loopFilterAdd, findItemIndex, playAndCommit, filterMusicList } from '@/utils/plugins.js'
 import { Search } from '@element-plus/icons-vue'
 import MusicList from './song-list-package/music-list.vue'
 import Comment from './song-list-package/comment.vue'
@@ -164,7 +164,7 @@ watch(
     // console.log(playlist)
 
     const { songs } = await store.dispatch('getInfo', { path: `/playlist/track/all?id=${newVal}` })
-    showMusicList.value = musicList.value = jointSinger({ musicList: songs, artists: 'ar', transTime: true, timeName: 'dt' })
+    showMusicList.value = musicList.value = loopFilterAdd({ musicList: songs, artists: 'ar', transTime: true, timeName: 'dt' })
     // getSubscribers(newVal)
     // const res = await store.dispatch('getInfo', { path: `/playlist/detail/dynamic?id=${newVal}` })
     // console.log(res)

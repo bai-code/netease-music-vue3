@@ -39,7 +39,7 @@ import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import NavTitleSlot from '@/components/nav-title-slot.vue'
 import ShowMusicInfoIconCenter from '@/components/show-music-info-icon-center.vue'
-import { jointSinger } from '@/utils/plugins.js'
+import { loopFilterAdd } from '@/utils/plugins.js'
 const titleList = reactive([
   {
     id: 0,
@@ -101,7 +101,7 @@ const getDiscList = async (month, year) => {
       error.value = true
       return
     }
-    tableDate.push({ data: jointSinger({ musicList: monthData }), id: [key], text: { month, year }, isShow: true })
+    tableDate.push({ data: loopFilterAdd({ musicList: monthData }), id: [key], text: { month, year }, isShow: true })
   } else {
     const { monthData = [], weekData = [] } = await store.dispatch('getInfo', { path: '/top/album' })
     // console.log(monthData, weekData.length)
@@ -112,8 +112,8 @@ const getDiscList = async (month, year) => {
       return
     }
     tableDate.push(
-      { data: jointSinger({ musicList: weekData }), id: '本周新碟', text: { month: '本周新碟' }, isShow: true },
-      { data: jointSinger({ musicList: monthData }), id: 'currentMonth', text: { month: todayMonth, year: todayYear }, isShow: false }
+      { data: loopFilterAdd({ musicList: weekData }), id: '本周新碟', text: { month: '本周新碟' }, isShow: true },
+      { data: loopFilterAdd({ musicList: monthData }), id: 'currentMonth', text: { month: todayMonth, year: todayYear }, isShow: false }
     )
   }
   timeout.value = true

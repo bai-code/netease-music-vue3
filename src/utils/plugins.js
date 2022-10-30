@@ -3,7 +3,7 @@
  * @param {*} list  传入数组
  * @returns 返回拼接完全的数组
  */
-export const forEachFilter = (list = [], symbol = '/', params = 'name') => {
+export const jointSinger = (list = [], symbol = '/', params = 'name') => {
   if (list.length === 0) return ''
   const len = list.length
   if (len === 1) {
@@ -48,6 +48,16 @@ export const transformTime = (t, isMs = true) => {
   return `${fillNum(m)}:${fillNum(s)}`
 }
 
+export const computedCount = (count = 0) => {
+  if (count / 100000000 >= 1) {
+    return parseInt(count / 100000000) + '亿'
+  } else if (count / 10000 >= 1) {
+    return parseInt(count / 10000) + '万'
+  } else {
+    return count
+  }
+}
+
 /**
  *
  * @param {*} list  数组
@@ -59,18 +69,34 @@ export const transformTime = (t, isMs = true) => {
  *
  * @returns  返回数组
  */
-export const jointSinger = ({ musicList = [], str = 'singer', value, needIndex = false, transTime = false, artists = 'artists', params = 'name', timeName = 'duration' }) => {
+export const loopFilterAdd = ({
+  musicList = [],
+  str = 'singer',
+  value, // 读取作者多层嵌套的名称
+  artists = 'artists', // 默认读取作者的数组从artiasts中读取
+  params = 'name', // 读取作者多层嵌套的名称
+
+  needIndex = false, // 是否需要添加索引 默认 index
+  transTime = false, // 是否需要转换时间
+  timeName = 'duration', // 转换时间的键名
+  isTransPlayCount = false, // 是否转换播放总数
+  readPlayCountName = 'playCount', // 需要读取对象中 playcount 具体名称
+  setPlayCountName = '_playCount' //  设置成 名称
+}) => {
   musicList.forEach((item, index) => {
     if (!value) {
-      item[str] = forEachFilter(item[artists], '', params)
+      item[str] = jointSinger(item[artists], '', params)
     } else {
-      item[str] = forEachFilter(item[value][artists], '', params)
+      item[str] = jointSinger(item[value][artists], '', params)
     }
     if (needIndex) {
       item.index = fillNum(index + 1)
     }
     if (transTime) {
       item.durationTime = transformTime(item[timeName])
+    }
+    if (isTransPlayCount) {
+      item[setPlayCountName] = computedCount(item[readPlayCountName])
     }
   })
   return musicList
@@ -104,15 +130,6 @@ export const playAndCommit = async ({ store, musicList = [], /* 传递的数组 
   return flag
 }
 
-export const computedCount = (count = 0) => {
-  if (count / 100000000 >= 1) {
-    return parseInt(count / 100000000) + '亿'
-  } else if (count / 10000 >= 1) {
-    return parseInt(count / 10000) + '万'
-  } else {
-    return count
-  }
-}
 /**
  * query  遍历对象需要匹配的某个属性
  * @param {*} param0 匹配的值

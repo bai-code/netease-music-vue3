@@ -1,5 +1,5 @@
 <template>
-  <el-scrollbar height="100%" class="scrollbar">
+  <el-scrollbar height="100%" class="scrollbar paddingRight">
     <div class="nav-title">
       <router-link :to="{ name: 'recommendation' }">个性推荐</router-link>
       <router-link :to="{ name: 'song-list' }">歌单</router-link>
@@ -17,7 +17,6 @@
 </template>
 
 <style lang="less" scoped>
-  
 div.nav-title {
   position: sticky;
   top: 0;

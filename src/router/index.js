@@ -105,6 +105,11 @@ const routes = [
         path: 'login',
         name: 'login',
         component: () => import('@/views/Login/login.vue')
+      },
+      {
+        path: 'exclusive',
+        name: 'exclusive',
+        component: () => import('@/views/views-package/exclusive.vue')
       }
     ]
   },

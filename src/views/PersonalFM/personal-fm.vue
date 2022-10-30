@@ -100,7 +100,6 @@ export default defineComponent({
         }
         showFm.value = list[currentIndex.value] || {}
         if (list.length === 0) return
-        console.log('提交请求')
         playAndCommit({ store, musicInfo: showFm.value, isPlay: isClick.value, isFm: true })
       },
       { immediate: true, deep: true }

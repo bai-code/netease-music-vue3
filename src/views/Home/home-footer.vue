@@ -66,7 +66,7 @@
 </template>
 
 <script setup>
-import { computed, ref, shallowRef, h } from 'vue'
+import { computed, ref, shallowRef, h, onDeactivated } from 'vue'
 import { useStore } from 'vuex'
 import audio from '@/utils/audio.js'
 // import { useRoute } from 'vue-router'
@@ -135,6 +135,12 @@ const goMusicDetailPage = () => {
   domBottom.value = '-70px'
   showCmp.value = MusicDetailContent
 }
+
+// 用于视频播放页面，暂停音乐播放
+onDeactivated(() => {
+  store.commit('pause')
+  console.log('销毁')
+})
 </script>
 
 <style lang="less" scoped>

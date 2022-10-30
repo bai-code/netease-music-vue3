@@ -47,7 +47,7 @@
 import { shallowReactive, ref, watchEffect } from 'vue'
 import { useStore } from 'vuex'
 import NavTitleSlot from '@/components/nav-title-slot.vue'
-import { jointSinger, playAndCommit } from '@/utils/plugins.js'
+import { loopFilterAdd, playAndCommit } from '@/utils/plugins.js'
 
 const store = useStore()
 const activeIndex = ref(0)
@@ -93,8 +93,8 @@ async function getTableDataList(type) {
   isLoading.value = true
   console.log(isLoading.value)
   const { data = [] } = await store.dispatch('getInfo', { path: `/top/song?type=${type}` })
-  // const filterData = jointSinger(data)
-  tableData.value[activeIndex.value] = jointSinger({ musicList: data, needIndex: true, transTime: true })
+  // const filterData = loopFilterAdd(data)
+  tableData.value[activeIndex.value] = loopFilterAdd({ musicList: data, needIndex: true, transTime: true })
   isLoading.value = false
   console.log(tableData.value, isLoading.value)
 }
