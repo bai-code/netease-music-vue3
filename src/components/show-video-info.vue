@@ -400,6 +400,9 @@ div.video-detail {
           }
           ul.comments-content {
             padding-left: 0;
+            :deep(.control span){
+              padding: 0 5px;
+            }
           }
         }
       }

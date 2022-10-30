@@ -30,9 +30,9 @@
 
   <!-- 推荐mv -->
   <div class="recommend-mv">
-    <NavTitle titleText="推荐MV" />
+    <NavTitle titleText="推荐MV" @linkPage="linkPage('')" />
     <div class="mv-container">
-      <show-mv-list :mvInfo="mv" v-for="mv in mvList" :key="mv.id" />
+      <show-mv-list :mvInfo="mv" v-for="mv in mvList" :key="mv.id" @playMv="playMv" />
     </div>
   </div>
 
@@ -147,6 +147,11 @@ const linkPage = (name) => {
   router.push({ name })
 }
 
+const playMv = (info) => {
+  router.push({ name: 'video-detail', query: { mvid: info.id } })
+  console.log(info)
+}
+
 onMounted(() => {
   requestBannerList()
   requestRecommendList()
@@ -197,9 +202,9 @@ div.exclusive {
     .flex(space-between,flex-start);
     & > li {
       width: 32%;
-      :deep(div.image){
+      :deep(div.image) {
         width: 100%;
-        height: 120px;
+        // height: 140px;
       }
     }
   }

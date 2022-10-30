@@ -233,11 +233,12 @@ div.comment-cmp {
         }
         .el-col.control {
           color: #666;
-          width: 220px;
+          min-width: 200px;
           .flex(space-between, center);
           span {
-            width: 50px;
+            // width: 50px;
             flex: 1 1 auto;
+            // min-width: ;
             text-align: center;
             &.tip-off {
               visibility: hidden;

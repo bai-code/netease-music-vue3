@@ -1,5 +1,5 @@
 <template>
-  <div class="show-mv-list">
+  <div class="show-mv-list" @click="playMv">
     <div class="show-img pointer">
       <img v-lazy="mvInfo.picUrl" alt="" />
       <div class="play-count">
@@ -18,8 +18,8 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue'
-defineProps({
+import { defineProps, defineEmits } from 'vue'
+const props = defineProps({
   mvInfo: {
     type: Object,
     default: () => {
@@ -32,6 +32,13 @@ defineProps({
     }
   }
 })
+
+const emits = defineEmits(['playMv'])
+
+const playMv = () => {
+  if (!props.mvInfo.name) return
+  emits('playMv', props.mvInfo)
+}
 </script>
 
 <style lang="less" scoped>
@@ -89,9 +96,9 @@ div.show-mv-list {
       &.author {
         font-size: 12px;
         color: @singerColor;
-				&:hover{
-					color: @fontColor;
-				}
+        &:hover {
+          color: @fontColor;
+        }
       }
     }
   }

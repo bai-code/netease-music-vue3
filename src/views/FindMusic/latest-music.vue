@@ -6,11 +6,11 @@
         <span :class="{ select: cmpIndex === '1' }" data-index="1">新碟上架</span>
       </div>
     </div>
-    <transition name="fade" mode="out-in">
+    <!-- <transition name="fade" mode="out-in"> -->
       <keep-alive>
         <component :is="activeCmpName" />
       </keep-alive>
-    </transition>
+    <!-- </transition> -->
   </div>
 </template>
 
@@ -19,7 +19,7 @@ import { ref, computed } from 'vue'
 import NewSongExpress from '@/views/FindMusic/latest-music/newsong-express.vue'
 import NewDisc from '@/views/FindMusic/latest-music/new-disc.vue'
 
-const cmpIndex = ref('1')
+const cmpIndex = ref('0')
 
 // const activeCmpName = ref(NewSongExpress) // 活跃的组件
 
@@ -39,7 +39,6 @@ const switchCmp = (e) => {
 
 <style lang="less" scoped>
 div.latest-music {
-  overflow: hidden;
   div.switch-cmp {
     position: relative;
     height: 30px;

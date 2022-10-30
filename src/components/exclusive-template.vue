@@ -58,7 +58,6 @@ div.exclusive {
   div.default-content {
     div.image {
       position: relative;
-      // width: 100%;
       width: 350px;
       height: 140px;
       img {

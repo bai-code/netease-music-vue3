@@ -55,7 +55,8 @@ const getCommentData = async (vid) => {
   commentList.value = comments
   hotCommentList.value = hotComments
   totalNum.value = total
-  // console.log(comments, hotComments, total)
+  // console.log(comments, hotComments, totalNum, res)
+  // console.log(totalNum, res)
 }
 
 const recommendVideoList = ref([])
@@ -92,7 +93,6 @@ watch(
     deep: true
   }
 )
-
 </script>
 
 <style lang="less" scoped>

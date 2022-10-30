@@ -1,5 +1,6 @@
 <template>
   <div class="new-disc">
+
     <NavTitleSlot :titleList="titleList" v-model:activeIndex="activeIndex">
       <template #recommend-all>
         <div class="recommend-all" @click="changeSelect">
@@ -168,7 +169,9 @@ onMounted(() => {
 <style lang="less" scoped>
 div.new-disc {
   min-height: 40px;
-  .nav-title-slot{
+  position: static;
+
+  .nav-title-slot {
     width: calc(100% - 10px);
   }
   div.recommend-all {
@@ -183,35 +186,40 @@ div.new-disc {
   }
   div.container {
     min-height: 400px;
+    position: static;
   }
   .el-row.music-container {
     position: static;
     .el-row.content {
       position: static;
       width: 100%;
+      .el-col.sticky {
+        position: static;
+        div.show-sticky {
+          position: sticky;
+          top: 62px;
+          height: 100px;
+          font-size: 20px;
+          text-align: center;
+          white-space: wrap;
+          width: 50px;
+          display: flex;
+          flex-direction: column;
+          span.month {
+            &.text {
+              font-size: 20px;
+              font-weight: 500;
+            }
+            font-size: 30px;
+          }
+          span.year {
+            font-size: 12px;
+          }
+        }
+      }
     }
     // min-height: 100px;
-    div.show-sticky {
-      position: sticky;
-      top: 62px;
-      height: 100px;
-      font-size: 20px;
-      text-align: center;
-      white-space: wrap;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      span.month {
-        &.text {
-          font-size: 20px;
-          font-weight: 500;
-        }
-        font-size: 30px;
-      }
-      span.year {
-        font-size: 12px;
-      }
-    }
+
     .c-right {
       flex: 0 0 auto;
       width: calc(100% / 24 * 22);

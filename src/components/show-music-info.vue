@@ -1,28 +1,38 @@
 <template>
-  <div class="show-music-info" :style="{ height: imgWH, width: imgWH }" @click="playMusic">
-    <div class="image pointer source">
-      <img v-lazy="musicInfo[showImgName]" alt="" />
-      <div class="play-count" v-if="musicInfo.playCount">
-        <i class="iconfont icon-play1"></i>
-        <span>{{ showPlayCount }}</span>
-      </div>
-      <div class="play-hover" v-else>根据您的音乐口味生成每日更新</div>
-      <div class="play-icon">
-        <i class="iconfont icon-hover"></i>
-      </div>
-      <slot name="date-re"></slot>
-      <div class="creator" v-if="musicInfo.creator">
-        <i class="iconfont icon-renwu-ren"></i>
-        <span class="nickname">{{ musicInfo.creator.nickname }}</span>
-        <el-image v-if="musicInfo.creator.avatarDetail" :src="musicInfo.creator.avatarDetail.identityIconUrl"></el-image>
-      </div>
-    </div>
+  <div class="show-music-info" @click="playMusic">
+    <el-skeleton :loading="loading" animated>
+      <template #template>
+        <el-skeleton-item variant="image" style="width: 160px; height: 160px" />
+        <el-skeleton-item variant="text" style="margin-right: 16px" />
+        <el-skeleton-item variant="text" style="width: 30%" />
+      </template>
+      <template #default>
+        <div class="image pointer source">
+          <img v-lazy="musicInfo[showImgName]" alt="" />
+          <div class="play-count" v-if="musicInfo.playCount">
+            <i class="iconfont icon-play1"></i>
+            <span>{{ showPlayCount }}</span>
+          </div>
+          <div class="play-hover" v-else>根据您的音乐口味生成每日更新</div>
+          <div class="play-icon">
+            <i class="iconfont icon-hover"></i>
+          </div>
+          <slot name="date-re"></slot>
+          <div class="creator" v-if="musicInfo.creator">
+            <i class="iconfont icon-renwu-ren"></i>
+            <span class="nickname">{{ musicInfo.creator.nickname }}</span>
+            <el-image v-if="musicInfo.creator.avatarDetail" :src="musicInfo.creator.avatarDetail.identityIconUrl"></el-image>
+          </div>
+        </div>
+      </template>
+    </el-skeleton>
+
     <p class="description pointer">{{ musicInfo.name }}</p>
   </div>
 </template>
 
 <script setup>
-import { defineProps, computed } from 'vue'
+import { ref, defineProps, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 const props = defineProps({
@@ -30,32 +40,40 @@ const props = defineProps({
     type: Object,
     reqiured: true,
     default: () => {
-      return {
-        picUrl: '',
-        name: '',
-        playCount: ''
-      }
+      return {}
     }
   },
   showImgName: {
     type: String,
     default: 'picUrl'
   },
-  imgWH: {
-    type: [String, Number],
-    default: '200px',
-    validator: (res) => {
-      if (typeof res === 'number') {
-        return res + 'px'
-      }
-      return res
-    }
-  },
+  // imgWH: {
+  //   type: [String, Number],
+  //   default: '200px',
+  //   validator: (res) => {
+  //     if (typeof res === 'number') {
+  //       return res + 'px'
+  //     }
+  //     return res
+  //   }
+  // },
   isRedirect: {
     type: Boolean
   }
 })
+
+const loading = ref(true)
 const store = useStore()
+
+watch(
+  () => props.musicInfo,
+  (newVal) => {
+    if (newVal && newVal.name) {
+      loading.value = false
+    }
+  },
+  { immediate: true, deep: true }
+)
 
 const showPlayCount = computed(() => {
   const playCount = props.musicInfo.playCount
@@ -90,16 +108,15 @@ const playMusic = () => {
 
 <style lang="less" scoped>
 div.show-music-info {
-  // height: 240px;
   position: relative;
-  width: 200px;
+  width: 140px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   div.image {
     flex: 0 0 auto;
     width: 100%;
-    height: 100%;
+    height: 140px;
     flex: 0 0 auto;
     position: relative;
     border-radius: 5px;
@@ -183,10 +200,10 @@ div.show-music-info {
         font-size: 12px;
         margin-right: 5px;
       }
-      span.nickname{
+      span.nickname {
         text-shadow: 0 0 3px #888;
       }
-      .el-image{
+      .el-image {
         height: 15px;
         width: 15px;
         border-radius: 50%;

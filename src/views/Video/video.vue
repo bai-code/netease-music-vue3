@@ -1,6 +1,6 @@
 <template>
   <div class="video">
-    <el-scrollbar height="700px" v-if="isMounted">
+    <el-scrollbar height="395px" v-if="isMounted">
       <nav-title-select :titleList="titleList" @changeIndex="changeIndex" :activeIndex="activeIndex"></nav-title-select>
       <TitleCategory :categoryList="categoryTagList" @changeCategory="changeCategory" :activeIndex="categoryActiveIndex">
         <template #left>
@@ -10,7 +10,7 @@
           </div>
         </template>
       </TitleCategory>
-      <div class="show-mv-list" v-infinite-scroll="loadVideo" infinite-scroll-distance="200px">
+      <div class="show-mv-list" v-infinite-scroll="loadVideo" :infinite-scroll-distance="300">
         <el-row class="video-container" type="flex" v-if="videoList[categoryActiveIndex] && videoList[categoryActiveIndex].length && isMounted">
           <el-col :span="8" v-for="item in videoList[categoryActiveIndex]" :key="item.id" class="video-item">
             <ShowVideo :videoInfo="item" @playVideo="playVideo" />
@@ -160,9 +160,12 @@ const playVideo = (videoInfo) => {
 div.video {
   width: 100%;
   height: 100%;
+
   // overflow: hidden;
   .el-scrollbar {
     width: 100%;
+    padding-right: 20px;
+    box-sizing: border-box;
     .nav-title-select {
       position: sticky;
       top: 0;
@@ -179,6 +182,7 @@ div.video {
         margin-left: 5px;
       }
     }
+
     div.show-mv-list {
       width: 100%;
       min-height: 700px;
