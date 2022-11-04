@@ -143,10 +143,10 @@ div.song-list {
       position: absolute;
       height: 100%;
       width: 100%;
-      // background-size: 100% 100%;
+      background-size: 200% 100%;
       left: 0;
       z-index: 1;
-      filter: blur(25px);
+      filter: blur(40px);
     }
     img {
       position: relative;
@@ -174,7 +174,7 @@ div.song-list {
           margin-right: 5px;
         }
       }
-      p {
+      p.name {
         color: @contrastColor;
         font-size: 16px;
         margin-top: 20px;

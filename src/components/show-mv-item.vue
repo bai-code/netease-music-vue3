@@ -1,12 +1,12 @@
 <template>
   <div class="show-mv-list" @click="playMv">
     <div class="show-img pointer">
-      <el-image :src="mvInfo.picUrl || mvInfo.cover" alt="" lazy>
+      <el-image class="imageFill" :src="mvInfo.picUrl || mvInfo.cover" alt="" lazy>
         <template #placeholder>
-          <img class="temp" src="~@/static/loading.gif" alt="" />
+          <img class="temp imageFill" src="~@/static/loading.gif" alt="" />
         </template>
         <template #error>
-          <img class="temp" src="~@/static/error.webp" alt="" />
+          <img class="temp imageFill" src="~@/static/error.webp" alt="" />
         </template>
       </el-image>
       <div :class="[{ needHover: needHover }, 'play-count']">
@@ -80,14 +80,6 @@ div.show-mv-list {
     }
     &:hover div.play-count.needHover {
       opacity: 0;
-    }
-    .el-image {
-      height: inherit;
-      width: inherit;
-      img.temp {
-        height: 100%;
-        width: 100%;
-      }
     }
     div.play-count {
       position: absolute;

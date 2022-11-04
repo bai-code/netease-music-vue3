@@ -1,7 +1,14 @@
 <template>
   <div class="video-container show-video pointer">
     <div class="img" @mouseenter="isHover = true" @mouseleave="isHover = false" @click="playVideo">
-      <img :src="tempImgUrl" alt="" :key="videoInfo.data.vid" />
+      <el-image class="imageFill" :src="tempImgUrl" alt="" :key="videoInfo.data.vid" lazy>
+          <template #placeholder v-if="!isHover">
+            <img class="temp imageFill" src="~@/static/loading.gif" alt="" />
+          </template>
+          <template #error>
+            <img class="temp imageFill" src="~@/static/error.webp" alt="" />
+          </template>
+      </el-image>
       <span class="show-icon" v-show="showIcon" key="icon">
         <i class="iconfont icon-hover"></i>
       </span>
@@ -120,7 +127,7 @@ div.video-container {
       bottom: 0;
       background: linear-gradient(rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0.4) 100%);
     }
-    img {
+    .el-image {
       height: 100%;
       width: 100%;
     }
