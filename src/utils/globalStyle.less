@@ -1,79 +1,88 @@
+@mainHeight: 420px;
 
-.overflow{
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	overflow: hidden;
-}
-
-.overflowMul(@num){
-	overflow: hidden;
-	text-overflow: ellipsis;
-	display: -webkit-box;
-	-webkit-box-orient: vertical;
-	-webkit-line-clamp: @num;
+.overflow {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
-.flex(@justify, @align){
-	display: flex;
-	justify-content: @justify;
-	align-items: @align;
+.overflowMul(@num) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: @num;
 }
 
-.flexCenter{
-	display: flex;
-	justify-content: center;
-	align-items: center;
+.flex(@justify, @align) {
+  display: flex;
+  justify-content: @justify;
+  align-items: @align;
 }
 
-.positions(@top, @left){
-	position: absolute;
-	top: @top;
-	left: @left;
-	transform: translateX(-@left);
-	// top: @top;
-}
-.posi(@left, @top){
-	position: absolute;
-	top: @top;
-	left: @left;
-	transform: translate(-50%,-50%);
+.flexCenter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.bgSrc(@src, @left, @top){
-	background-image: url(@src);
-	background-position: @left @top;
+.positions(@top, @left) {
+  position: absolute;
+  top: @top;
+  left: @left;
+  transform: translateX(-@left);
+  // top: @top;
+}
+.posi(@left, @top) {
+  position: absolute;
+  top: @top;
+  left: @left;
+  transform: translate(-50%, -50%);
 }
 
-a{
-	text-decoration: none;
-	color: inherit;
+.bgSrc(@src, @left, @top) {
+  background-image: url(@src);
+  background-position: @left @top;
 }
 
-ul{
-	// list-style: none;
-	margin: 0;
-	padding-left: 0;
-}
-li{
-	list-style: none;
-}
-p{
-	margin: 0;
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
-.pointer{
-	cursor: pointer;
+ul {
+  // list-style: none;
+  margin: 0;
+  padding-left: 0;
+}
+li {
+  list-style: none;
+}
+p {
+  margin: 0;
 }
 
-.default{
-	cursor: default;
+.pointer {
+  cursor: pointer;
 }
 
-.disabled{
-	color: #ccc;
+.default {
+  cursor: default;
+}
+
+.disabled {
+  color: #ccc;
 }
 
 // 用于scrollbar padding-right边距
-.paddingRight{
-	padding-right: 20px;
+.paddingRight {
+  padding-right: 20px;
+}
+
+.fontHover:hover {
+  color: #222;
+}
+
+.singerHover:hover {
+  color: #888 !important;
 }

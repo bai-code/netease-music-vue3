@@ -1,37 +1,20 @@
 <template>
   <div class="video">
-    <el-scrollbar height="395px" v-if="isMounted">
-      <nav-title-select :titleList="titleList" @changeIndex="changeIndex" :activeIndex="activeIndex"></nav-title-select>
-      <TitleCategory :categoryList="categoryTagList" @changeCategory="changeCategory" :activeIndex="categoryActiveIndex">
-        <template #left>
-          <div class="show-text pointer">
-            <span title="更新中......">{{ showBtnText }}</span>
-            <i class="iconfont icon-arrow-right"></i>
-          </div>
-        </template>
-      </TitleCategory>
-      <div class="show-mv-list" v-infinite-scroll="loadVideo" :infinite-scroll-distance="300">
-        <el-row class="video-container" type="flex" v-if="videoList[categoryActiveIndex] && videoList[categoryActiveIndex].length && isMounted">
-          <el-col :span="8" v-for="item in videoList[categoryActiveIndex]" :key="item.id" class="video-item">
-            <ShowVideo :videoInfo="item" @playVideo="playVideo" />
-          </el-col>
-          <div class="show-loading-icon" v-loading="isLoading"></div>
-        </el-row>
-      </div>
-      <!-- <div class="empty" v-else>暂无数据</div> -->
+    <el-scrollbar height="395px">
+      <NavTitleSelect :titleList="titleList" @changeIndex="changeIndex" :activeIndex="activeIndex" />
+      <router-view v-slot="{ Component }">
+        <keep-alive>
+          <component :is="Component" />
+        </keep-alive>
+      </router-view>
     </el-scrollbar>
   </div>
 </template>
 
 <script setup>
-import { shallowReactive, ref, onMounted, reactive, computed, watch } from 'vue'
-import { useStore } from 'vuex'
-import { useRouter } from 'vue-router'
+import { shallowReactive, ref, watch } from 'vue'
 import NavTitleSelect from '@/components/nav-title-select.vue'
-import TitleCategory from '@/components/title-category.vue'
-import ShowVideo from '@/components/show-video.vue'
-import { ElMessage } from 'element-plus'
-import { transformTime } from '@/utils/plugins.js'
+import { useRoute, useRouter } from 'vue-router'
 
 const titleList = shallowReactive([
   {
@@ -45,11 +28,40 @@ const titleList = shallowReactive([
 ])
 
 const activeIndex = ref(0)
+
+const route = useRoute()
+watch(
+  () => route.name,
+  (val) => {
+    if (val === 'video-content') {
+      activeIndex.value = 0
+    } else if (val === 'mv-content') {
+      activeIndex.value = 1
+    }
+  },
+  { immediate: true }
+)
+
+const router = useRouter()
 const changeIndex = (index) => {
   activeIndex.value = index
+  let name = 'video-content'
+  if (index === 0) {
+    name = 'video-content'
+  } else {
+    name = 'mv-content'
+  }
+
+  router.push({ name })
 }
 
-const store = useStore()
+// watch(
+//   activeIndex,
+//   (index) => {
+//     changeIndex(index)
+//   },
+//   { immediate: true }
+// )
 
 // 一百多条
 // const groupTagList = reactive([])
@@ -58,148 +70,20 @@ const store = useStore()
 //   groupTagList.push(data)
 //   console.log(groupTagList)
 // }
-
-const hasMore = ref(true)
-const videoList = reactive([])
-const isLoading = ref(false)
-const getVideoList = async (id = '58100') => {
-  if (!hasMore.value || isLoading.value) {
-    return
-  }
-  if (!videoList[categoryActiveIndex.value]) {
-    videoList[categoryActiveIndex.value] = []
-  }
-  const len = videoList[categoryActiveIndex.value].length
-  isLoading.value = true
-  // const { hasmore, datas = [] } = await store.dispatch('getInfo', { path: `/video/group?id=${id}&offset=${len}` })
-  // console.log(datas)
-  const { datas = [], hasmore } = await store.dispatch('getInfo', { path: `/video/group?id=${id}&offset=${len}` })
-
-  // console.log(datas, hasmore)
-
-  // if (datas.length === 0) {
-  //   isLoading.value = false
-  //   return
-  // }
-  datas.forEach((item) => {
-    item.data.countTime = transformTime(item.data.durationms || item.data.duration)
-  })
-
-  videoList[categoryActiveIndex.value].push(...datas)
-  hasMore.value = hasmore
-
-  isLoading.value = false
-  // console.log('切换', videoList)
-}
-// 子组件切换图片
-const loadVideo = () => {
-  getVideoList(videoId.value)
-  console.log('load  加载更多')
-}
-
-const showBtnText = computed(() => {
-  if (categoryTagList.value.length === 0 || !categoryTagList.value[categoryActiveIndex.value]) return
-  return categoryTagList.value[categoryActiveIndex.value].name
-})
-
-const videoId = computed(() => {
-  if (categoryTagList.value.length === 0 || !categoryTagList.value[categoryActiveIndex.value]) return
-  return categoryTagList.value[categoryActiveIndex.value].id
-})
-
-// 切换分类
-const categoryActiveIndex = ref(0)
-const changeCategory = (index) => {
-  categoryActiveIndex.value = index
-  hasMore.value = true
-  if (!videoList[categoryActiveIndex.value]) {
-    videoList[categoryActiveIndex.value] = []
-    getVideoList(videoId.value)
-  }
-}
-
-// 九条数据
-const categoryTagList = ref([])
-const getVideoCategoryList = async () => {
-  const { data = [] } = await store.dispatch('getInfo', { path: '/video/category/list' })
-  if (data.length === 0) {
-    ElMessage({
-      type: 'error',
-      message: '获取信息错误，请刷新试试！！！'
-    })
-    return
-  }
-  categoryTagList.value = data
-  // console.log(categoryTagList.value)
-}
-
-// 当获取到列表触发一次
-watch(categoryTagList, (newVal) => {
-  const { id } = newVal[0]
-  getVideoList(id)
-})
-
-const isMounted = ref(false) // 用于element-plus   load事件
-
-onMounted(() => {
-  // getVideoTagList()
-  isMounted.value = true
-  getVideoCategoryList()
-  // getVideoList(videoId.value)
-})
-
-const router = useRouter()
-const playVideo = (videoInfo) => {
-  const vid = videoInfo.data.vid
-  // console.log(videoInfo, vid)
-  router.push({ name: 'video-detail', query: { vid } })
-}
 </script>
 
 <style lang="less" scoped>
 div.video {
   width: 100%;
   height: 100%;
-
-  // overflow: hidden;
   .el-scrollbar {
     width: 100%;
     padding-right: 20px;
     box-sizing: border-box;
+    // overflow-x: hidden;
     .nav-title-select {
       position: sticky;
       top: 0;
-    }
-
-    div.show-text {
-      padding: 5px 15px;
-      border: 1px solid #ccc;
-      border-radius: 30px;
-      width: 80px;
-      text-align: center;
-      i.iconfont {
-        font-size: 12px;
-        margin-left: 5px;
-      }
-    }
-
-    div.show-mv-list {
-      width: 100%;
-      min-height: 700px;
-      .el-row.video-container {
-        min-height: 700px;
-        flex-wrap: wrap;
-        min-height: 40px;
-        .el-col.video-item {
-          padding: 0 10px;
-          box-sizing: border-box;
-        }
-        div.show-loading-icon {
-          height: 30px;
-          width: 100%;
-          flex: 0 0 auto;
-        }
-      }
     }
   }
 }

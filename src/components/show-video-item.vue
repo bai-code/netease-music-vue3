@@ -88,7 +88,7 @@ const playVideo = () => {
 <style lang="less" scoped>
 div.video-container {
   display: flex;
-  height: 180px;
+  min-height: 180px;
   width: 100%;
   border-radius: 5px;
   flex-direction: column;
@@ -97,8 +97,8 @@ div.video-container {
   text-shadow: 0 0 5px #ccc;
   margin-top: 10px;
   div.img {
-    height: calc(100% - 50px);
-    width: 100%;
+    height: 135px;
+    width: 240px;
     flex: 0 0 auto;
     overflow: hidden;
     position: relative;

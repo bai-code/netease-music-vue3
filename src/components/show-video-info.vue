@@ -12,9 +12,9 @@
           </div>
           <!-- 作者 -->
           <el-row class="author-attention pointer" type="flex" justify="space-between" align="middle">
-            <el-col :span="8" class="image">
+            <el-col :span="18" class="image">
               <el-image :src="videoInfo.avatarUrl || videoInfo.cover"></el-image>
-              <span>{{ (videoInfo.creator && videoInfo.creator.nickname) || videoInfo.mvCreator }}</span>
+              <span class="author">{{ (videoInfo.creator && videoInfo.creator.nickname) || videoInfo.mvCreator }}</span>
             </el-col>
             <el-col :span="4" class="attention pointer">
               <i class="iconfont icon-add"></i>
@@ -55,7 +55,7 @@
               <span class="count">({{ videoInfo.commentCount }})</span>
             </el-col>
             <div class="textarea">
-              <el-input type="textarea" resize="none" v-model="inputValue" always :rows="4" placeholder="接口数据提交异常，提交后间隔一段时间刷新尝试！！！"></el-input>
+              <el-input type="textarea" resize="none" v-model="inputValue" always :rows="4" placeholder="接口数据提交异常，后续建设！！！"></el-input>
               <span :class="[{ error: 140 - inputValue.length < 0 }, 'show-textCount']">{{ 140 - inputValue.length }}</span>
             </div>
             <div class="submit">
@@ -392,6 +392,7 @@ div.video-detail {
           }
         }
         div.good-comments {
+          width: 100%;
           div.title {
             font-weight: bolder;
             &.new-comment {
@@ -400,7 +401,7 @@ div.video-detail {
           }
           ul.comments-content {
             padding-left: 0;
-            :deep(.control span){
+            :deep(.control span) {
               padding: 0 5px;
             }
           }

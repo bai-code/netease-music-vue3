@@ -223,6 +223,7 @@ export default defineComponent({
           position: absolute;
           width: 300px;
           height: 300px;
+          box-shadow: 0 0 5px #ccc;
           .flexCenter;
           .el-image {
             flex: 0 0 auto;
