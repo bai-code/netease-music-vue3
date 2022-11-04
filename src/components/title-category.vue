@@ -40,6 +40,7 @@ const changeCategory = (index) => {
       margin-right: 8px;
       border-radius: 20px;
       padding: 3px 8px;
+      box-sizing: border-box;
       &.active {
         color: @bgColor;
         background: #fdebeb;

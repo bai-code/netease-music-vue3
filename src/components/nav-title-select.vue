@@ -1,4 +1,5 @@
 <template>
+<!-- title 大标题选择 -->
   <ul class="nav-title-select">
     <li v-for="(title, index) in titleList" :key="title.id" :class="[{ active: activeIndex === index }, 'pointer']" @click="selectItem(index)">{{ title.text }}</li>
   </ul>

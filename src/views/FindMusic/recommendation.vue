@@ -32,7 +32,7 @@
   <div class="recommend-mv">
     <NavTitle titleText="推荐MV" @linkPage="linkPage('')" />
     <div class="mv-container">
-      <show-mv-list :mvInfo="mv" v-for="mv in mvList" :key="mv.id" @playMv="playMv" />
+      <ShowMvItem :mvInfo="mv" v-for="mv in mvList" :key="mv.id"  :needHover="true" />
     </div>
   </div>
 
@@ -52,7 +52,7 @@ import NavTitle from '@/components/nav-title.vue'
 import ShowMusicInfo from '@/components/show-music-info.vue'
 import datePng from '@/static/tempDateBg.png'
 import ShowMusicInfoS from '@/components/show-music-info-s.vue'
-import ShowMvList from '@/components/show-mv-list.vue'
+import ShowMvItem from '@/components/show-mv-item.vue'
 import { loopFilterAdd, playAndCommit } from '@/utils/plugins.js'
 import { useRouter } from 'vue-router'
 import ExclusiveTemplate from '@/components/exclusive-template.vue'
@@ -147,10 +147,10 @@ const linkPage = (name) => {
   router.push({ name })
 }
 
-const playMv = (info) => {
-  router.push({ name: 'video-detail', query: { mvid: info.id } })
-  console.log(info)
-}
+// const playMv = (info) => {
+//   router.push({ name: 'video-detail', query: { mvid: info.id } })
+//   console.log(info)
+// }
 
 onMounted(() => {
   requestBannerList()

@@ -37,7 +37,7 @@ onMounted(() => {
     border-right: 1px solid @borderColor;
   }
   .el-main {
-    padding: 20px 0 5px 20px;
+    padding: 20px 0 0 20px;
     &::-webkit-scrollbar {
       display: none;
     }

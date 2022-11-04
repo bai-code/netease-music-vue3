@@ -1,24 +1,35 @@
 <template>
   <div class="show-mv-list" @click="playMv">
     <div class="show-img pointer">
-      <img v-lazy="mvInfo.picUrl" alt="" />
-      <div class="play-count">
+      <el-image :src="mvInfo.picUrl || mvInfo.cover" alt="" lazy>
+        <template #placeholder>
+          <img class="temp" src="~@/static/loading.gif" alt="" />
+        </template>
+        <template #error>
+          <img class="temp" src="~@/static/error.webp" alt="" />
+        </template>
+      </el-image>
+      <div :class="[{ needHover: needHover }, 'play-count']">
         <i class="iconfont icon-play1"></i>
-        {{ mvInfo.playCount }}
+        {{ mvInfo._playCount || mvInfo.playCount }}
       </div>
-      <div class="hover overflow">
-        {{ mvInfo.copywriter }}
-      </div>
+      <slot name="hover">
+        <div :class="[{ needHover: needHover }, 'overflow', 'hover']">
+          {{ mvInfo.copywriter }}
+        </div>
+      </slot>
     </div>
     <div class="show-mv-info">
-      <p class="name">{{ mvInfo.name }}</p>
+      <p class="name" :class="{ overflow: textOverflow }">{{ mvInfo.name }}</p>
       <p class="author overflow pointer">{{ mvInfo.author }}</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue'
+import { defineProps } from 'vue'
+import { useRouter } from 'vue-router'
+
 const props = defineProps({
   mvInfo: {
     type: Object,
@@ -30,35 +41,53 @@ const props = defineProps({
         playCount: ''
       }
     }
+  },
+  needHover: {
+    // 是否需要hover效果
+    type: Boolean,
+    default: false
+  },
+  textOverflow: {
+    type: Boolean,
+    default: false
   }
 })
 
-const emits = defineEmits(['playMv'])
+// const emits = defineEmits(['playMv'])
 
+const router = useRouter()
 const playMv = () => {
-  if (!props.mvInfo.name) return
-  emits('playMv', props.mvInfo)
+  const { id } = props.mvInfo
+  if (!id) return
+  router.push({ name: 'video-detail', query: { mvid: id } })
+  // console.log(props.mvInfo, router)
+  // emits('playMv', props.mvInfo)
 }
 </script>
 
 <style lang="less" scoped>
 div.show-mv-list {
+  margin-bottom: 20px;
   div.show-img {
     position: relative;
-    height: 120px;
-    width: 100%;
+    height: 130px;
+    width: 240px;
     overflow: hidden;
     border-radius: 5px;
     font-size: 12px;
-    &:hover div.hover {
+    &:hover div.hover.needHover {
       height: 30px;
     }
-    &:hover div.play-count {
+    &:hover div.play-count.needHover {
       opacity: 0;
     }
-    img {
+    .el-image {
       height: inherit;
       width: inherit;
+      img.temp {
+        height: 100%;
+        width: 100%;
+      }
     }
     div.play-count {
       position: absolute;
@@ -87,10 +116,12 @@ div.show-mv-list {
     }
   }
   div.show-mv-info {
+    width: 240px;
     p {
       margin: 5px 0;
       font-size: 14px;
-      &.name {
+
+      &.name:not(.overflow) {
         .overflowMul(2);
       }
       &.author {
