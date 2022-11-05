@@ -83,5 +83,6 @@ div.home-container {
   font-size: 14px;
   color: @fontColor;
   box-shadow: 0 5px 10px @boxShadowColor, 5px 0 10px @boxShadowColor, 0 -5px 10px @boxShadowColor, -5px 0 10px @boxShadowColor;
+  user-select: none;
 }
 </style>
