@@ -1,1 +1,3 @@
-<template>关注</template>
+<template>
+  <div>关注</div>
+</template>

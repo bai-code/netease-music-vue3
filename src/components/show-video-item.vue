@@ -1,14 +1,7 @@
 <template>
-  <div class="video-container show-video pointer">
+  <div class="video-container show-video pointer show-video-item">
     <div class="img" @mouseenter="isHover = true" @mouseleave="isHover = false" @click="playVideo">
-      <el-image class="imageFill" :src="tempImgUrl" alt="" :key="videoInfo.data.vid" lazy>
-          <template #placeholder v-if="!isHover">
-            <img class="temp imageFill" src="~@/static/loading.gif" alt="" />
-          </template>
-          <template #error>
-            <img class="temp imageFill" src="~@/static/error.webp" alt="" />
-          </template>
-      </el-image>
+      <img class="imageFill" :src="tempImgUrl" alt="" lazy />
       <span class="show-icon" v-show="showIcon" key="icon">
         <i class="iconfont icon-hover"></i>
       </span>
@@ -25,6 +18,7 @@
 
 <script setup>
 import { defineProps, computed, ref, watch, defineEmits } from 'vue'
+import { computedCount } from '@/utils/plugins'
 
 const props = defineProps({
   videoInfo: {
@@ -36,13 +30,14 @@ const emits = defineEmits(['playVideo'])
 
 const filterTime = computed(() => {
   const praisedCount = props.videoInfo.data && props.videoInfo.data.praisedCount
-  if (praisedCount > 100000000) {
-    return parseInt(praisedCount / 100000000) + '亿'
-  } else if (praisedCount > 100000) {
-    return parseInt(praisedCount / 100000) + '万'
-  } else {
-    return praisedCount
-  }
+  // if (praisedCount > 100000000) {
+  //   return parseInt(praisedCount / 100000000) + '亿'
+  // } else if (praisedCount > 100000) {
+  //   return parseInt(praisedCount / 100000) + '万'
+  // } else {
+  //   return praisedCount
+  // }
+  return computedCount(praisedCount)
 })
 
 const showIcon = ref(false)
@@ -88,7 +83,6 @@ watch(
 
 const playVideo = () => {
   emits('playVideo', props.videoInfo)
-  // console.log(id);
 }
 </script>
 
@@ -126,10 +120,6 @@ div.video-container {
     &::after {
       bottom: 0;
       background: linear-gradient(rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 0.4) 100%);
-    }
-    .el-image {
-      height: 100%;
-      width: 100%;
     }
     span.show-icon {
       .positions(50%,50%);
