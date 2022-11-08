@@ -1,7 +1,7 @@
 <template>
-  <div class="show-mv-list" @click="playMv">
+  <div class="show-mv-item" @click="playMv">
     <div class="show-img pointer">
-      <el-image class="imageFill" :src="mvInfo.picUrl || mvInfo.cover" alt="" lazy>
+      <el-image class="imageFill" :src="mvInfo.picUrl || mvInfo.cover || mvInfo.imgurl" alt="" lazy>
         <template #placeholder>
           <img class="temp imageFill" src="~@/static/loading.gif" alt="" />
         </template>
@@ -20,8 +20,9 @@
       </slot>
     </div>
     <div class="show-mv-info">
-      <p class="name" :class="{ overflow: textOverflow }">{{ mvInfo.name }}</p>
-      <p class="author overflow pointer">{{ mvInfo.author }}</p>
+      <p class="name" :class="{ overflow: textOverflow }"
+      :title="mvInfo.name">{{ mvInfo.name }}</p>
+      <p class="author overflow pointer" v-if="mvInfo.author">{{ mvInfo.author }}</p>
     </div>
   </div>
 </template>
@@ -66,7 +67,7 @@ const playMv = () => {
 </script>
 
 <style lang="less" scoped>
-div.show-mv-list {
+div.show-mv-item {
   margin-bottom: 20px;
   div.show-img {
     position: relative;

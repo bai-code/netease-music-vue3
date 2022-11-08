@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
-// import Home from '../views/Home/Home.vue'
 import Nav from '@/views/Home/home-nav.vue'
 import Content from '@/views/Home/home-content.vue'
 import Footer from '@/views/Home/home-footer.vue'
+import { accessToken } from '@/utils/plugins.js'
 
 // const musicDetailContent = import('@/views/views-package/music-detail-content.vue')
 
@@ -99,6 +99,12 @@ const routes = [
         component: () => import('@/views/Music-list/song-list-package/link-userInfo.vue')
       },
       {
+        path: 'singer-related/:singerId', // 歌手相关
+        name: 'singer-related',
+        meta: { requiredAuth: true },
+        component: () => import('@/views/FindMusic/singer-list/singer-related.vue')
+      },
+      {
         path: 'login',
         name: 'login',
         component: () => import('@/views/Login/login.vue')
@@ -135,6 +141,15 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  const info = accessToken({ tokenName: 'userinfo', isObj: true })
+  if (to.meta.requiredAuth && (!info || (info && !info.token))) {
+    next({ name: 'login' })
+  } else {
+    next()
+  }
 })
 
 export default router

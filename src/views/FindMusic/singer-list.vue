@@ -7,7 +7,7 @@
       <el-col :span="4" v-for="singer in singerList" :key="singer.id">
         <div class="singer-item" @click="linkToSingerRelated(singer)">
           <div class="image pointer">
-            <el-image fit="fill" class="imageFill" :src="singer.img1v1Url||singer.picUrl" lazy>
+            <el-image fit="fill" class="imageFill" :src="singer.img1v1Url || singer.picUrl" lazy>
               <template #placeholder>
                 <img class="temp imageFill" src="~@/static/loading.gif" alt="" />
               </template>
@@ -30,8 +30,9 @@
 </template>
 
 <script setup>
-import { reactive, watch, ref, onMounted } from 'vue'
+import { reactive, watch, ref, onActivated } from 'vue'
 import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 import TitltCategoryMore from '@/components/title-category-more'
 
 // activeIndex 选中项
@@ -256,7 +257,6 @@ const getSingerList = async (area = '-1', type = '-1', initial = '-1') => {
     singerList.value.push(...arr)
   }
   isLoading.value = false
-  console.log(artists, more)
 }
 
 const tempCategory = ref({})
@@ -269,7 +269,6 @@ watch(
     getSingerList(area, type, name)
     singerList.value = []
     tempCategory.value = { area, type, name }
-    console.log(area, type, name)
   },
   { immediate: true, deep: true }
 )
@@ -280,12 +279,15 @@ const loadMore = () => {
   // console.log('更多', tempCategory.value)
 }
 
+const router = useRouter()
 const linkToSingerRelated = (val) => {
-  console.log(val)
+  const { id } = val
+  if (!id) return
+  router.push({ name: 'singer-related', params: { singerId: id } })
 }
 
 const isMounted = ref(false)
-onMounted(() => {
+onActivated(() => {
   isMounted.value = true
 })
 </script>

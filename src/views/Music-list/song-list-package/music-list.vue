@@ -14,9 +14,9 @@
   </div>
 </template>
 <script setup>
-import { defineEmits, defineProps } from 'vue'
+import { defineEmits, defineProps, computed } from 'vue'
 import { fillNum } from '@/utils/plugins.js'
-import { computed } from '@vue/reactivity'
+// import { computed } from '@vue/reactivity'
 import { useStore } from 'vuex'
 const props = defineProps({
   mId: {
@@ -83,7 +83,7 @@ div.music-list {
     }
     .index {
       color: #ccc;
-      &.active{
+      &.active {
         color: @bgColor;
       }
     }

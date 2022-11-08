@@ -4,6 +4,9 @@ import router from './router'
 import store from './store'
 import LazyLoad from 'lazy-load-vue3'
 
+// 包装el-image 全部添加插槽placeholder  和  error
+import MImage from '@/globalComponent/m-image.vue'
+
 import '@/utils/normalize.css' // 重置样式
 
 import '@/utils/iconfont/iconfont.css' // 图标样式
@@ -22,6 +25,8 @@ const app = createApp(App).use(store).use(router)
 app.config.globalProperties.$axios = axios
 
 app.use(ElementPlus)
+
+app.component('m-image', MImage)
 
 app.component('Loading', Loading)
 

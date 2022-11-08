@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onActivated, defineProps } from 'vue'
+import { ref, reactive, onActivated, defineProps, onDeactivated } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { ElMessageBox, ElMessage } from 'element-plus'
@@ -96,7 +96,7 @@ const submitForm = (formEl) => {
       })
       const { redirectToPath } = props
       if (redirectToPath) {
-        router.push({ name: redirectToPath })
+        router.push({ path: redirectToPath })
       } else {
         router.back()
       }
@@ -134,4 +134,8 @@ const handleClose = (done) => {
       // catch error
     })
 }
+
+onDeactivated(() => {
+  dialogVisible.value = false
+})
 </script>

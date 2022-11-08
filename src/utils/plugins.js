@@ -74,7 +74,7 @@ export const loopFilterAdd = ({
   str = 'singer',
   value, // 读取作者多层嵌套的名称
   artists = 'artists', // 默认读取作者的数组从artiasts中读取
-  params = 'name', // 读取作者多层嵌套的名称
+  params = 'name', // 读取作者的名称
   symbol = '/',
   needIndex = false, // 是否需要添加索引 默认 index
   transTime = false, // 是否需要转换时间
@@ -169,4 +169,27 @@ export const filterMusicList = ({ musicList = [], query, params, params1 = 'name
   // return musicList.filter((item) => {
 
   // })
+}
+
+/**
+ *  存取数据
+ * @param {*} tokenName 需要获取存储数据名
+ * @param {*} isSet 是不是存储数据
+ * @param {*} isObg  是不是复杂数据类型
+ * @returns
+ */
+export const accessToken = ({ tokenName, isSet = false, isObj = false, data }) => {
+  if (isSet) {
+    let packData = data
+    if (isObj) {
+      packData = JSON.stringify(data)
+    }
+    localStorage.setItem(tokenName, packData)
+  } else {
+    const argu = localStorage.getItem(tokenName)
+    if (isObj) {
+      return JSON.parse(argu)
+    }
+    return argu
+  }
 }

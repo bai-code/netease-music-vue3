@@ -17,9 +17,11 @@ export default defineComponent({
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
-      vm.redirectToPath = to.redirectedFrom && to.redirectedFrom.name
-      // vm.redirectToPath = to.query
-      console.log(to.redirectedFrom, from)
+      if (to.redirectedFrom) {
+        const { path } = to.redirectedFrom
+        vm.redirectToPath = path
+      }
+      // console.log(to.redirectedFrom, from)
     })
   }
 })
