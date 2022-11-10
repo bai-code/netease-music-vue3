@@ -1,13 +1,16 @@
 <template>
   <!-- 歌手详情页 -->
-  <div class="singer-detail">
+  <div class="singer-detail" v-if="singerDetail.length > 0">
     <el-row v-for="detail in singerDetail" :key="detail.ti">
       <h3 class="title">{{ detail.ti }}</h3>
       <ul class="txt">
         <li v-for="(t, index) in detail.txt.split('\n')" :key="index">{{ t }}</li>
       </ul>
-      <!-- <p class="txt">{{ detail.txt }}</p> -->
     </el-row>
+  </div>
+  <div class="singer-simply-detail" v-else>
+    <h3 class="title">歌手简介</h3>
+    <p>{{ simplyDetail }}</p>
   </div>
 </template>
 <script setup>
@@ -22,9 +25,14 @@ const props = defineProps({
 
 const store = useStore()
 const singerDetail = ref([])
+const simplyDetail = ref('')
 const getSingerDesc = async (id) => {
-  const { introduction = [] } = await store.dispatch('getInfo', { path: `/artist/desc?id=${id}` })
-  singerDetail.value = introduction
+  const { introduction = [], briefDesc = '' } = await store.dispatch('getInfo', { path: `/artist/desc?id=${id}` })
+  if (introduction.length > 0) {
+    singerDetail.value = introduction
+  } else {
+    simplyDetail.value = briefDesc
+  }
 }
 
 watch(
@@ -52,6 +60,13 @@ div.singer-detail {
       text-indent: 2em;
       margin-top: 5px;
     }
+  }
+}
+div.singer-simply-detail {
+  text-indent: 2em;
+  p {
+    padding-left: 24px;
+    box-sizing: border-box;
   }
 }
 </style>

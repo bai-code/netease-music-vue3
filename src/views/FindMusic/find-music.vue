@@ -17,6 +17,9 @@
 </template>
 
 <style lang="less" scoped>
+// .el-scrollbar {
+//   width: 100%;
+// }
 div.nav-title {
   position: sticky;
   top: 0;

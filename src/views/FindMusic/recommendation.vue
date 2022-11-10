@@ -9,7 +9,7 @@
   <div class="recommend-music">
     <NavTitle titleText="推荐音乐" />
     <div class="container">
-      <ShowMusicInfo :musicInfo="todayInfo" imgWH="18%">
+      <ShowMusicInfo :musicInfo="todayInfo" imgWH="18%" :isPlaylist="false">
         <template #date-re>
           <span class="today">{{ today }}</span>
         </template>

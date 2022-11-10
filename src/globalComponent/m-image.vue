@@ -1,6 +1,6 @@
 <template>
-  <div class="m-image">
-    <el-image class="imageFill" :src="src" :alt="alt" :lazy="lazy">
+  <!-- <div class="m-image"> -->
+    <el-image class="m-image" fit="fill"  :src="src" :alt="alt" :lazy="lazy">
       <template #placeholder>
         <img class="temp imageFill" src="~@/static/loading.gif" alt="" />
       </template>
@@ -8,7 +8,8 @@
         <img class="temp imageFill" src="~@/static/error.webp" alt="" />
       </template>
     </el-image>
-  </div>
+    <!-- <slot></slot> -->
+  <!-- </div> -->
 </template>
 
 <script setup>
@@ -26,3 +27,12 @@ defineProps({
   }
 })
 </script>
+
+<style lang="less" scoped>
+.el-image.m-image {
+  // position: relative;
+  span.time {
+    transform: translate(50%, 50%);
+  }
+}
+</style>

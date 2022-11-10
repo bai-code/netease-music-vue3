@@ -1,6 +1,6 @@
 <template>
   <div class="show-music-info-icon-center pointer" ref="conRef">
-    <el-skeleton style="width: 149px" :loading="loading" animated >
+    <el-skeleton style="width: 149px" :loading="loading" animated>
       <template #template>
         <el-skeleton-item variant="image" style="width: 149px; height: 149px" />
         <div style="padding: 14px 0">
@@ -12,16 +12,16 @@
         </div>
       </template>
       <template #default>
-          <div class="image-c" :style="{ width: imgH, height: imgH }" @click="playMusic">
-            <el-image :src="musicInfo[showImgName] || musicInfo.picUrl || ''" alt="" class="el-image" :lazy="true" ></el-image>
-            <span class="show-icon">
-              <i class="iconfont icon-hover"></i>
-            </span>
-          </div>
-          <div class="text-content">
-            <div class="music-name">{{ musicInfo.name }}</div>
-            <div class="singer overflow">{{ musicInfo.singer }}</div>
-          </div>
+        <div class="image-c" :style="{ width: imgH, height: imgH }" @click="playMusic">
+          <el-image :src="musicInfo[showImgName] || musicInfo.picUrl || ''" alt="" class="el-image" :lazy="true"></el-image>
+          <span class="show-icon">
+            <i class="iconfont icon-hover"></i>
+          </span>
+        </div>
+        <div class="text-content">
+          <div class="music-name">{{ musicInfo.name }}</div>
+          <div class="singer overflow" v-if="musicInfo.singer">{{ musicInfo.singer }}</div>
+        </div>
       </template>
     </el-skeleton>
   </div>
@@ -33,7 +33,10 @@ import { ref, defineProps, onMounted, defineEmits, watch } from 'vue'
 const props = defineProps({
   musicInfo: {
     type: Object,
-    required: true
+    required: true,
+    default: () => {
+      return {}
+    }
   },
   showImgName: {
     type: String,

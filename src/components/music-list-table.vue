@@ -3,7 +3,7 @@
     <el-table :data="showMusicList" style="width: 100%" header-row-class-name="headerRowStyle" @row-dblclick="playMusic" :row-class-name="setClassName" :show-header="isShowHeader" stripe>
       <el-table-column width="50">
         <template v-slot="scope">
-          <span class="index" v-if="activeIndex !== scope.$index">{{ fillNum(scope.$index + 1) }}</span>
+          <span v-if="activeIndex !== scope.$index" :class="['index', { mark: isMark && scope.$index < 3 }]">{{ fillIndex ? fillNum(scope.$index + 1) : scope.$index + 1 }}</span>
           <span class="index" v-else>
             <i class="iconfont icon-yangshengqi"></i>
           </span>
@@ -13,15 +13,16 @@
         <template v-slot="scope">
           <div class="cell-name">
             <span class="name">{{ scope.row.name }}</span>
-            <span class="alia" v-if="scope.row.alia.length > 0">({{ scope.row.alia[0] }})</span>
-            <span class="show-sq" v-if="scope.row.sq"> SQ </span>
-            <span class="show-mv" v-if="scope.row.mv" @click="playMv(scope.row)"> MV </span>
+            <span class="alia" v-if="scope.row.alia && scope.row.alia.length > 0">({{ scope.row.alia[0] }})</span>
+            <span class="show-sq" v-if="showIcon && scope.row.sq"> SQ </span>
+            <span class="show-mv" v-if="showIcon && scope.row.mv" @click="playMv(scope.row)"> MV </span>
           </div>
         </template>
       </el-table-column>
-      <!-- <el-table-column prop="singer" label="歌手" class-name="column-item singer pointer" width="180" /> -->
-      <el-table-column prop="durationTime" label="时间" class-name=" column-item durationTime" width="80" />
+      <el-table-column prop="singer" label="歌手" class-name="column-item singer pointer" width="180" v-if="showSinger" />
+      <el-table-column v-if="showMusicList[0].durationTime" prop="durationTime" label="时间" class-name=" column-item durationTime" width="80" />
     </el-table>
+    <slot name="look-more"> </slot>
   </div>
 </template>
 
@@ -41,6 +42,24 @@ const props = defineProps({
   isShowHeader: {
     type: Boolean,
     default: true
+  },
+  showIcon: {
+    // 是否展示icon图片==》  mv sq vip等
+    type: Boolean,
+    default: true
+  },
+  fillIndex: {
+    // 索引是否填充成两位数
+    type: Boolean,
+    default: true
+  },
+  isMark: {
+    type: Boolean,
+    default: false
+  },
+  showSinger: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -85,6 +104,9 @@ div.music-list {
     }
     span.index {
       color: #ccc;
+      &.mark {
+        color: @bgColor;
+      }
       i.iconfont {
         color: @bgColor;
       }
@@ -99,6 +121,9 @@ div.music-list {
       .cell {
         overflow: hidden;
         white-space: nowrap;
+      }
+      &.singer {
+        text-align: end;
       }
       &.album,
       &.singer {

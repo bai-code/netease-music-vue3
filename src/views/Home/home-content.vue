@@ -38,6 +38,7 @@ onMounted(() => {
   }
   .el-main {
     padding: 20px 0 0 20px;
+    box-sizing: border-box;
     &::-webkit-scrollbar {
       display: none;
     }

@@ -27,7 +27,7 @@ export const jointSinger = (list = [], symbol = ' / ', params = 'name') => {
  * @returns
  */
 export const fillNum = (num) => {
-  if (typeof num === 'number' && num < 10) {
+  if (num < 10) {
     return String(num).padStart(2, '0')
   }
   return num

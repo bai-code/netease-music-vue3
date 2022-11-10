@@ -17,7 +17,7 @@
             </el-image>
           </div>
           <div class="singer">
-            <span class="name pointer">{{ singer.name }}</span>
+            <span class="name overflow pointer" :title="singer.name">{{ singer.name }}</span>
             <span class="icon pointer" v-if="singer.accountId">
               <i class="iconfont icon-person"></i>
             </span>
@@ -333,6 +333,10 @@ onActivated(() => {
         padding: 5px 0 20px 0;
         box-sizing: border-box;
         .flex(space-between,center);
+        span.name {
+          flex: 0 0 auto;
+          width: calc(100% - 20px);
+        }
         span.icon {
           background: @bgColor;
           height: 18px;

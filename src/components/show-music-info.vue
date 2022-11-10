@@ -1,5 +1,5 @@
 <template>
-  <div class="show-music-info" @click="playMusic">
+  <div class="show-music-info">
     <el-skeleton :loading="loading" animated>
       <template #template>
         <el-skeleton-item variant="image" style="width: 160px; height: 160px" />
@@ -8,13 +8,13 @@
       </template>
       <template #default>
         <div class="image pointer source">
-          <img v-lazy="musicInfo[showImgName]" alt="" />
+          <img v-lazy="musicInfo[showImgName]" alt="" @click="playMusic" />
           <div class="play-count" v-if="musicInfo.playCount">
             <i class="iconfont icon-play1"></i>
             <span>{{ showPlayCount }}</span>
           </div>
           <div class="play-hover" v-else>根据您的音乐口味生成每日更新</div>
-          <div class="play-icon">
+          <div class="play-icon" :class="{ 'right-bottom': iconPosition === 'right-bottom', center: iconPosition === 'center' }" @click="playOver">
             <i class="iconfont icon-hover"></i>
           </div>
           <slot name="date-re"></slot>
@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, computed, watch } from 'vue'
+import { ref, defineProps, computed, watch, defineEmits } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 const props = defineProps({
@@ -47,20 +47,19 @@ const props = defineProps({
     type: String,
     default: 'picUrl'
   },
-  // imgWH: {
-  //   type: [String, Number],
-  //   default: '200px',
-  //   validator: (res) => {
-  //     if (typeof res === 'number') {
-  //       return res + 'px'
-  //     }
-  //     return res
-  //   }
-  // },
-  isRedirect: {
-    type: Boolean
+  iconPosition: {
+    // icon图标位置
+    type: String,
+    default: 'right-bottom'
+  },
+  isPlaylist: {
+    // 区分是歌单还是每日歌曲
+    type: Boolean,
+    default: true
   }
 })
+
+const emits = defineEmits(['playOver'])
 
 const loading = ref(true)
 const store = useStore()
@@ -97,12 +96,18 @@ const playMusic = () => {
     }
   } else {
     const { id } = props.musicInfo
-    if (props.isRedirect) {
+    if (props.isPlaylist) {
       router.push({ name: 'song-list-package', params: { pId: id } })
     } else {
       router.push({ name: 'music-list', params: { id }, query: { argu: 'playlist' } })
     }
   }
+}
+
+const playOver = (val) => {
+  // 直接播放
+  emits('playOver', props.musicInfo)
+  console.log(val)
 }
 </script>
 
@@ -169,8 +174,6 @@ div.show-music-info {
     div.play-icon {
       position: absolute;
       opacity: 0;
-      right: 8%;
-      bottom: 8%;
       height: 24%;
       width: 24%;
       background: #fff;
@@ -178,6 +181,13 @@ div.show-music-info {
       z-index: 11;
       .flex(center,center);
       transition: opacity 0.7s;
+      &.right-bottom {
+        right: 8%;
+        bottom: 8%;
+      }
+      &.center {
+        .posi(50%,50%);
+      }
       & > i {
         color: @bgColor;
         font-size: 16px;
