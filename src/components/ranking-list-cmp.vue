@@ -75,7 +75,6 @@ const linkTo = () => {
   const { id } = props.rankingInfo
   if (!id) return
   router.push({ name: 'song-list-package', params: { pId: id } })
-  console.log(props.rankingInfo)
 }
 </script>
 

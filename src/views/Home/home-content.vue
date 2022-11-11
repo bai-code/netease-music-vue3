@@ -3,7 +3,7 @@
     <el-aside width="200px">
       <HomeAside />
     </el-aside>
-    <el-main>
+    <el-main :class="{ isDaily }">
       <router-view v-slot="{ Component }">
         <keep-alive>
           <component :is="Component" />
@@ -17,11 +17,28 @@
 // @ is an alias to /src
 // import HomeNav from './home-nav.vue'
 import HomeAside from './home-aside.vue'
+import { useRoute } from 'vue-router'
 // import HomeFooter from './home-footer.vue'
 import { useStore } from 'vuex'
-import { onMounted } from 'vue'
+import { onMounted, watch, ref } from 'vue'
 
 const store = useStore()
+
+const route = useRoute()
+
+const isDaily = ref(false)
+// 是否在每日页面，添加一个border
+watch(
+  () => route.query.argu,
+  (val) => {
+    if (val === 'daily') {
+      isDaily.value = true
+    } else {
+      isDaily.value = false
+    }
+  },
+  { immediate: true }
+)
 
 // 网易播放地址会过期，默认请求一次
 onMounted(() => {
@@ -39,6 +56,9 @@ onMounted(() => {
   .el-main {
     padding: 20px 0 0 20px;
     box-sizing: border-box;
+    &.isDaily {
+      padding: 0;
+    }
     &::-webkit-scrollbar {
       display: none;
     }

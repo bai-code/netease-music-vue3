@@ -8,20 +8,23 @@
       </template>
       <template #default>
         <div class="image pointer source">
-          <img v-lazy="musicInfo[showImgName]" alt="" @click="playMusic" />
-          <div class="play-count" v-if="musicInfo.playCount">
-            <i class="iconfont icon-play1"></i>
-            <span>{{ showPlayCount }}</span>
+          <div class="img" @click="playMusic">
+            <img v-lazy="musicInfo[showImgName]" alt="" />
+            <div class="play-count" v-if="musicInfo.playCount">
+              <i class="iconfont icon-play1"></i>
+              <span>{{ showPlayCount }}</span>
+            </div>
+            <div class="play-hover" v-else>根据您的音乐口味生成每日更新</div>
+            <slot name="date-re"></slot>
+            <div class="creator" v-if="musicInfo.creator">
+              <i class="iconfont icon-renwu-ren"></i>
+              <span class="nickname">{{ musicInfo.creator.nickname }}</span>
+              <el-image v-if="musicInfo.creator.avatarDetail" :src="musicInfo.creator.avatarDetail.identityIconUrl"></el-image>
+            </div>
           </div>
-          <div class="play-hover" v-else>根据您的音乐口味生成每日更新</div>
+
           <div class="play-icon" :class="{ 'right-bottom': iconPosition === 'right-bottom', center: iconPosition === 'center' }" @click="playOver">
             <i class="iconfont icon-hover"></i>
-          </div>
-          <slot name="date-re"></slot>
-          <div class="creator" v-if="musicInfo.creator">
-            <i class="iconfont icon-renwu-ren"></i>
-            <span class="nickname">{{ musicInfo.creator.nickname }}</span>
-            <el-image v-if="musicInfo.creator.avatarDetail" :src="musicInfo.creator.avatarDetail.identityIconUrl"></el-image>
           </div>
         </div>
       </template>

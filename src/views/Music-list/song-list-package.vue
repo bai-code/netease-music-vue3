@@ -48,7 +48,7 @@
               </div>
             </el-tooltip>
           </el-col>
-          <el-col class="tag">
+          <el-col class="tag" v-if="musicInfo.tags && musicInfo.tags.length > 0">
             <div>标签：</div>
             <div v-for="(tag, index) in musicInfo.tags" :key="index">
               <span class="pointer tag">{{ tag }}</span>
@@ -66,10 +66,10 @@
               <el-col :span="22" class="description-content">
                 <div class="content curt" ref="domRef">
                   <span>简介：</span>
-                  <span class="content">{{ musicInfo.description }}</span>
+                  <span class="content" ref="descRef">{{ musicInfo.description }}</span>
                 </div>
               </el-col>
-              <el-col :span="2" @click="spreadContext">
+              <el-col :span="2" @click="spreadContext" v-if="isShowSpreadBtn">
                 <i class="iconfont icon-pull-up" v-if="isSpread" key="up"></i>
                 <i class="iconfont icon-pull-down" key="down" v-else></i>
               </el-col>
@@ -161,7 +161,7 @@ watch(
     mId.value = newVal
     const { playlist } = await store.dispatch('getInfo', { path: `/playlist/detail?id=${newVal}` })
     musicInfo.value = playlist
-    // console.log(playlist)
+    console.log(playlist)
 
     const { songs } = await store.dispatch('getInfo', { path: `/playlist/track/all?id=${newVal}` })
     showMusicList.value = musicList.value = loopFilterAdd({ musicList: songs, artists: 'ar', transTime: true, timeName: 'dt' })
@@ -230,6 +230,17 @@ watch(
   },
   { immediate: true }
 )
+
+const descRef = ref()
+const isShowSpreadBtn = computed(() => {
+  const h = descRef.value && descRef.value.offsetHeight
+  if (h <= 25) {
+    return false
+  } else {
+    return true
+  }
+})
+console.log(isShowSpreadBtn)
 </script>
 <style lang="less" scoped>
 div.song-list-package {

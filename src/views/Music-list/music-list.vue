@@ -27,7 +27,7 @@
             ></el-tooltip>
           </div>
           <el-tooltip content="建设中......" placement="top-end">
-            <div class="collect-all pointer">
+            <div class="collect-all pointer hoverBg">
               <span class="icon"><i class="iconfont icon-folder"></i></span>
               <span>收藏全部</span>
             </div>
@@ -35,29 +35,19 @@
         </el-row>
       </el-row>
     </slot>
-    <div class="infinite-list" v-if="musicList.length">
-      <el-row v-for="(item, index) in musicList" :key="item.id" class="infinite-list-item" type="flex" align="middle" @dblclick="playMusic(index)" :class="{ active: index === currentIndex }">
-        <el-col :span="2" class="index">
-          <span v-if="currentIndex === index" class="currentPlay"> <i class="iconfont icon-yangshengqi"></i> </span>
-          <span class="index" v-else>{{ fillNum(index + 1) }}</span>
-        </el-col>
-        <el-col :span="4" class="img">
-          <el-image fit="fill" :src="(item.al && item.al.picUrl) || ''" alt="" />
-        </el-col>
-        <el-col :span="8" class="music-name overflow">{{ item.name }}</el-col>
-        <el-col :offset="1" :span="7" class="singer overflow">{{ item.singer }}</el-col>
-      </el-row>
-      <p class="sole">------我是有底线的------</p>
+
+    <div class="table-list" v-if="musicList.length">
+      <musicListTable :showMusicList="musicList" />
     </div>
-    <div class="show-empty" v-else v-loading="isLoading" style="height: 200px"></div>
   </el-scrollbar>
 </template>
 
 <script setup>
-import { watchEffect, ref, reactive, computed } from 'vue'
+import { watchEffect, ref, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
-import { loopFilterAdd, fillNum, playAndCommit } from '@/utils/plugins.js'
+import { loopFilterAdd, playAndCommit } from '@/utils/plugins.js'
+import musicListTable from '@/components/music-list-table.vue'
 
 const musicList = reactive([])
 const isLoading = ref(false)
@@ -76,7 +66,7 @@ watchEffect(async () => {
     isDaily.value = true
     const { data, code } = await store.dispatch('getInfo', { path: '/recommend/songs' })
     if (code === 200) {
-      musicList.push(...loopFilterAdd({ musicList: data.dailySongs, artists: 'ar' }))
+      musicList.push(...loopFilterAdd({ musicList: data.dailySongs, artists: 'ar', transTime: true }))
     }
     // console.log(res)
   } else {
@@ -97,22 +87,24 @@ watchEffect(async () => {
   isLoading.value = false
 })
 
-const currentIndex = computed(() => {
-  return store.getters.findCurrentPageIndex(musicList)
-})
+// const currentIndex = computed(() => {
+//   return store.getters.findCurrentPageIndex(musicList)
+// })
 // 播放全部 默认第一首开始
 const playAll = () => {
   playAndCommit({ store, musicList, index: 0 })
 }
 // 播放全部  默认当前点击歌曲为第一首
-const playMusic = (index) => {
-  playAndCommit({ store, musicList, index })
-}
+// const playMusic = (index) => {
+//   playAndCommit({ store, musicList, index })
+// }
 </script>
 
 <style scoped lang="less">
 .el-row.daily-content {
-  margin: 10px 0 10px 20px;
+  position: relative;
+  padding: 30px 0 10px 20px;
+  border-bottom: 1px solid @borderColor;
   .el-row.dailySongs {
     width: 100%;
     margin-bottom: 15px;
@@ -161,15 +153,18 @@ const playMusic = (index) => {
     }
   }
   .el-row.play-controls {
+    padding: 10px 0;
     & > div {
-      color: #fff;
       &.play-all {
         display: flex;
         flex-direction: row;
+        color: #fff;
+
         div.all {
           padding: 7px 7px 7px 13px;
           box-sizing: border-box;
           background: @bgColor;
+
           border-bottom-left-radius: 20px;
           border-top-left-radius: 20px;
           .flex(flex-start,center);
@@ -192,11 +187,11 @@ const playMusic = (index) => {
         }
       }
       &.collect-all {
-        background: @bgColor;
         .flex(center,center);
         padding: 7px 15px;
         border-radius: 20px;
         margin-left: 20px;
+        border: 1px solid @borderColor;
         span.icon {
           margin-right: 5px;
         }
@@ -205,10 +200,8 @@ const playMusic = (index) => {
   }
 }
 
-div.infinite-list {
-  min-height: 400px;
-  // height: 100%;
-  overflow: hidden;
+div.table-list {
+  padding: 0 20px 20px;
   .el-row.infinite-list-item {
     height: 60px;
     border-radius: 5px;

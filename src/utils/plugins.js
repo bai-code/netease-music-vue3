@@ -93,7 +93,8 @@ export const loopFilterAdd = ({
       item.index = fillNum(index + 1)
     }
     if (transTime) {
-      item.durationTime = transformTime(item[timeName])
+      // 时间兼容处理
+      item.durationTime = transformTime(item[timeName] || item.dt)
     }
     if (isTransPlayCount) {
       item[setPlayCountName] = computedCount(item[readPlayCountName])

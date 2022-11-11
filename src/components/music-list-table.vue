@@ -3,23 +3,37 @@
     <el-table :data="showMusicList" style="width: 100%" header-row-class-name="headerRowStyle" @row-dblclick="playMusic" :row-class-name="setClassName" :show-header="isShowHeader" stripe>
       <el-table-column width="50">
         <template v-slot="scope">
-          <span v-if="activeIndex !== scope.$index" :class="['index', { mark: isMark && scope.$index < 3 }]">{{ fillIndex ? fillNum(scope.$index + 1) : scope.$index + 1 }}</span>
-          <span class="index" v-else>
-            <i class="iconfont icon-yangshengqi"></i>
-          </span>
+          <div class="index">
+            <span v-if="activeIndex !== scope.$index" :class="['index', { mark: isMark && scope.$index < 3 }]">{{ fillIndex ? fillNum(scope.$index + 1) : scope.$index + 1 }}</span>
+            <span class="index" v-else>
+              <i class="iconfont icon-yangshengqi"></i>
+            </span>
+          </div>
         </template>
       </el-table-column>
       <el-table-column prop="name" label="标题" class-name="column-item title-name default">
         <template v-slot="scope">
           <div class="cell-name">
-            <span class="name">{{ scope.row.name }}</span>
-            <span class="alia" v-if="scope.row.alia && scope.row.alia.length > 0">({{ scope.row.alia[0] }})</span>
+            <div class="name overflow" :title="scope.row.alia && scope.row.alia.length > 0 ? scope.row.name + scope.row.alia[0] : scope.row.name">
+              <span class="name overflow">{{ scope.row.name }}</span>
+              <span class="alia" v-if="scope.row.alia && scope.row.alia.length > 0">({{ scope.row.alia[0] }})</span>
+            </div>
             <span class="show-sq" v-if="showIcon && scope.row.sq"> SQ </span>
             <span class="show-mv" v-if="showIcon && scope.row.mv" @click="playMv(scope.row)"> MV </span>
           </div>
         </template>
       </el-table-column>
+
       <el-table-column prop="singer" label="歌手" class-name="column-item singer pointer" width="180" v-if="showSinger" />
+      <el-table-column prop="al.name" label="专辑" class-name="column-item singer pointer" width="180" v-if="showSinger">
+        <template v-slot="scope">
+          <div class="al overflow" :title="scope.row.al.tns.length > 0 ? scope.row.al.name + scope.row.al.tns[0] : scope.row.al.name">
+            <span>{{ scope.row.al.name }}</span>
+            <span v-if="scope.row.al.tns.length > 0">( {{ scope.row.al.tns[0] }} )</span>
+          </div>
+        </template>
+      </el-table-column>
+
       <el-table-column v-if="showMusicList[0].durationTime" prop="durationTime" label="时间" class-name=" column-item durationTime" width="80" />
     </el-table>
     <slot name="look-more"> </slot>
@@ -54,12 +68,14 @@ const props = defineProps({
     default: true
   },
   isMark: {
+    // 是否标记列表索引颜色
     type: Boolean,
     default: false
   },
   showSinger: {
+    //  是否展示歌手
     type: Boolean,
-    default: false
+    default: true
   }
 })
 
@@ -90,6 +106,8 @@ const playMv = (row) => {
 <style lang="less" scoped>
 div.music-list {
   width: 100%;
+  // padding: 20px;
+  // box-sizing: border-box;
   :deep(.el-table) {
     .headerRowStyle {
       .cell {
@@ -99,11 +117,12 @@ div.music-list {
     .currentActive {
       .cell {
         color: @bgColor;
-        background: rgba(0, 0, 0, 0.2);
+        background: rgba(200, 200, 200, 0.3);
       }
     }
-    span.index {
+    div.index {
       color: #ccc;
+      text-align: center;
       &.mark {
         color: @bgColor;
       }
@@ -122,9 +141,6 @@ div.music-list {
         overflow: hidden;
         white-space: nowrap;
       }
-      &.singer {
-        text-align: end;
-      }
       &.album,
       &.singer {
         &:hover {
@@ -136,21 +152,30 @@ div.music-list {
       &.durationTime {
         color: @singerColor;
       }
+      &.durationTime {
+        text-align: center;
+      }
     }
     .el-table__cell {
-      padding: 4px 0;
+      padding: 0; // 可以控制table列表行高
       border: transparent;
+      .cell {
+        padding: 7px;
+        box-sizing: border-box;
+      }
     }
   }
 
   div.cell-name {
-    span.alia {
-      color: #999;
-      font-size: 13px;
-      margin-left: 5px;
+    // display: flex;
+    .flex(flex-start, center);
+    width: 97%;
+    div.name {
+      width: 0 1 auto;
     }
     span.show-sq,
     span.show-mv {
+      flex: 0 0 auto;
       color: #f00;
       border: 1px solid #f00;
       border-radius: 3px;
@@ -161,12 +186,12 @@ div.music-list {
       line-height: 14px;
       letter-spacing: 1px;
       margin-left: 3px;
-      position: relative;
       transform: scale(0.9);
-      // overflow: hidden;
+      width: 18px;
     }
     span.show-mv {
-      padding-right: 8px;
+      width: 27px;
+      letter-spacing: 0px;
       &::after {
         content: '';
         border-width: 3px 5px;
