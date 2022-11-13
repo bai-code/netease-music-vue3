@@ -72,6 +72,9 @@ onMounted(() => {
 <style lang="less" scoped>
 div.ranking-list {
   width: 100%;
+  div.official {
+    min-height: 500px;
+  }
   div.global {
     width: 100%;
     ul.g-item {

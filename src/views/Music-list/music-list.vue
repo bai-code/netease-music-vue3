@@ -1,5 +1,6 @@
 <template>
   <el-scrollbar>
+    <!-- // 每日歌曲推荐 -->
     <slot v-if="isDaily">
       <el-row class="daily-content">
         <el-row class="dailySongs">
@@ -37,14 +38,13 @@
     </slot>
 
     <div class="table-list" v-if="musicList.length">
-      <musicListTable :showMusicList="musicList" />
+      <musicListTable :showMusicList="musicList" :isLoading="isLoading" />
     </div>
   </el-scrollbar>
 </template>
 
 <script setup>
-import { watchEffect, ref, reactive } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, reactive, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { loopFilterAdd, playAndCommit } from '@/utils/plugins.js'
 import musicListTable from '@/components/music-list-table.vue'
@@ -54,50 +54,25 @@ const isLoading = ref(false)
 
 // 是否是每日推荐 && 当前日期
 const date = new Date().getDate()
-const isDaily = ref(false)
+const isDaily = ref(true)
 
-const route = useRoute()
+// const route = useRoute()
 const store = useStore()
-watchEffect(async () => {
-  const { argu } = route.query
-  isLoading.value = true
-  // 是否是每日推荐重定向过来的
-  if (argu === 'daily') {
-    isDaily.value = true
-    const { data, code } = await store.dispatch('getInfo', { path: '/recommend/songs' })
-    if (code === 200) {
-      musicList.push(...loopFilterAdd({ musicList: data.dailySongs, artists: 'ar', transTime: true }))
-    }
-    // console.log(res)
-  } else {
-    isDaily.value = false
-    const { id } = route.params
-    if (argu === 'playlist') {
-      // 专辑数据获取
-      // 歌单数据获取
-      const {
-        playlist: { tracks }
-      } = await store.dispatch('getInfo', { path: `/playlist/detail?id=${id}` })
-      musicList.push(...loopFilterAdd({ musicList: tracks, artists: 'ar' }))
-    } else {
-      const { songs = [] } = await store.dispatch('getInfo', { path: `/album?id=${id}` })
-      musicList.push(...loopFilterAdd({ musicList: songs, artists: 'ar' }))
-    }
-  }
-  isLoading.value = false
-})
-
-// const currentIndex = computed(() => {
-//   return store.getters.findCurrentPageIndex(musicList)
-// })
 // 播放全部 默认第一首开始
 const playAll = () => {
   playAndCommit({ store, musicList, index: 0 })
 }
-// 播放全部  默认当前点击歌曲为第一首
-// const playMusic = (index) => {
-//   playAndCommit({ store, musicList, index })
-// }
+
+const getDailySongs = async () => {
+  const { data, code } = await store.dispatch('getInfo', { path: '/recommend/songs' })
+  if (code === 200) {
+    musicList.push(...loopFilterAdd({ musicList: data.dailySongs, artists: 'ar', transTime: true }))
+  }
+}
+
+onMounted(() => {
+  getDailySongs()
+})
 </script>
 
 <style scoped lang="less">

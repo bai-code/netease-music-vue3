@@ -149,14 +149,29 @@ const store = createStore({
       // console.log(id, musicInfo)
       if (!id) return
       const { code, data = [] } = await $axios.get(`/song/url/v1?id=${id}&level=${level}`)
-      // console.log(data)
+      console.log(data, musicInfo)
       if (code === 200) {
         const { url } = data[0]
         if (!url) {
           if (!isNext) {
+            let msg = ''
+            switch (musicInfo.fee) {
+              case 0:
+                msg = '免费或无版权'
+                break
+              case 1:
+                msg = 'VIP歌曲'
+                break
+              case 4:
+                msg = '该专辑为付费专辑'
+                break
+              case 8:
+                msg = '非会员可免费播放低音质，会员可播放高音质及下载'
+                break
+            }
             ElMessage({
               type: 'error',
-              message: '获取歌曲资源失败'
+              message: msg
             })
           }
           return false

@@ -1,10 +1,12 @@
 <template>
-  <el-carousel v-if="bannerList.length" :interval="4000" type="card" height="200px" :initial-index="0">
-    <el-carousel-item v-for="banner in bannerList" :key="banner.targetId" @click="playMusic(banner)">
-      <img :src="banner.imageUrl" :alt="banner.typeTitle" />
-      <span class="mark" :style="{ backgroundColor: banner.titleColor }">{{ banner.typeTitle }}</span>
-    </el-carousel-item>
-  </el-carousel>
+  <div class="carousel">
+    <el-carousel v-if="bannerList.length" :interval="4000" type="card" height="200px" :initial-index="0">
+      <el-carousel-item v-for="banner in bannerList" :key="banner.targetId" @click="playMusic(banner)">
+        <img :src="banner.imageUrl" :alt="banner.typeTitle" />
+        <span class="mark" :style="{ backgroundColor: banner.titleColor }">{{ banner.typeTitle }}</span>
+      </el-carousel-item>
+    </el-carousel>
+  </div>
   <!-- 推荐音乐 -->
   <div class="recommend-music">
     <NavTitle titleText="推荐音乐" />
@@ -32,7 +34,7 @@
   <div class="recommend-mv">
     <NavTitle titleText="推荐MV" @linkPage="linkPage('')" />
     <div class="mv-container">
-      <ShowMvItem :mvInfo="mv" v-for="mv in mvList" :key="mv.id"  :needHover="true" />
+      <ShowMvItem :mvInfo="mv" v-for="mv in mvList" :key="mv.id" :needHover="true" />
     </div>
   </div>
 
@@ -134,7 +136,7 @@ const playMusic = async (info) => {
       playAndCommit({ store, musicInfo: songs[0] })
     } else if (info.targetType === 1000) {
       // 歌单
-      router.push({ name: 'music-list', params: { id: info.targetId }, query: { argu: 'playlist' } })
+      router.push({ name: 'song-list-package', params: { pId: info.targetId } })
     } else {
       // 新碟首发  数字专辑
       router.push({ name: 'music-list', params: { id: info.targetId } })
@@ -162,26 +164,28 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
-.el-carousel {
-  .el-carousel__item {
-    overflow: hidden;
-    border-radius: 5px;
-    img {
-      height: 100%;
-      width: 100%;
-    }
-    span.mark {
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      padding: 3px 13px;
-      font-size: 14px;
-      color: @contrastColor;
-      border-top-left-radius: 10px;
+div.carousel {
+  height: 226px;
+  .el-carousel {
+    .el-carousel__item {
+      overflow: hidden;
+      border-radius: 5px;
+      img {
+        height: 100%;
+        width: 100%;
+      }
+      span.mark {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        padding: 3px 13px;
+        font-size: 14px;
+        color: @contrastColor;
+        border-top-left-radius: 10px;
+      }
     }
   }
 }
-
 div.recommend-music {
   div.container {
     display: flex;
@@ -250,6 +254,7 @@ div.new-songs {
     flex-wrap: wrap;
     .show-music-info-s {
       width: 32%;
+      margin: 10px 0 10px;
     }
   }
 }

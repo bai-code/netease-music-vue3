@@ -13,7 +13,8 @@
       </div>
     </el-col>
     <el-col :span="18" v-if="rankingInfo.trackList">
-      <MusicListTable :showMusicList="rankingInfo.trackList" :isShowHeader="false" :showIcon="showIcon" :fillIndex="fillIndex" :isMark="true" :showSinger="true">
+      <MusicListTable :showMusicList="rankingInfo.trackList" :isShowHeader="false" :showIcon="false" :fillIndex="false" :isMark="true" :showLoading="false" :showAlbum="false"
+      :showCurrentStyle="false">
         <template #look-more>
           <div class="look-more" @click="linkTo">
             <span class="fontHover pointer">查看全部</span>
@@ -41,13 +42,17 @@ const props = defineProps({
       }
     }
   },
-  showIcon: {
-    // 是否展示歌曲icon =》 新歌or排序or上升等
-    type: Boolean,
-    default: false
-  },
-  fillIndex: {
-    // 是否填充索引
+  // showIcon: {
+  //   // 是否展示歌曲icon =》 新歌or排序or上升等
+  //   type: Boolean,
+  //   default: false
+  // },
+  // fillIndex: {
+  //   // 是否填充索引
+  //   type: Boolean,
+  //   default: false
+  // },
+  showLoading: {
     type: Boolean,
     default: false
   }
@@ -81,6 +86,7 @@ const linkTo = () => {
 <style lang="less" scoped>
 .el-row.ranking-list-cmp {
   margin-bottom: 30px;
+  min-height: 194px;
   .el-col {
     div.image {
       height: 170px;
@@ -122,7 +128,15 @@ const linkTo = () => {
         text-align: end;
       }
       .el-table__cell {
-        padding: 6px 0;
+        &.singer {
+          text-align: end;
+        }
+        .cell {
+          padding: 6px;
+        }
+      }
+      .el-table__row {
+        padding: 0;
       }
     }
     div.look-more {

@@ -14,8 +14,11 @@
         </div>
       </template>
     </NavTitleSlot>
+    <div class="content">
+      <MusicListTable :showMusicList="tableData[activeIndex]" :isShowHeader="false" :showImage="true" />
+    </div>
     <!-- 表格 -->
-    <el-table :data="tableData[activeIndex]" style="width: 100%" v-loading="isLoading" @row-dblclick="playMusic" :row-class-name="setRow">
+    <!-- <el-table :data="tableData[activeIndex]" style="width: 100%" v-loading="isLoading" @row-dblclick="playMusic" :row-class-name="setRow">
       <el-table-column type="#" width="50">
         <template #default="scope">
           <span class="index" v-if="activeClassIndex + 1 != scope.row.index">{{ scope.row.index }}</span>
@@ -39,7 +42,7 @@
       <el-table-column prop="singer" class-name="pointer" width="150" />
       <el-table-column prop="name" width="150" class-name="pointer" />
       <el-table-column prop="durationTime" width="80" class-name="dt" />
-    </el-table>
+    </el-table> -->
   </div>
 </template>
 
@@ -48,6 +51,7 @@ import { shallowReactive, ref, watchEffect } from 'vue'
 import { useStore } from 'vuex'
 import NavTitleSlot from '@/components/nav-title-slot.vue'
 import { loopFilterAdd, playAndCommit } from '@/utils/plugins.js'
+import MusicListTable from '@/components/music-list-table.vue'
 
 const store = useStore()
 const activeIndex = ref(0)
@@ -91,20 +95,18 @@ const tableData = ref([])
 
 async function getTableDataList(type) {
   isLoading.value = true
-  console.log(isLoading.value)
   const { data = [] } = await store.dispatch('getInfo', { path: `/top/song?type=${type}` })
   // const filterData = loopFilterAdd(data)
   tableData.value[activeIndex.value] = loopFilterAdd({ musicList: data, needIndex: true, transTime: true })
   isLoading.value = false
-  console.log(tableData.value, isLoading.value)
 }
 
-// 设置活跃项的class类名
-const setRow = ({ rowIndex }) => {
-  if (rowIndex === activeClassIndex.value) {
-    return 'row-active'
-  }
-}
+// // 设置活跃项的class类名
+// const setRow = ({ rowIndex }) => {
+//   if (rowIndex === activeClassIndex.value) {
+//     return 'row-active'
+//   }
+// }
 
 watchEffect(() => {
   if (typeof tableData.value[activeIndex.value] !== 'object') {
@@ -126,8 +128,8 @@ const playAllMusic = () => {
 
 <style lang="less" scoped>
 div.newsong-express {
-  .nav-title-slot{
-    width: calc(100% - 10px)
+  .nav-title-slot {
+    width: calc(100% - 10px);
   }
   div.controls {
     .flex(space-around,center);

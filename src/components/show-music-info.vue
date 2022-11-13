@@ -35,9 +35,12 @@
 </template>
 
 <script setup>
-import { ref, defineProps, computed, watch, defineEmits } from 'vue'
+import { ref, defineProps, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
+import { getPlaylist } from '@/utils/plugins'
+// import getPlaylist from '@/hooks/useGetPlaylist.vue'
+
 const props = defineProps({
   musicInfo: {
     type: Object,
@@ -62,7 +65,7 @@ const props = defineProps({
   }
 })
 
-const emits = defineEmits(['playOver'])
+// const emits = defineEmits(['playOver'])
 
 const loading = ref(true)
 const store = useStore()
@@ -105,12 +108,13 @@ const playMusic = () => {
       router.push({ name: 'music-list', params: { id }, query: { argu: 'playlist' } })
     }
   }
+  console.log(props.musicInfo)
 }
 
-const playOver = (val) => {
+const playOver = () => {
   // 直接播放
-  emits('playOver', props.musicInfo)
-  console.log(val)
+  const { id } = props.musicInfo
+  getPlaylist({ id, isPlay: true })
 }
 </script>
 

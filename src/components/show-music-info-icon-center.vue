@@ -18,7 +18,7 @@
             <i class="iconfont icon-hover"></i>
           </span>
         </div>
-        <div class="text-content">
+        <div class="text-content" v-if="showOther">
           <div class="music-name">{{ musicInfo.name }}</div>
           <div class="singer overflow" v-if="musicInfo.singer">{{ musicInfo.singer }}</div>
         </div>
@@ -41,6 +41,11 @@ const props = defineProps({
   showImgName: {
     type: String,
     default: 'picUrl'
+  },
+  showOther: {
+  // 是否展示其他 =》歌手 ，歌名
+    type: Boolean,
+    default: true
   }
 })
 

@@ -1,8 +1,9 @@
 <!-- 包装组件歌单 -->
+<!-- 歌单组件 -->
 <template>
   <el-scrollbar>
-    <div class="song-list-package">
-      <el-row class="music-info" type="flex" v-if="musicInfo.name">
+    <div class="song-list-package paddingRight">
+      <el-row class="music-info" type="flex">
         <el-col :span="7"> <el-image :src="musicInfo.coverImgUrl"></el-image></el-col>
         <el-col :span="16">
           <div class="name">
@@ -10,12 +11,14 @@
             <h2 class="playlist-name overflow" :title="musicInfo.name">{{ musicInfo.name }}</h2>
           </div>
           <el-col class="creator">
-            <div class="avatar">
-              <el-image :src="musicInfo.creator.avatarUrl"></el-image>
-              <el-image v-if="musicInfo.creator.avatarDetail" :src="musicInfo.creator.avatarDetail.identityIconUrl" class="tag"></el-image>
+            <div class="container" v-if="musicInfo.creator">
+              <div class="avatar">
+                <el-image :src="musicInfo.creator.avatarUrl"></el-image>
+                <el-image v-if="musicInfo.creator.avatarDetail" :src="musicInfo.creator.avatarDetail.identityIconUrl" class="tag"></el-image>
+              </div>
+              <span class="create-user pointer">{{ musicInfo.creator.nickname }}</span>
+              <span class="create-date default">{{ createTime }} 创建</span>
             </div>
-            <span class="create-user pointer">{{ musicInfo.creator.nickname }}</span>
-            <span class="create-date default">{{ createTime }}创建</span>
           </el-col>
           <el-col class="controls">
             <div class="play-all pointer">
@@ -57,19 +60,19 @@
           </el-col>
           <el-col class="playCount">
             <span>歌曲：</span>
-            <span class="show-num">{{ musicInfo.trackIds.length }}</span>
+            <span class="show-num" v-if="musicInfo.trackIds">{{ musicInfo.trackIds.length }}</span>
             <span class="gutter">播放：</span>
             <span class="show-num">{{ playCount }}</span>
           </el-col>
           <el-col class="description">
             <el-row>
               <el-col :span="22" class="description-content">
-                <div class="content curt" ref="domRef">
-                  <span>简介：</span>
-                  <span class="content" ref="descRef">{{ musicInfo.description }}</span>
+                <div class="content">
+                  <span class="title">简介：</span>
+                  <span class="content" :class="[isSpread ? '' : 'overflow']" ref="domRef">{{ musicInfo.description }}</span>
                 </div>
               </el-col>
-              <el-col :span="2" @click="spreadContext" v-if="isShowSpreadBtn">
+              <el-col :span="2" @click="spreadContext" v-if="true">
                 <i class="iconfont icon-pull-up" v-if="isSpread" key="up"></i>
                 <i class="iconfont icon-pull-down" key="down" v-else></i>
               </el-col>
@@ -78,13 +81,16 @@
         </el-col>
       </el-row>
       <el-row class="title-search" type="flex" justify="space-between">
-        <el-col :span="8">
+        <el-col :span="12">
           <ul class="select-item">
-            <li v-for="(select, index) in selectList" :class="[{ select: index === selectIndex }, 'pointer']" :key="select.id" @click="changeSelectItem(index)">{{ select.text }}</li>
+            <li v-for="(select, index) in selectList" :class="[{ select: index === selectIndex }, 'pointer']" :key="select.id" @click="changeSelectItem(index)">
+              {{ select.text }}
+              <span v-if="select.commentCount">({{ select.commentCount }})</span>
+            </li>
           </ul>
         </el-col>
         <el-col :span="5">
-          <el-input :suffix-icon="Search" v-model="inputValue"></el-input>
+          <el-input :suffix-icon="Search" v-model="inputValue" placeholder="歌名/歌手"></el-input>
         </el-col>
       </el-row>
       <el-row class="music-list">
@@ -100,31 +106,35 @@ import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import { computedCount, loopFilterAdd, findItemIndex, playAndCommit, filterMusicList } from '@/utils/plugins.js'
 import { Search } from '@element-plus/icons-vue'
-import MusicList from './song-list-package/music-list.vue'
 import Comment from './song-list-package/comment.vue'
 import Collector from './song-list-package/collector.vue'
+import MusicList from '@/components/music-list-table.vue'
 
 const showCmp = shallowRef(MusicList)
 const mId = ref(0)
 // 切换组件
-const selectList = [
+const isSpread = ref(false)
+
+const selectList = ref([
   {
     id: 0,
     text: '歌曲列表'
   },
   {
     id: 1,
-    text: '评论'
+    text: '评论',
+    commentCount: 0
   },
   {
     id: 2,
     text: '收藏者'
   }
-]
+])
 const selectIndex = ref(0)
 watch(
   selectIndex,
   (index) => {
+    isSpread.value = false
     switch (index) {
       case 0:
         showCmp.value = MusicList
@@ -149,27 +159,26 @@ const store = useStore()
 const musicInfo = ref({})
 
 const domRef = ref()
-const isSpread = ref(false)
 
 const musicList = ref([])
 const showMusicList = ref([])
+// const comments = ref(0) // 评论数
+const getMusicList = async (pId) => {
+  const { playlist = {} } = await store.dispatch('getInfo', { path: `/playlist/detail?id=${pId}` })
+  musicInfo.value = playlist
+  selectList.value[1].commentCount = playlist.commentCount
+  // console.log(playlist)
+
+  const { songs } = await store.dispatch('getInfo', { path: `/playlist/track/all?id=${pId}` })
+  showMusicList.value = musicList.value = loopFilterAdd({ musicList: songs, artists: 'ar', transTime: true, timeName: 'dt' })
+}
 
 watch(
   () => route.params.pId,
-  async (newVal) => {
-    if (!newVal) return
-    mId.value = newVal
-    const { playlist } = await store.dispatch('getInfo', { path: `/playlist/detail?id=${newVal}` })
-    musicInfo.value = playlist
-    console.log(playlist)
-
-    const { songs } = await store.dispatch('getInfo', { path: `/playlist/track/all?id=${newVal}` })
-    showMusicList.value = musicList.value = loopFilterAdd({ musicList: songs, artists: 'ar', transTime: true, timeName: 'dt' })
-    // getSubscribers(newVal)
-    // const res = await store.dispatch('getInfo', { path: `/playlist/detail/dynamic?id=${newVal}` })
-    // console.log(res)
-
-    // console.log(songs)
+  async (pId) => {
+    if (!pId) return
+    mId.value = pId
+    getMusicList(pId)
   },
   { immediate: true }
 )
@@ -231,16 +240,16 @@ watch(
   { immediate: true }
 )
 
-const descRef = ref()
-const isShowSpreadBtn = computed(() => {
-  const h = descRef.value && descRef.value.offsetHeight
-  if (h <= 25) {
-    return false
-  } else {
-    return true
-  }
-})
-console.log(isShowSpreadBtn)
+// const descRef = ref()
+// const isShowSpreadBtn = computed(() => {
+//   const h = descRef.value && descRef.value.offsetHeight
+//   if (h <= 25) {
+//     return false
+//   } else {
+//     return true
+//   }
+// })
+// console.log(isShowSpreadBtn)
 </script>
 <style lang="less" scoped>
 div.song-list-package {
@@ -272,34 +281,37 @@ div.song-list-package {
       }
       .el-col.creator {
         margin-bottom: 10px;
-        .flex(flex-start,center);
-        div.avatar {
-          display: inline-block;
-          position: relative;
-          .el-image {
-            height: 30px;
-            width: 30px;
-            border-radius: 50%;
-            &.tag {
-              height: 13px;
-              width: 13px;
-              position: absolute;
-              left: 19px;
-              bottom: 2px;
+        height: 33px;
+        div.container {
+          .flex(flex-start,center);
+          div.avatar {
+            display: inline-block;
+            position: relative;
+            .el-image {
+              height: 30px;
+              width: 30px;
+              border-radius: 50%;
+              &.tag {
+                height: 13px;
+                width: 13px;
+                position: absolute;
+                left: 19px;
+                bottom: 2px;
+              }
             }
           }
-        }
-        & > span {
-          font-size: 12px;
-          margin-left: 10px;
-          &.create-user {
-            color: #507daf;
-            &:hover {
-              color: #0b58b0;
+          & > span {
+            font-size: 12px;
+            margin-left: 10px;
+            &.create-user {
+              color: #507daf;
+              &:hover {
+                color: #0b58b0;
+              }
             }
-          }
-          &.create-date {
-            color: #666;
+            &.create-date {
+              color: #666;
+            }
           }
         }
       }
@@ -369,13 +381,23 @@ div.song-list-package {
       }
       .el-col.description {
         .el-col.description-content {
-          div.content.curt {
-            .overflow;
-          }
-          span.content {
-            display: inline;
-            color: #666;
-            line-height: 20px;
+          width: 100%;
+          div.content {
+            // .overflow;
+            display: flex;
+            line-height: 22px;
+            // .flex(flex-start,center);
+            span.title {
+              flex: 0 0 auto;
+            }
+            span.content {
+              flex: 0 0 auto;
+              width: calc(100% - 40px);
+              color: #666;
+              // line-height: 20px;
+
+              // display: inline-block;
+            }
           }
         }
       }
@@ -386,7 +408,7 @@ div.song-list-package {
     .el-col {
       ul.select-item {
         .flex(flex-start,center);
-        margin-bottom: 30px;
+        margin-bottom: 15px;
         & > li {
           margin-right: 10px;
           &.select {
@@ -400,6 +422,10 @@ div.song-list-package {
     }
   }
   .el-row.music-list {
+    div.loading {
+      height: 50px;
+      width: 100%;
+    }
     // :deep(.el-table) {
     //   .headerRowStyle {
     //     .cell {

@@ -34,6 +34,7 @@ import audio from '@/utils/audio.js'
 const oldTime = ref(null)
 const store = useStore()
 
+// 网易播放地址会过期，默认请求一次
 const initMusicResource = () => {
   const { musicInfo } = store.state
   if (!musicInfo.id) return

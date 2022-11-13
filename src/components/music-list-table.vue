@@ -11,40 +11,58 @@
           </div>
         </template>
       </el-table-column>
+      <el-table-column prop="singer" label="歌手" class-name="column-item singer pointer" width="70" v-if="showImage">
+        <template #default="scope">
+          <ShowMusicInfoS :musicInfo="scope.row" showImgName="blurPicUrl" :showOther="false" />
+        </template>
+      </el-table-column>
       <el-table-column prop="name" label="标题" class-name="column-item title-name default">
         <template v-slot="scope">
           <div class="cell-name">
-            <div class="name overflow" :title="scope.row.alia && scope.row.alia.length > 0 ? scope.row.name + scope.row.alia[0] : scope.row.name">
+            <div
+              class="name overflow"
+              :title="
+                scope.row.alia && scope.row.alia.length > 0 ? scope.row.name + scope.row.alia[0] : scope.row.alias && scope.row.alias.length > 0 ? scope.row.name + scope.row.alias[0] : scope.row.name
+              "
+            >
               <span class="name overflow">{{ scope.row.name }}</span>
               <span class="alia" v-if="scope.row.alia && scope.row.alia.length > 0">({{ scope.row.alia[0] }})</span>
+              <span class="alia" v-else-if="scope.row.alias && scope.row.alias.length > 0">({{ scope.row.alias[0] }})</span>
             </div>
             <span class="show-sq" v-if="showIcon && scope.row.sq"> SQ </span>
-            <span class="show-mv" v-if="showIcon && scope.row.mv" @click="playMv(scope.row)"> MV </span>
+            <span class="show-mv" v-if="showIcon && (scope.row.mv || scope.row.mvid)" @click="playMv(scope.row)"> MV </span>
           </div>
         </template>
       </el-table-column>
 
-      <el-table-column prop="singer" label="歌手" class-name="column-item singer pointer" width="180" v-if="showSinger" />
-      <el-table-column prop="al.name" label="专辑" class-name="column-item singer pointer" width="180" v-if="showSinger">
+      <el-table-column prop="singer" label="歌手" class-name="column-item singer pointer" width="160" v-if="showSinger" />
+      <el-table-column prop="al.name" label="专辑" class-name="column-item album pointer" width="180" v-if="showAlbum">
         <template v-slot="scope">
-          <div class="al overflow" :title="scope.row.al.tns.length > 0 ? scope.row.al.name + scope.row.al.tns[0] : scope.row.al.name">
+          <div class="al overflow" v-if="scope.row.al && scope.row.al.tns" :title="scope.row.al.tns.length > 0 ? scope.row.al.name + scope.row.al.tns[0] : scope.row.al.name">
             <span>{{ scope.row.al.name }}</span>
             <span v-if="scope.row.al.tns.length > 0">( {{ scope.row.al.tns[0] }} )</span>
+          </div>
+          <div class="al overflow" v-else-if="scope.row.album" :title="scope.row.album.name">
+            <span>{{ scope.row.album.name }}</span>
           </div>
         </template>
       </el-table-column>
 
       <el-table-column v-if="showMusicList[0].durationTime" prop="durationTime" label="时间" class-name=" column-item durationTime" width="80" />
     </el-table>
+    <slot v-if="showLoading">
+      <div class="loading" v-loading="isLoading"></div>
+    </slot>
     <slot name="look-more"> </slot>
   </div>
 </template>
 
 <script setup>
-import { defineProps, computed } from 'vue'
+import { defineProps, computed, watch, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { playAndCommit, findItemIndex, fillNum } from '@/utils/plugins'
+import ShowMusicInfoS from '@/components/show-music-info-s'
 
 const props = defineProps({
   showMusicList: {
@@ -76,12 +94,39 @@ const props = defineProps({
     //  是否展示歌手
     type: Boolean,
     default: true
+  },
+  showAlbum: {
+    type: Boolean,
+    default: true
+  },
+  showLoading: {
+    // 是否展示loading请求状态
+    type: Boolean,
+    default: true
+  },
+  showCurrentStyle: {
+    // 是否给当前播放音乐添加样式
+    type: Boolean,
+    default: true
+  },
+  showImage: {
+    // 是否展示图片
+    type: Boolean,
+    default: false
   }
+  // isLoading: {
+  //   // 请求状态
+  //   type: Boolean,
+  //   default: false
+  // }
 })
 
 const store = useStore()
 const activeIndex = computed(() => {
-  return store.getters.findCurrentPageIndex(props.showMusicList)
+  if (props.showCurrentStyle) {
+    return store.getters.findCurrentPageIndex(props.showMusicList)
+  }
+  return -1
 })
 
 const setClassName = ({ rowIndex }) => {
@@ -99,8 +144,21 @@ const playMusic = (row) => {
 
 const router = useRouter()
 const playMv = (row) => {
-  router.push({ name: 'video-detail', query: { mvid: row.mv } })
+  const { mvid, mv } = row
+  router.push({ name: 'video-detail', query: { mvid: mvid || mv } })
 }
+
+const isLoading = ref(false)
+watch(
+  () => props.showMusicList,
+  (list) => {
+    if (list.length === 0) {
+      isLoading.value = true
+    } else {
+      isLoading.value = false
+    }
+  }
+)
 </script>
 
 <style lang="less" scoped>
@@ -111,7 +169,9 @@ div.music-list {
   :deep(.el-table) {
     .headerRowStyle {
       .cell {
-        color: #333;
+        color: #888;
+        font-weight: 500;
+        font-size: 14px;
       }
     }
     .currentActive {
@@ -155,6 +215,13 @@ div.music-list {
       &.durationTime {
         text-align: center;
       }
+      .show-music-info-s {
+        :deep(.el-image.image) {
+          height: 60px;
+          width: 60px;
+          border-radius: 5px;
+        }
+      }
     }
     .el-table__cell {
       padding: 0; // 可以控制table列表行高
@@ -172,6 +239,10 @@ div.music-list {
     width: 97%;
     div.name {
       width: 0 1 auto;
+      span.alia {
+        color: #888;
+        margin-left: 5px;
+      }
     }
     span.show-sq,
     span.show-mv {
@@ -202,6 +273,10 @@ div.music-list {
         top: 4px;
       }
     }
+  }
+  div.loading {
+    height: 40px;
+    width: 100%;
   }
 }
 </style>

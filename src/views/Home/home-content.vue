@@ -19,10 +19,10 @@
 import HomeAside from './home-aside.vue'
 import { useRoute } from 'vue-router'
 // import HomeFooter from './home-footer.vue'
-import { useStore } from 'vuex'
-import { onMounted, watch, ref } from 'vue'
+// import { useStore } from 'vuex'
+import { watch, ref } from 'vue'
 
-const store = useStore()
+// const store = useStore()
 
 const route = useRoute()
 
@@ -41,10 +41,10 @@ watch(
 )
 
 // 网易播放地址会过期，默认请求一次
-onMounted(() => {
-  const { musicInfo } = store.state
-  store.dispatch('getMusicInfo', { musicInfo, isPlay: false })
-})
+// onMounted(() => {
+//   const { musicInfo } = store.state
+//   store.dispatch('getMusicInfo', { musicInfo, isPlay: false })
+// })
 </script>
 
 <style lang="less" scoped>

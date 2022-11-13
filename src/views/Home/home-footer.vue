@@ -13,7 +13,7 @@
         </div>
         <div class="music-info" v-if="musicInfo.name">
           <div class="music-img overflow pointer">
-            <el-image :src="musicInfo.picUrl"> </el-image>
+            <m-image class="el-image" :src="musicInfo.picUrl"> </m-image>
             <div class="mask-layer">
               <!-- <i class="iconfont icon"></i> -->
               <div class="arrow-up-down" v-if="musicInfo.isFmMusic" @click="$router.push({ name: 'personal-fm' })">
@@ -139,7 +139,6 @@ const goMusicDetailPage = () => {
 // 用于视频播放页面，暂停音乐播放
 onDeactivated(() => {
   store.commit('pause')
-  console.log('销毁')
 })
 </script>
 

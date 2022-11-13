@@ -1,12 +1,12 @@
 <template>
   <div class="show-music-info-s overflow" type="flex" :style="{ height: ch }">
     <div class="image pointer overflow" @click="playMusic" :style="{ height: ch, width: ch }">
-      <img v-lazy="musicInfo.picUrl" alt="" />
+      <m-image class="el-image image" :src="musicInfo.picUrl || musicInfo.album.blurPicUrl" alt="" />
       <span class="icon">
         <i class="iconfont icon-hover"></i>
       </span>
     </div>
-    <div class="musicInfo">
+    <div class="musicInfo" v-if="showOther">
       <p class="overflow">
         <span class="name">{{ musicInfo.name }}</span
         ><span class="alias" v-if="musicInfo.song.alias.length">({{ musicInfo.song.alias[0] }})</span>
@@ -42,6 +42,11 @@ const props = defineProps({
       }
     },
     default: '50px'
+  },
+  showOther: {
+    // 是否展示其他 =》歌手，歌名
+    type: Boolean,
+    default: true
   }
 })
 
@@ -54,9 +59,7 @@ const playMusic = () => {
 
 <style lang="less" scoped>
 div.show-music-info-s {
-  margin-top: 20px;
   border-radius: 5px;
-  padding: 3px 0;
   box-sizing: border-box;
   &:hover {
     background: @hoverColor;
@@ -68,7 +71,7 @@ div.show-music-info-s {
     box-sizing: border-box;
     flex: 0 0 auto;
     border-radius: 5px;
-    img {
+    .image.el-image {
       height: inherit;
       width: inherit;
     }

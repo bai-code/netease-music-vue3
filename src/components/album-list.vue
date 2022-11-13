@@ -15,12 +15,12 @@
           <i class="iconfont icon-play"></i>
         </span>
         <el-tooltip placement="top" content="建设中">
-          <span class="icon pointer">
+          <span class="icon folder pointer">
             <i class="iconfont icon-folder"></i>
           </span>
         </el-tooltip>
       </div>
-      <MusicListTable :showMusicList="showMusicList" :isShowHeader="isShowHeader" />
+      <MusicListTable :showMusicList="showMusicList" :isShowHeader="isShowHeader" :showSinger="false" :showAlbum="false" />
       <div class="show-more pointer" v-if="showMore" @click="spreadMore">
         <span>查看全部 {{ showMore }} 首</span>
         <span class="icon">
@@ -133,8 +133,13 @@ const playMusic = () => {
       span.icon {
         color: #666;
         &.play {
-          margin: 0 20px;
+          margin: 0 15px 0 20px;
         }
+        &.folder {
+          padding-left: 15px;
+          border-left: 1px solid #ddd;
+        }
+
         i.iconfont {
           color: inherit;
         }
