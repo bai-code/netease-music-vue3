@@ -13,7 +13,12 @@
       </el-table-column>
       <el-table-column prop="singer" label="歌手" class-name="column-item singer pointer" width="70" v-if="showImage">
         <template #default="scope">
-          <ShowMusicInfoS :musicInfo="scope.row" showImgName="blurPicUrl" :showOther="false" />
+          <div class="image" @click="playMusic(scope.row)">
+            <m-image :src="scope.row.album.blurPicUrl"></m-image>
+            <span class="icon">
+              <i class="iconfont icon-hover"></i>
+            </span>
+          </div>
         </template>
       </el-table-column>
       <el-table-column prop="name" label="标题" class-name="column-item title-name default">
@@ -62,7 +67,6 @@ import { defineProps, computed, watch, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { playAndCommit, findItemIndex, fillNum } from '@/utils/plugins'
-import ShowMusicInfoS from '@/components/show-music-info-s'
 
 const props = defineProps({
   showMusicList: {
@@ -139,7 +143,7 @@ const playMusic = (row) => {
   const { id } = row
   const { showMusicList } = props
   const index = findItemIndex({ musicList: showMusicList, query: 'id', params: id })
-  playAndCommit({ store, musicList: showMusicList, index })
+  playAndCommit({ musicList: showMusicList, index })
 }
 
 const router = useRouter()
@@ -164,8 +168,6 @@ watch(
 <style lang="less" scoped>
 div.music-list {
   width: 100%;
-  // padding: 20px;
-  // box-sizing: border-box;
   :deep(.el-table) {
     .headerRowStyle {
       .cell {
@@ -215,13 +217,6 @@ div.music-list {
       &.durationTime {
         text-align: center;
       }
-      .show-music-info-s {
-        :deep(.el-image.image) {
-          height: 60px;
-          width: 60px;
-          border-radius: 5px;
-        }
-      }
     }
     .el-table__cell {
       padding: 0; // 可以控制table列表行高
@@ -232,7 +227,29 @@ div.music-list {
       }
     }
   }
-
+  div.image {
+    height: 60px;
+    width: 60px;
+    // position: relative;
+    .flex(center,center);
+    .m-image {
+      // position: absolute;
+      width: inherit;
+      height: inherit;
+      border-radius: 5px;
+    }
+    span.icon {
+      position: absolute;
+      background: #fff;
+      height: 25px;
+      width: 25px;
+      border-radius: 50%;
+      .flex(center,center);
+      & > i.iconfont {
+        color: @bgColor;
+      }
+    }
+  }
   div.cell-name {
     // display: flex;
     .flex(flex-start, center);

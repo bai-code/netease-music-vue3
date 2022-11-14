@@ -144,12 +144,18 @@ const store = createStore({
       }
       return {}
     },
+    /**
+     *
+     * @param {isFm} 是不是播放fm页面
+     * @param {mp3Url} 部分数据中自带url
+     * @returns
+     */
     async getMusicInfo({ commit, state }, { musicInfo = {}, isPlay = true /* 默认播放 */, isNext = false, isFm = false }) {
       const { id, level = 'standard' } = musicInfo
       // console.log(id, musicInfo)
       if (!id) return
       const { code, data = [] } = await $axios.get(`/song/url/v1?id=${id}&level=${level}`)
-      console.log(data, musicInfo)
+      // console.log(data, musicInfo)
       if (code === 200) {
         const { url } = data[0]
         if (!url) {
@@ -222,32 +228,6 @@ const store = createStore({
         }
       }
       _get()
-      // while (flag) {
-      //   if (params === 'next') {
-      //     if (index + 1 >= len) {
-      //       index = 0
-      //     } else {
-      //       index += 1
-      //     }
-      //   } else {
-      //     if (index - 1 < 0) {
-      //       index = len - 1
-      //     } else {
-      //       index -= 1
-      //     }
-      //   }
-      //   const res = await dispatch('getMusicInfo', { musicInfo: musicList[index], isNext: true })
-      //   console.log('执行')
-      //   if (res) {
-      //     flag = false
-      //   } else {
-      //     ElMessage({
-      //       type: 'error',
-      //       message: '获取资源失败，自动下一首'
-      //     })
-      //   }
-      // }
-      // console.log('下一首', index + 1)
     }
   },
   modules: {

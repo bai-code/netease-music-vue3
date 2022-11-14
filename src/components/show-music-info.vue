@@ -10,11 +10,13 @@
         <div class="image pointer source">
           <div class="img" @click="playMusic">
             <img v-lazy="musicInfo[showImgName]" alt="" />
-            <div class="play-count" v-if="musicInfo.playCount">
-              <i class="iconfont icon-play1"></i>
-              <span>{{ showPlayCount }}</span>
-            </div>
-            <div class="play-hover" v-else>根据您的音乐口味生成每日更新</div>
+            <template v-if="hoverShowText">
+              <div class="play-count" v-if="musicInfo.playCount">
+                <i class="iconfont icon-play1"></i>
+                <span>{{ showPlayCount }}</span>
+              </div>
+              <div class="play-hover" v-else>根据您的音乐口味生成每日更新</div>
+            </template>
             <slot name="date-re"></slot>
             <div class="creator" v-if="musicInfo.creator">
               <i class="iconfont icon-renwu-ren"></i>
@@ -31,6 +33,7 @@
     </el-skeleton>
 
     <p class="description pointer">{{ musicInfo.name }}</p>
+    <p class="singer" v-if="showSinger">{{ musicInfo.singer }}</p>
   </div>
 </template>
 
@@ -62,10 +65,18 @@ const props = defineProps({
     // 区分是歌单还是每日歌曲
     type: Boolean,
     default: true
+  },
+  showSinger: {
+    // 是否展示歌手
+    type: Boolean,
+    default: false
+  },
+  hoverShowText: {
+    // hover展示文字
+    type: Boolean,
+    default: true
   }
 })
-
-// const emits = defineEmits(['playOver'])
 
 const loading = ref(true)
 const store = useStore()

@@ -85,7 +85,7 @@
           <ul class="select-item">
             <li v-for="(select, index) in selectList" :class="[{ select: index === selectIndex }, 'pointer']" :key="select.id" @click="changeSelectItem(index)">
               {{ select.text }}
-              <span v-if="select.commentCount">({{ select.commentCount }})</span>
+              <span v-if="select.commentCount || select.commentCount === 0">({{ select.commentCount }})</span>
             </li>
           </ul>
         </el-col>
@@ -220,7 +220,7 @@ const playMusic = (row) => {
   if (row !== 'all') {
     index = findItemIndex({ musicList: showMusicList.value, params: row.name })
   }
-  playAndCommit({ store, musicList: showMusicList.value, index })
+  playAndCommit({ musicList: showMusicList.value, index })
 }
 
 // 搜索框事件

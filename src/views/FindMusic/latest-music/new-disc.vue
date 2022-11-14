@@ -1,6 +1,5 @@
 <template>
   <div class="new-disc">
-
     <NavTitleSlot :titleList="titleList" v-model:activeIndex="activeIndex">
       <template #recommend-all>
         <div class="recommend-all" @click="changeSelect">
@@ -20,7 +19,7 @@
           <el-col :span="22" class="c-right">
             <div class="show-month">
               <template v-for="i in item.data" :key="i.id">
-                <ShowMusicInfoIconCenter :musicInfo="i" :style="{ width: '22%' }" @playMusic="playMusic" showImgName="blurPicUrl" />
+                <ShowMusicInfo :musicInfo="i" :style="{ width: '22%' }" @playMusic="playMusic" showImgName="blurPicUrl" iconPosition="center" :hoverShowText="false" />
               </template>
             </div>
           </el-col>
@@ -39,7 +38,9 @@ import { ref, reactive, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import NavTitleSlot from '@/components/nav-title-slot.vue'
-import ShowMusicInfoIconCenter from '@/components/show-music-info-icon-center.vue'
+// import ShowMusicInfoIconCenter from '@/components/show-music-info-icon-center.vue'
+import ShowMusicInfo from '@/components/show-music-info.vue'
+
 import { loopFilterAdd } from '@/utils/plugins.js'
 const titleList = reactive([
   {
@@ -126,7 +127,6 @@ const getDiscList = async (month, year) => {
 const firstShowMonth = ref(true)
 const load = () => {
   const name = router.currentRoute.value.name
-  // console.log(router.currentRoute.value)
   if (name !== 'latest-music') return
   if (isLoading.value || !timeout.value) return
   if (firstShowMonth.value) {
@@ -155,9 +155,8 @@ const load = () => {
 
 const router = useRouter()
 const playMusic = async (params) => {
-  // console.log(params, router)
   const { id } = params
-  router.push({ name: 'music-list', params: { id } })
+  router.push({ name: 'song-list-package', params: { pId: id } })
 }
 
 onMounted(() => {
@@ -227,7 +226,7 @@ div.new-disc {
         display: flex;
         flex-wrap: wrap;
         width: 100%;
-        .show-music-info-icon-center {
+        .show-music-info {
           margin-right: calc(3%);
         }
       }
