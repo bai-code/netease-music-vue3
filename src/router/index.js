@@ -123,6 +123,11 @@ const routes = [
         path: 'mv-all',
         name: 'mv-all',
         component: () => import('@/views/Video/mv-all.vue')
+      },
+      {
+        path: 'search-result',
+        name: 'search-result',
+        component: () => import('@/views/views-package/search-result.vue')
       }
     ]
   },

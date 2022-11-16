@@ -9,14 +9,52 @@
       <slot name="search">
         <div class="search">
           <div class="move-back">
-            <span class="pointer" @click="routerGo(-1)">
+            <span class="pointer" @click="$router.go(-1)">
               <i class="iconfont icon-arrow-left"></i>
             </span>
-            <span class="pointer" @click="routerGo(1)">
+            <span class="pointer" @click="$router.go(1)">
               <i class="iconfont icon-arrow-right"></i>
             </span>
           </div>
-          <el-autocomplete v-model="inputValue" :fetch-suggestions="querySearch" :trigger-on-focus="false" clearable class="inline-input" placeholder="请输入歌名/歌手" @select="handleSelect" />
+          <el-autocomplete
+            v-model="inputValue"
+            :fetch-suggestions="querySearch"
+            :trigger-on-focus="true"
+            clearable
+            class="inline-input"
+            :placeholder="placeholder"
+            @select="handleSelect"
+            value-key="searchWord"
+          >
+            <template v-slot="scope" v-if="!showSearchResult">
+              <!-- <div class="hot-content"> -->
+              <!-- <h4 class="title">热搜榜</h4> -->
+              <!-- <ul class="content"> -->
+              <li class="s-item" :class="{ hot: scope.item._index <= 3 }">
+                <span class="h-index"> {{ scope.item._index }}</span>
+                <div class="h-content">
+                  <p>
+                    <span class="keywords overflow">{{ scope.item.searchWord }}</span>
+                    <span class="icon" v-if="scope.item.iconType">
+                      <em>HOT</em>
+                    </span>
+                    <span class="s-num">{{ scope.item.score }}</span>
+                  </p>
+
+                  <p class="overflow">
+                    {{ scope.item.content }}
+                  </p>
+                </div>
+              </li>
+              <!-- </ul> -->
+              <!-- </div> -->
+            </template>
+            <template #default="scope" v-else>
+              <div class="h-content">
+                {{ scope.item.keyword }}
+              </div>
+            </template>
+          </el-autocomplete>
         </div>
       </slot>
     </el-col>
@@ -55,10 +93,6 @@ const userInfo = computed(() => {
   return store.state.userinfo.userInfo
 })
 
-const handleSelect = (item) => {
-  console.log(item)
-}
-
 const inputFocus = () => {
   isSpread.value = true
 }
@@ -94,39 +128,137 @@ const logout = async () => {
   // console.log(flag)
 }
 
+const timeout = ref(null) // 异步定时器
 const restaurants = ref([])
-const querySearch = (queryString, cb) => {
-  const results = queryString ? restaurants.value.filter(createFilter(queryString)) : restaurants.value
-  // call callback function to return suggestions
-  cb(results)
-}
-const createFilter = (queryString) => {
-  return (restaurant) => {
-    return restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
+const showSearchResult = ref(false) // 输入框是否有值
+const oldValue = ref('') // 旧的搜索值
+const oldList = ref([]) // 旧的搜索结果
+// const result = ref([])
+const querySearch = async (queryString, cb) => {
+  // const results = [{}]
+  console.log(queryString)
+  if (queryString) {
+    showSearchResult.value = true
+    if (oldValue.value !== queryString) {
+      const {
+        result: { allMatch = [] }
+      } = await store.dispatch('getInfo', { path: `/search/suggest?keywords=${queryString}&type=mobile` })
+      allMatch.forEach((item) => {
+        item.searchWord = item.keyword
+      })
+      oldList.value = allMatch
+      oldValue.value = queryString
+    }
+    cb(oldList.value)
+  } else {
+    showSearchResult.value = false
+    if (restaurants.value.length > 0) {
+      cb(restaurants.value)
+    } else {
+      restaurants.value = await getSearchHotDetail()
+      clearTimeout(timeout.value)
+      timeout.value = setTimeout(() => {
+        cb(restaurants.value)
+      }, 100)
+    }
   }
 }
-const loadAll = () => {
-  return [
-    { value: 'vue', link: 'https://github.com/vuejs/vue' },
-    { value: 'element', link: 'https://github.com/ElemeFE/element' },
-    { value: 'cooking', link: 'https://github.com/ElemeFE/cooking' },
-    { value: 'mint-ui', link: 'https://github.com/ElemeFE/mint-ui' },
-    { value: 'vuex', link: 'https://github.com/vuejs/vuex' },
-    { value: 'vue-router', link: 'https://github.com/vuejs/vue-router' },
-    { value: 'babel', link: 'https://github.com/babel/babel' }
-  ]
+
+// 获取默认搜索词
+const placeholder = ref('')
+const getPlaceHolderText = async () => {
+  const { data, code } = await store.dispatch('getInfo', { path: '/search/default' })
+  if (code === 200) {
+    placeholder.value = data.realkeyword
+  } else {
+    placeholder.value = '搜索歌曲/歌手'
+  }
 }
 
-const routerGo = () => {
-  console.log(history)
+// 获取热搜关键词
+const hotSearchList = ref([])
+const getSearchHotDetail = async () => {
+  const { data = [] } = await store.dispatch('getInfo', { path: '/search/hot/detail' })
+  hotSearchList.value = data.forEach((item, index) => {
+    item._index = index + 1
+  })
+  return data
+}
+
+// 搜索框选中的值
+const handleSelect = (item) => {
+  const { searchWord } = item
+  inputValue.value = searchWord
+
+  router.push({ name: 'search-result', query: { s: searchWord } })
+  // console.log(item)
 }
 
 onMounted(() => {
-  restaurants.value = loadAll()
+  getPlaceHolderText()
+  // getSearchHotDetail()
+  // restaurants.value = loadAll()
 })
 </script>
 
 <style lang="less" scoped>
+// 默认添加到body下， 不能在html添加位置添加样式
+li.s-item {
+  height: 55px;
+  padding: 8px 0;
+  box-sizing: border-box;
+  .flex(flex-start, center);
+  width: 260px;
+  color: #aaa;
+
+  &.hot {
+    span.h-index {
+      color: @bgColor;
+    }
+    span.keywords {
+      font-weight: bolder;
+    }
+  }
+  span.keywords {
+    width: calc(100% - 60px);
+  }
+  span.h-index {
+    width: 30px;
+    color: #ccc;
+  }
+  span.icon {
+    font-weight: bolder;
+    color: @bgColor;
+    margin-left: 5px;
+    display: inline-block;
+    transform: scale(0.8);
+    align-self: flex-end;
+  }
+  span.s-num {
+    margin-left: 10px;
+    color: #ccc;
+    flex: 0 0 auto;
+    min-width: 60px;
+  }
+  div.h-content {
+    flex: 0 0 auto;
+    width: calc(100% - 50px);
+    font-size: 12px;
+    height: 100%;
+    .flex(space-between,flex-start);
+    flex-direction: column;
+    p {
+      height: 20px;
+      line-height: 20px;
+      margin: 0;
+      flex: 0 1 auto;
+      width: 100%;
+      span.keywords {
+        color: #666;
+      }
+    }
+  }
+}
 .el-row.home-nav {
   height: 60px;
   padding: 0 20px;
@@ -167,7 +299,7 @@ onMounted(() => {
           color: @contrastColor;
           font-size: 12px;
           &::placeholder {
-            color: inherit;
+            color: #ddd;
           }
         }
         .el-input__suffix {
