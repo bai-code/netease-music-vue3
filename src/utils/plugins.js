@@ -86,7 +86,7 @@ export const loopFilterAdd = ({
 }) => {
   musicList.forEach((item, index) => {
     if (!value) {
-      item[str] = jointSinger(item[artists], symbol, params)
+      item[str] = jointSinger(item[artists] || item.ar, symbol, params)
     } else {
       item[str] = jointSinger(item[value][artists], symbol, params)
     }

@@ -1,56 +1,54 @@
 <template>
-  <el-scrollbar>
-    <el-row class="personal-fm" v-if="showFm.name">
-      <el-col :span="11" class="image">
-        <div class="image-container">
-          <ul class="img-c">
-            <TransitionGroup name="image" mode="in-out">
-              <template v-for="(fm, index) in personalFmList" :key="fm.id">
-                <li class="img-i" v-show="fm && fm.album && currentIndex === index" :class="{ next: index === currentIndex + 1, prev: index === currentIndex - 1 }">
-                  <el-image fit="fill" :src="fm.album.blurPicUrl"></el-image>
-                </li>
-              </template>
-            </TransitionGroup>
-          </ul>
+  <el-row class="personal-fm" v-if="showFm.name">
+    <el-col :span="11" class="image">
+      <div class="image-container">
+        <ul class="img-c">
+          <TransitionGroup name="image" mode="in-out">
+            <template v-for="(fm, index) in personalFmList" :key="fm.id">
+              <li class="img-i" v-show="fm && fm.album && currentIndex === index" :class="{ next: index === currentIndex + 1, prev: index === currentIndex - 1 }">
+                <el-image fit="fill" :src="fm.album.blurPicUrl"></el-image>
+              </li>
+            </template>
+          </TransitionGroup>
+        </ul>
 
-          <div :class="[isPlay ? 'right-bottom' : 'center', 'play-icon pointer']">
-            <i class="iconfont icon-hover" v-show="!isPlay" @click="playMusic('play')"></i>
-            <i class="iconfont icon-pause" v-show="isPlay" @click="playMusic('pause')"></i>
-          </div>
+        <div :class="[isPlay ? 'right-bottom' : 'center', 'play-icon pointer']">
+          <i class="iconfont icon-hover" v-show="!isPlay" @click="playMusic('play')"></i>
+          <i class="iconfont icon-pause" v-show="isPlay" @click="playMusic('pause')"></i>
         </div>
-        <div class="controls">
-          <span class="delete pointer" @click="deleteFm">
-            <i class="iconfont icon-delete"></i>
-          </span>
-          <span class="play-next pointer" @click="playNext">
-            <i class="iconfont icon-next" :class="{ disabled: isLoading }"></i>
-          </span>
-        </div>
-      </el-col>
-      <el-col :span="12" :push="1" class="lyric">
-        <el-row class="musicInfo">
-          <el-col class="music-name">
-            <h2 class="overflow">
-              {{ showFm.name }}
-            </h2>
+      </div>
+      <div class="controls">
+        <span class="delete pointer" @click="deleteFm">
+          <i class="iconfont icon-delete"></i>
+        </span>
+        <span class="play-next pointer" @click="playNext">
+          <i class="iconfont icon-next" :class="{ disabled: isLoading }"></i>
+        </span>
+      </div>
+    </el-col>
+    <el-col :span="12" :push="1" class="lyric">
+      <el-row class="musicInfo">
+        <el-col class="music-name">
+          <h2 class="overflow">
+            {{ showFm.name }}
+          </h2>
+        </el-col>
+        <el-row class="info" v-if="showFm.album">
+          <el-col class="album overflow" :span="11">
+            专辑：<span class="pointer" :title="showFm.album.name">{{ showFm.album.name }}</span>
           </el-col>
-          <el-row class="info" v-if="showFm.album">
-            <el-col class="album overflow" :span="11">
-              专辑：<span class="pointer" :title="showFm.album.name">{{ showFm.album.name }}</span>
-            </el-col>
-            <el-col class="singer overflow" :span="11" :offset="1"
-              >歌手：<span class="s pointer">{{ showFm.artists[0].name }}</span>
-            </el-col>
-          </el-row>
-          <div class="lyric">
-            <LyricCmp :musicInfo="musicInfo">
-              <template #musicInfo><span></span> </template>
-            </LyricCmp>
-          </div>
+          <el-col class="singer overflow" :span="11" :offset="1"
+            >歌手：<span class="s pointer">{{ showFm.artists[0].name }}</span>
+          </el-col>
         </el-row>
-      </el-col>
-    </el-row>
-  </el-scrollbar>
+        <div class="lyric">
+          <LyricCmp :musicInfo="musicInfo">
+            <template #musicInfo><span></span> </template>
+          </LyricCmp>
+        </div>
+      </el-row>
+    </el-col>
+  </el-row>
 </template>
 
 <script>

@@ -1,13 +1,14 @@
 <template>
   <el-row class="container title-category" type="flex" justify="space-between" align="middle">
-    <slot name="left">占位</slot>
+    <slot name="left"></slot>
     <!-- <div class="title-content"> -->
-      <ul class="category">
-        <li :class="[{ active: activeIndex === index }, 'c-item', 'pointer']" v-for="(title, index) in categoryList" :key="title.id" @click="changeCategory(index)">
-          <span>{{ title.name }}</span>
-        </li>
-      </ul>
+    <ul class="category">
+      <li :class="[{ active: activeIndex === index }, 'c-item', 'pointer']" v-for="(title, index) in categoryList" :key="title.id" @click="changeCategory(index)">
+        <span>{{ title.name }}</span>
+      </li>
+    </ul>
     <!-- </div> -->
+    <slot name="right" ></slot>
   </el-row>
 </template>
 

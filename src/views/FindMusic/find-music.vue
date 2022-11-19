@@ -1,25 +1,20 @@
 <template>
-  <el-scrollbar height="100%" class="scrollbar paddingRight">
-    <div class="nav-title">
-      <router-link :to="{ name: 'recommendation' }">个性推荐</router-link>
-      <router-link :to="{ name: 'song-list' }">歌单</router-link>
-      <router-link :to="{ name: 'ranking-list' }">排行榜</router-link>
-      <router-link :to="{ name: 'singer-list' }">歌手</router-link>
-      <router-link :to="{ name: 'latest-music' }">最新音乐</router-link>
-    </div>
+  <div class="nav-title">
+    <router-link :to="{ name: 'recommendation' }">个性推荐</router-link>
+    <router-link :to="{ name: 'song-list' }">歌单</router-link>
+    <router-link :to="{ name: 'ranking-list' }">排行榜</router-link>
+    <router-link :to="{ name: 'singer-list' }">歌手</router-link>
+    <router-link :to="{ name: 'latest-music' }">最新音乐</router-link>
+  </div>
 
-    <router-view v-slot="{ Component }">
-      <keep-alive>
-        <component :is="Component" />
-      </keep-alive>
-    </router-view>
-  </el-scrollbar>
+  <router-view v-slot="{ Component }">
+    <keep-alive>
+      <component :is="Component" />
+    </keep-alive>
+  </router-view>
 </template>
 
 <style lang="less" scoped>
-// .el-scrollbar {
-//   width: 100%;
-// }
 div.nav-title {
   position: sticky;
   top: 0;

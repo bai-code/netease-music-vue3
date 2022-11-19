@@ -4,11 +4,13 @@
       <HomeAside />
     </el-aside>
     <el-main :class="{ isDaily }">
-      <router-view v-slot="{ Component }">
-        <keep-alive>
-          <component :is="Component" />
-        </keep-alive>
-      </router-view>
+      <el-scrollbar>
+        <router-view v-slot="{ Component }">
+          <keep-alive>
+            <component :is="Component" />
+          </keep-alive>
+        </router-view>
+      </el-scrollbar>
     </el-main>
   </el-container>
 </template>
@@ -54,11 +56,16 @@ watch(
     border-right: 1px solid @borderColor;
   }
   .el-main {
-    padding: 20px 0 0 20px;
+    padding: 0;
     box-sizing: border-box;
-    &.isDaily {
-      padding: 0;
+    .el-scrollbar {
+      padding: 20px 20px 0;
+      box-sizing: border-box;
+      &.isDaily {
+        padding: 0;
+      }
     }
+
     &::-webkit-scrollbar {
       display: none;
     }

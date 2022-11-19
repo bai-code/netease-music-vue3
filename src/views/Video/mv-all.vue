@@ -1,41 +1,39 @@
 <template>
   <div class="mv-all">
     <h2 class="title" ref="h2Ref">全部MV</h2>
-    <el-scrollbar height="350px" ref="scrollbarRef">
-      <el-row class="type-container">
-        <el-col class="area">
-          <TitleCategory :categoryList="areaList" :activeIndex="areaIndex" @changeCategory="areaIndex = $event">
-            <template #left>
-              <span class="area">地区：</span>
-            </template>
-          </TitleCategory>
-        </el-col>
-        <el-col class="type">
-          <TitleCategory :categoryList="typeList" :activeIndex="typeIndex" @changeCategory="typeIndex = $event">
-            <template #left>
-              <span class="area">类型：</span>
-            </template>
-          </TitleCategory>
-        </el-col>
-        <el-col class="order"
-          ><TitleCategory :categoryList="orderList" :activeIndex="orderIndex" @changeCategory="orderIndex = $event">
-            <template #left>
-              <span class="area">排序：</span>
-            </template>
-          </TitleCategory></el-col
-        >
-      </el-row>
-      <el-row class="mv-list">
-        <el-col :span="8" v-for="info in showMvList" :key="info.id">
-          <ShowMvItem :mvInfo="info" :textOverflow="true" />
-        </el-col>
-      </el-row>
+    <el-row class="type-container">
+      <el-col class="area">
+        <TitleCategory :categoryList="areaList" :activeIndex="areaIndex" @changeCategory="areaIndex = $event">
+          <template #left>
+            <span class="area">地区：</span>
+          </template>
+        </TitleCategory>
+      </el-col>
+      <el-col class="type">
+        <TitleCategory :categoryList="typeList" :activeIndex="typeIndex" @changeCategory="typeIndex = $event">
+          <template #left>
+            <span class="area">类型：</span>
+          </template>
+        </TitleCategory>
+      </el-col>
+      <el-col class="order"
+        ><TitleCategory :categoryList="orderList" :activeIndex="orderIndex" @changeCategory="orderIndex = $event">
+          <template #left>
+            <span class="area">排序：</span>
+          </template>
+        </TitleCategory></el-col
+      >
+    </el-row>
+    <el-row class="mv-list">
+      <el-col :span="8" v-for="info in showMvList" :key="info.id">
+        <ShowMvItem :mvInfo="info" :textOverflow="true" />
+      </el-col>
+    </el-row>
 
-      <el-row type="flex" justify="center">
-        <el-pagination v-if="showMvList.length > 0" layout="prev, pager, next" :total="total" :page-size="pageSize" :current-page="currentPage" @current-change="currentChange" />
-      </el-row>
-      <div class="loading" v-loading="isLoading"></div>
-    </el-scrollbar>
+    <el-row type="flex" justify="center">
+      <el-pagination v-if="showMvList.length > 0" layout="prev, pager, next" :total="total" :page-size="pageSize" :current-page="currentPage" @current-change="currentChange" />
+    </el-row>
+    <div class="loading" v-loading="isLoading"></div>
   </div>
 </template>
 
@@ -186,7 +184,7 @@ watch([areaIndex, typeIndex, orderIndex], (val) => {
   router.replace({ name: 'mv-all', query })
 })
 
-const scrollbarRef = ref()
+// const scrollbarRef = ref()
 const currentChange = (val) => {
   currentPage.value = val
   const offset = (val - 1) * pageSize.value
@@ -196,7 +194,7 @@ const currentChange = (val) => {
   } else {
     getMvList(routeQuery.value)
   }
-  scrollbarRef.value.setScrollTop(0)
+  // scrollbarRef.value.setScrollTop(0)
 }
 
 // const nextChange = (val) => {
@@ -227,7 +225,7 @@ div.mv-all {
         }
       }
     }
-    div.loading{
+    div.loading {
       height: 50px;
     }
   }

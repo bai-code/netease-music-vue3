@@ -236,6 +236,7 @@ const store = useStore()
 const singerList = ref([])
 const hasMore = ref(true)
 const getSingerList = async (area = '-1', type = '-1', initial = '-1') => {
+  if (isLoading.value) return
   isLoading.value = true
   if (initial === '热门') {
     initial = -1
