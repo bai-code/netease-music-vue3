@@ -1,7 +1,7 @@
 <template>
   <div class="show-mv-item" @click="playMv">
     <div class="show-img pointer">
-      <el-image class="imageFill" :src="mvInfo.picUrl || mvInfo.cover || mvInfo.imgurl" alt="" lazy>
+      <el-image class="imageFill" :src="mvInfo.picUrl || mvInfo.cover || mvInfo.imgurl || mvInfo.coverUrl" alt="" lazy>
         <template #placeholder>
           <img class="temp imageFill" src="~@/static/loading.gif" alt="" />
         </template>
@@ -14,15 +14,15 @@
         {{ mvInfo._playCount || mvInfo.playCount }}
       </div>
       <slot name="hover">
-        <div :class="[{ needHover: needHover }, 'overflow', 'hover']">
+        <div :class="[{ needHover: needHover }, 'overflow', 'hover']" v-if="needHover">
           {{ mvInfo.copywriter }}
         </div>
       </slot>
+      <slot name="duration"> </slot>
     </div>
     <div class="show-mv-info">
-      <p class="name" :class="{ overflow: textOverflow }"
-      :title="mvInfo.name">{{ mvInfo.name }}</p>
-      <p class="author overflow pointer" v-if="mvInfo.author">{{ mvInfo.author }}</p>
+      <p class="name" :class="{ overflow: textOverflow }" :title="mvInfo.name || mvInfo.title">{{ mvInfo.name || mvInfo.title }}</p>
+      <p class="author overflow pointer" v-if="mvInfo.author || mvInfo.singer">{{ mvInfo.author || mvInfo.singer }}</p>
     </div>
   </div>
 </template>
@@ -58,10 +58,10 @@ const props = defineProps({
 
 const router = useRouter()
 const playMv = () => {
-  const { id } = props.mvInfo
-  if (!id) return
-  router.push({ name: 'video-detail', query: { mvid: id } })
-  // console.log(props.mvInfo, router)
+  const { id, vid } = props.mvInfo
+  const vId = id || vid
+  if (!vId) return
+  router.push({ name: 'video-detail', query: { mvid: vId } })
   // emits('playMv', props.mvInfo)
 }
 </script>

@@ -21,7 +21,7 @@
     </div>
     <div class="list">
       <MusicListTable :showMusicList="showList" />
-      <div class="pagination" v-if="showList.length>0">
+      <div class="pagination" v-if="showList.length > 0">
         <el-pagination small background layout="prev, pager, next" :total="total" :page-size="pageSize" @current-change="currentChange" :current-page="currentPage" />
       </div>
     </div>
@@ -30,7 +30,7 @@
 
 <script setup>
 import MusicListTable from '@/components/music-list-table.vue'
-import { reactive, ref, defineProps, watch } from 'vue'
+import { reactive, ref, defineProps, watch, defineExpose } from 'vue'
 import { loopFilterAdd, playAndCommit } from '@/utils/plugins.js'
 import { useStore } from 'vuex'
 
@@ -46,6 +46,7 @@ const pageSize = ref(100) // 每页条目数
 const singleList = reactive([]) // 总列表
 const showList = ref([]) // 需要展示的数组
 const total = ref(100) // 总数
+const showCount = ref('') // 需要在父级展示的数据
 const currentPage = ref(1) // 当前第几页
 
 const store = useStore()
@@ -64,7 +65,8 @@ const getMusicList = async (txt) => {
     singleList.splice(start, pageSize.value, ...newList)
     showList.value = songs
     total.value = songCount
-    console.log(singleList, songCount, start)
+    showCount.value = songCount + '首单曲'
+    // console.log(singleList, songCount, start)
   }
 }
 
@@ -79,7 +81,6 @@ watch(
   (txt) => {
     if (!txt) return
     getMusicList(txt)
-    console.log(txt)
   },
   { immediate: true }
 )
@@ -87,6 +88,10 @@ watch(
 const playMusic = () => {
   playAndCommit({ musicList: showList.value, index: 0 })
 }
+
+defineExpose({
+  showCount
+})
 </script>
 
 <style lang="less" scoped>
@@ -135,7 +140,7 @@ div.single-list {
     div.pagination {
       .flex(center,center);
       padding-bottom: 20px;
-      :deep(.is-active){
+      :deep(.is-active) {
         background: @bgColor;
       }
     }

@@ -49,6 +49,14 @@ export const transformTime = (t, isMs = true) => {
   return `${fillNum(m)}:${fillNum(s)}`
 }
 
+/**
+ * 转换时间 年月日
+ * @param {*} t
+ */
+export const transformLocalTime = (t) => {
+  return new Date(t).toLocaleDateString().replace(new RegExp('/', 'g'), '-')
+}
+
 export const computedCount = (count = 0) => {
   if (count / 100000000 >= 1) {
     return parseInt(count / 100000000) + '亿'
@@ -82,11 +90,17 @@ export const loopFilterAdd = ({
   timeName = 'duration', // 转换时间的键名
   isTransPlayCount = false, // 是否转换播放总数
   readPlayCountName = 'playCount', // 需要读取对象中 playcount 具体名称
-  setPlayCountName = '_playCount' //  设置成 名称
+  setPlayCountName = '_playCount', //  设置成 名称
+  addSingerAlias = false, // 是否添加别名, 需要的话只去第一个作者及别名
+  transLocalTime = false // 转化发布时间
 }) => {
   musicList.forEach((item, index) => {
     if (!value) {
-      item[str] = jointSinger(item[artists] || item.ar, symbol, params)
+      if (addSingerAlias) {
+        item[str] = [item[artists].name, item[artists].alias[0]]
+      } else {
+        item[str] = jointSinger(item[artists] || item.ar, symbol, params)
+      }
     } else {
       item[str] = jointSinger(item[value][artists], symbol, params)
     }
@@ -99,6 +113,9 @@ export const loopFilterAdd = ({
     }
     if (isTransPlayCount) {
       item[setPlayCountName] = computedCount(item[readPlayCountName])
+    }
+    if (transLocalTime) {
+      item._publishTime = transformLocalTime(item.publishTime)
     }
   })
   return musicList

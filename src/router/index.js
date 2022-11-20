@@ -89,7 +89,7 @@ const routes = [
         component: () => import('@/views/Music-list/music-list.vue')
       },
       {
-        path: 'song-list-package/:pId', // 歌单 playlist  id
+        path: 'song-list-package/:pId', // 歌单,专辑playlist  id
         name: 'song-list-package',
         component: () => import('@/views/Music-list/song-list-package.vue')
       },

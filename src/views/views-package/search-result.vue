@@ -1,68 +1,77 @@
 <template>
   <div class="search-result">
     <h2>搜索 {{ searchText }}</h2>
-    <h6>你可能感兴趣</h6>
-    <ul class="show-singer">
-      <li class="singer-item" v-for="info in artistInfoList" :key="info.id">
-        <div class="image">
-          <m-image :src="info.img1v1Url || info.picUrl"></m-image>
-        </div>
-        <div class="info">
-          <div class="singer">
-            <span>{{ info.occupation }}：</span>
-            <span>{{ info.name }}</span>
-            <span class="en" v-if="info.alias"> ({{ info.alias[0] }})</span>
+    <div class="recommend" v-if="artistInfoList.length > 0">
+      <h6 class="t">你可能感兴趣</h6>
+      <ul class="show-singer">
+        <li class="singer-item pointer" v-for="info in artistInfoList" :key="info.id" @click="linkTo(info)">
+          <div class="image">
+            <img class="m-image" :src="info.img1v1Url || info.picUrl" />
           </div>
-          <div class="other">
-            <span class="fans-num">粉丝：{{ computedCount(info.fansSize) }},</span>
-            <span clas="music-n"> 歌曲：{{ info.musicSize }}</span>
+          <div class="info">
+            <div class="singer">
+              <span>{{ info.occupation }}：</span>
+              <span>{{ info.name }}</span>
+              <span class="en" v-if="info.alias"> ({{ info.alias[0] }})</span>
+            </div>
+            <div class="other">
+              <span class="fans-num">粉丝：{{ computedCount(info.fansSize) }},</span>
+              <span clas="music-n"> 歌曲：{{ info.musicSize }}</span>
+            </div>
           </div>
-        </div>
-      </li>
-    </ul>
+        </li>
+      </ul>
+    </div>
     <div class="content">
-      <NavTitleSlot :titleList="categoryList" :activeIndex="activeIndex" :borderBottom="true">
+      <NavTitleSlot :titleList="categoryList" :activeIndex="activeIndex" :borderBottom="true" @update:activeIndex="changeSelect">
         <template #controls
-          ><div class="right-txt" v-if="searchInfo[activeIndex]">找到 {{ searchInfo[activeIndex].text }}</div></template
+          ><div class="right-txt" v-if="childrenRef && childrenRef.showCount">找到 {{ childrenRef.showCount }}</div></template
         >
       </NavTitleSlot>
-      <template v-if="searchInfo[activeIndex]">
-        <component :is="cacheCmp" :searchText="searchText" />
-      </template>
+      <div class="cmp">
+        <component ref="childrenRef" :is="cacheCmp" :searchText="searchText" />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { watch, ref, shallowRef } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { computedCount } from '@/utils/plugins.js'
 import NavTitleSlot from '@/components/nav-title-slot.vue'
 import SingleList from './search-result/single-music'
+import Singer from './search-result/singer.vue'
+import Album from './search-result/album.vue'
+import Video from './search-result/video.vue'
+import { ElMessage } from 'element-plus'
 
 const searchText = ref('') // 搜索 text
 const route = useRoute()
 const store = useStore()
-const searchInfo = ref([{}])
-
+const childrenRef = ref()
 const activeIndex = ref(0)
-const categoryList = ref([
+const categoryList = shallowRef([
   {
     id: 0,
-    text: '单曲'
+    text: '单曲',
+    cmp: SingleList
   },
   {
     id: 1,
-    text: '歌手'
+    text: '歌手',
+    cmp: Singer
   },
   {
     id: 2,
-    text: '专辑'
+    text: '专辑',
+    cmp: Album
   },
   {
     id: 3,
-    text: '视频'
+    text: '视频',
+    cmp: Video
   },
   {
     id: 4,
@@ -86,80 +95,53 @@ const categoryList = ref([
   }
 ])
 
+const cacheCmp = shallowRef('') // 动态组件默认
+
+const router = useRouter()
+const changeSelect = (index) => {
+  const { cmp } = categoryList.value[index]
+  if (cmp) {
+    // activeIndex.value = index
+    router.push({ name: 'search-result', query: { c: index, s: searchText.value } })
+  } else {
+    ElMessage({
+      type: 'warning',
+      message: '建设中'
+    })
+  }
+}
+
 const artistInfoList = ref([])
 const getSearchResult = async (val) => {
   const {
     result: { artist = {} }
   } = await store.dispatch('getInfo', { path: `/search/multimatch?keywords=${val}` })
   artistInfoList.value = artist
-  // console.log(artistInfoList.value)
 }
-// const singleList = ref([])
-// const showRightText = ref('')
-// const pageSize = ref(100) // 歌曲列表分页数
-// const musicListAll = ref([]) // 用于缓存所有歌曲列表数据
-// const getSearchTypeResult = async () => {
-// let txt = ''
-// const len = (searchInfo.value[activeIndex.value] && searchInfo.value[activeIndex.value].length) || 0
-// const { result: { songs, songCount } = {} } = await store.dispatch('getInfo', { path: `/cloudsearch?keywords=${val}&type=${type}&offset=${len}&limit=5` })
-// const newList = loopFilterAdd({ musicList: songs, transTime: true })
-// // singleList.value.push(...newList)
-// switch (type) {
-//   case 1:
-//     txt = songCount + '首单曲'
-//     break
-//   case 100:
-//     txt = songCount + '位歌手'
-//     break
-//   case 10:
-//     txt = songCount + '张专辑'
-//     break
-//   case 1014:
-//     txt = songCount + '个视频'
-//     break
-//   case 1000:
-//     txt = songCount + '个歌单'
-//     break
-//   case 1002:
-//     txt = songCount + '个用户'
-//     break
-//   case 1004:
-//     txt = songCount + '个MV'
-//     break
-//   case 1009:
-//     txt = songCount + '个电台'
-//     break
-//   case 1018:
-//     txt = songCount + '个综合'
-//     break
-//   case 2000:
-//     txt = songCount + '个声音'
-//     break
-// }
-// if (type === 1) {
-//   // musicListAll.value.splice(len, pageSize, )
-// }
-// searchInfo.value[activeIndex.value] = { text: txt, total: songCount, list: newList, pageSize }
-// showRightText.value = songCount
-// console.log(res, val)
-// const res = await store.dispatch('getInfo', { path: `/cloudsearch?keywords=${val}&type=100` })
-// console.log(res)
-// }
 
 watch(
-  () => route.query.s,
+  () => [route.query.s, route.query.c],
   (val) => {
-    searchText.value = val
-    getSearchResult(val)
+    searchText.value = val[0]
+    getSearchResult(val[0])
+    const index = val[1] || 0
+    activeIndex.value = -(-index)
+    const { cmp } = categoryList.value[index]
+    cacheCmp.value = cmp
   },
   { immediate: true }
 )
 
-const cacheCmp = shallowRef(SingleList)
+const linkTo = (val) => {
+  router.push({ name: 'singer-related', params: { singerId: val.id } })
+}
 </script>
 
 <style lang="less" scoped>
 div.search-result {
+  h6.t {
+    font-weight: 500;
+  }
   ul.show-singer {
     li {
       width: 33%;
@@ -210,7 +192,6 @@ div.search-result {
     }
     div.right-txt {
       color: #aaa;
-      line-height: 10px;
       padding-top: -5px;
     }
   }
