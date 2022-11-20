@@ -30,7 +30,7 @@
               <!-- <div class="hot-content"> -->
               <!-- <h4 class="title">热搜榜</h4> -->
               <!-- <ul class="content"> -->
-              <li class="s-item" :class="{ hot: scope.item._index <= 3 }">
+              <li class="s-item" :class="{ hot: scope.item._index <= 3, notContent: !scope.item.content }">
                 <span class="h-index"> {{ scope.item._index }}</span>
                 <div class="h-content">
                   <p>
@@ -41,7 +41,7 @@
                     <span class="s-num">{{ scope.item.score }}</span>
                   </p>
 
-                  <p class="overflow">
+                  <p class="overflow" v-if="scope.item.content">
                     {{ scope.item.content }}
                   </p>
                 </div>
@@ -210,7 +210,9 @@ li.s-item {
   .flex(flex-start, center);
   width: 260px;
   color: #aaa;
-
+  &.notContent div.h-content {
+    .flex(center, flex-start);
+  }
   &.hot {
     span.h-index {
       color: @bgColor;
@@ -245,7 +247,7 @@ li.s-item {
     width: calc(100% - 50px);
     font-size: 12px;
     height: 100%;
-    .flex(space-between,flex-start);
+    .flex(space-between,center);
     flex-direction: column;
     p {
       height: 20px;

@@ -2,7 +2,14 @@
   <!-- 标题选择  右侧插槽 -->
   <div class="nav-title-slot">
     <ul class="nav-title">
-      <li v-for="(title, index) in titleList" :key="title.id" :class="[{ active: index === activeIndex }, 'pointer']" @click="changeIndex(index)">{{ title.text }}</li>
+      <li
+        v-for="(title, index) in titleList"
+        :key="title.id"
+        :class="[{ active: index === activeIndex && !borderBottom, borderBottom: index === activeIndex && borderBottom }, 'pointer', 'item']"
+        @click="changeIndex(index)"
+      >
+        {{ title.text }}
+      </li>
     </ul>
     <slot name="controls"> </slot>
     <slot name="recommend-all"></slot>
@@ -19,6 +26,11 @@ defineProps({
   activeIndex: {
     type: [Number, String],
     default: 0
+  },
+  borderBottom: {
+    // 是否添加border-bottom下划线
+    type: Boolean,
+    default: false
   }
 })
 
@@ -37,7 +49,15 @@ div.nav-title-slot {
     // color: @fontColor;
     & > li {
       margin-right: 10px;
+      padding-bottom: 5px;
+      box-sizing: border-box;
+      border-bottom: 3px solid transparent;
+
       &.active {
+        font-weight: bolder;
+      }
+      &.borderBottom {
+        border-bottom-color: @bgColor;
         font-weight: bolder;
       }
     }

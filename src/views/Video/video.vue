@@ -1,13 +1,11 @@
 <template>
   <div class="video">
-    <el-scrollbar height="395px">
-      <NavTitleSelect :titleList="titleList" @changeIndex="changeIndex" :activeIndex="activeIndex" />
-      <router-view v-slot="{ Component }">
-        <keep-alive>
-          <component :is="Component" />
-        </keep-alive>
-      </router-view>
-    </el-scrollbar>
+    <NavTitleSelect :titleList="titleList" @changeIndex="changeIndex" :activeIndex="activeIndex" />
+    <router-view v-slot="{ Component }">
+      <keep-alive>
+        <component :is="Component" />
+      </keep-alive>
+    </router-view>
   </div>
 </template>
 
@@ -76,15 +74,10 @@ const changeIndex = (index) => {
 div.video {
   width: 100%;
   height: 100%;
-  .el-scrollbar {
-    width: 100%;
-    padding-right: 20px;
-    box-sizing: border-box;
-    // overflow-x: hidden;
-    .nav-title-select {
-      position: sticky;
-      top: 0;
-    }
+// overflow: hidden;
+  .nav-title-select {
+    position: sticky;
+    top: 0;
   }
 }
 </style>

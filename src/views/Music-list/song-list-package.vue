@@ -4,14 +4,20 @@
   <el-scrollbar>
     <div class="song-list-package paddingRight">
       <el-row class="music-info" type="flex">
-        <el-col :span="7"> <el-image :src="musicInfo.coverImgUrl"></el-image></el-col>
-        <el-col :span="16">
+        <el-col :span="7"> <el-image :src="musicInfo.coverImgUrl || musicInfo.blurPicUrl || musicInfo.pucUrl"></el-image></el-col>
+        <el-col :span="17">
           <div class="name">
-            <span class="tag-name">歌单</span>
-            <h2 class="playlist-name overflow" :title="musicInfo.name">{{ musicInfo.name }}</h2>
+            <span class="tag-name">{{ isalbum ? '专辑' : '歌单' }}</span>
+            <h2 class="playlist-name overflow" :title="musicInfo.name" v-if="!isalbum">
+              {{ musicInfo.name }}
+            </h2>
+            <h2 class="playlist-name album" :title="musicInfo.name" v-else>
+              <span class="name">{{ musicInfo.name }}</span>
+              <span class="transName" v-if="musicInfo.transNames">({{ musicInfo.transNames[0] }})</span>
+            </h2>
           </div>
           <el-col class="creator">
-            <div class="container" v-if="musicInfo.creator">
+            <div class="container" v-if="musicInfo.creator && !isalbum">
               <div class="avatar">
                 <el-image :src="musicInfo.creator.avatarUrl"></el-image>
                 <el-image v-if="musicInfo.creator.avatarDetail" :src="musicInfo.creator.avatarDetail.identityIconUrl" class="tag"></el-image>
@@ -39,7 +45,7 @@
               </div>
             </el-tooltip>
             <el-tooltip content="建设中..." placement="top">
-              <div class="collect pointer">
+              <div class="collect pointer" :style="{ order: isalbum ? 1 : 0 }">
                 <i class="iconfont icon-share"></i>
                 <span class="c">分享 ({{ shareCount }})</span>
               </div>
@@ -51,20 +57,30 @@
               </div>
             </el-tooltip>
           </el-col>
-          <el-col class="tag" v-if="musicInfo.tags && musicInfo.tags.length > 0">
+          <el-col class="tag" v-if="musicInfo.tags && musicInfo.tags.length > 0 && !isalbum">
             <div>标签：</div>
             <div v-for="(tag, index) in musicInfo.tags" :key="index">
               <span class="pointer tag">{{ tag }}</span>
               <span v-if="index != musicInfo.tags.length - 1" class="symbol">/</span>
             </div>
           </el-col>
-          <el-col class="playCount">
+          <el-col class="playCount" v-if="!isalbum">
             <span>歌曲：</span>
             <span class="show-num" v-if="musicInfo.trackIds">{{ musicInfo.trackIds.length }}</span>
             <span class="gutter">播放：</span>
             <span class="show-num">{{ playCount }}</span>
           </el-col>
-          <el-col class="description">
+          <el-col class="playCount info" v-else>
+            <p class="singer info">
+              <span>歌手：</span>
+              <span class="s" v-if="musicInfo.singer">{{ musicInfo.singer }}</span>
+            </p>
+            <p class="time info">
+              <span class="tt">时间：</span>
+              <span class="pt">{{ musicInfo._publishTime }}</span>
+            </p>
+          </el-col>
+          <el-col class="description" v-if="!isalbum">
             <el-row>
               <el-col :span="22" class="description-content">
                 <div class="content">
@@ -89,7 +105,7 @@
             </li>
           </ul>
         </el-col>
-        <el-col :span="5">
+        <el-col :span="5" v-if="!isalbum">
           <el-input :suffix-icon="Search" v-model="inputValue" placeholder="歌名/歌手"></el-input>
         </el-col>
       </el-row>
@@ -114,7 +130,7 @@ const showCmp = shallowRef(MusicList)
 const mId = ref(0)
 // 切换组件
 const isSpread = ref(false)
-
+const isalbum = ref(false) // 是否是专辑
 const selectList = ref([
   {
     id: 0,
@@ -162,7 +178,8 @@ const domRef = ref()
 
 const musicList = ref([])
 const showMusicList = ref([])
-// const comments = ref(0) // 评论数
+
+// 获取歌单信息
 const getMusicList = async (pId) => {
   const { playlist = {} } = await store.dispatch('getInfo', { path: `/playlist/detail?id=${pId}` })
   musicInfo.value = playlist
@@ -173,12 +190,35 @@ const getMusicList = async (pId) => {
   showMusicList.value = musicList.value = loopFilterAdd({ musicList: songs, artists: 'ar', transTime: true, timeName: 'dt' })
 }
 
+// 获取专辑信息
+const getAlbumList = async (pId) => {
+  const { album, songs } = await store.dispatch('getInfo', { path: `/album?id=${pId}` })
+  if (!album) return
+  musicInfo.value = loopFilterAdd({ musicList: [album], transLocalTime: true })[0]
+  showMusicList.value = loopFilterAdd({ musicList: songs, artists: 'ar', transTime: true, timeName: 'dt' })
+
+  const { commentCount, subCount, shareCount } = await store.dispatch('getInfo', { path: `/album/detail/dynamic?id=${pId}` })
+  selectList.value[1].commentCount = commentCount
+
+  Object.assign(musicInfo.value, { commentCount, subCount, shareCount })
+
+  // console.log(res)
+
+  // console.log(musicInfo.value)
+}
+
 watch(
-  () => route.params.pId,
-  async (pId) => {
+  () => [route.params.pId, route.query.isAlbum],
+  async (val) => {
+    const [pId, isAlbum] = val
     if (!pId) return
     mId.value = pId
-    getMusicList(pId)
+    isalbum.value = isAlbum
+    if (isAlbum) {
+      getAlbumList(pId)
+    } else {
+      getMusicList(pId)
+    }
   },
   { immediate: true }
 )
@@ -192,7 +232,7 @@ const createTime = computed(() => {
 })
 
 const subscribedCount = computed(() => {
-  return computedCount(musicInfo.value.subscribedCount)
+  return computedCount(musicInfo.value.subscribedCount || musicInfo.value.commentCount)
 })
 
 const shareCount = computed(() => {
@@ -265,18 +305,28 @@ div.song-list-package {
         width: 185px;
       }
       div.name {
-        .flex(flex-start,center);
+        .flex(flex-start,flex-start);
         width: 100%;
         span.tag-name {
+          flex: 0 0 auto;
           border: 1px solid @bgColor;
           color: @bgColor;
           border-radius: 4px;
-          padding: 0 5px;
+          padding: 2px 5px;
           width: 30px;
+          margin-top: 5px;
         }
         h2.playlist-name {
           display: inline-block;
           margin: 5px 10px;
+          line-height: 24px;
+          &.album {
+            span.transName {
+              color: #aaa;
+              padding-left: 10px;
+              box-sizing: border-box;
+            }
+          }
         }
       }
       .el-col.creator {
@@ -376,6 +426,15 @@ div.song-list-package {
           }
           &.show-num {
             color: #666;
+          }
+        }
+        &.info {
+          p.info {
+            margin: 10px 0;
+            span.s,
+            span.pt {
+              color: #666;
+            }
           }
         }
       }

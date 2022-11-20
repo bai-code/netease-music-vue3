@@ -1,5 +1,6 @@
 <template>
   <el-row class="title-category-more">
+  <!-- 歌手页面多项选择 -->
     <el-col v-for="title in titleCategory" :key="title.id">
       <TitltCategory :categoryList="title.children" :activeIndex="title.activeIndex" @changeCategory="changeCategory" :categoryIndex="title.categoryIndex">
         <template #left>

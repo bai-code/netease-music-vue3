@@ -138,7 +138,7 @@ onDeactivated(() => {
 
 <style lang="less" scoped>
 div.video-content {
-  overflow-y: hidden;
+  // overflow-y: hidden;
   div.show-text {
     padding: 5px 15px;
     border: 1px solid #ccc;

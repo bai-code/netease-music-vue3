@@ -1,7 +1,17 @@
 <template>
   <div class="music-list" v-if="showMusicList.length > 0">
-    <el-table :data="showMusicList" style="width: 100%" header-row-class-name="headerRowStyle" @row-dblclick="playMusic" :row-class-name="setClassName" :show-header="isShowHeader" stripe>
-      <el-table-column width="50">
+    <el-table
+      :data="showMusicList"
+      style="width: 100%"
+      header-row-class-name="headerRowStyle"
+      @row-dblclick="playMusic"
+      :row-class-name="setClassName"
+      :show-header="isShowHeader"
+      stripe
+      order="sortOrder"
+      @row-click="linkToAlbum"
+    >
+      <el-table-column width="50" prop="index">
         <template v-slot="scope">
           <div class="index">
             <span v-if="activeIndex !== scope.$index" :class="['index', { mark: isMark && scope.$index < 3 }]">{{ fillIndex ? fillNum(scope.$index + 1) : scope.$index + 1 }}</span>
@@ -11,11 +21,11 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="singer" label="歌手" class-name="column-item singer pointer" width="70" v-if="showImage">
+      <el-table-column prop="image" class-name="column-item singer pointer" width="70" v-if="showImage">
         <template #default="scope">
           <div class="image" @click="playMusic(scope.row)">
-            <m-image :src="scope.row.album.blurPicUrl"></m-image>
-            <span class="icon">
+            <m-image :src="(scope.row.album && scope.row.album.blurPicUrl) || scope.row.blurPicUrl"></m-image>
+            <span class="icon" v-if="showImageIcon">
               <i class="iconfont icon-hover"></i>
             </span>
           </div>
@@ -25,7 +35,7 @@
         <template v-slot="scope">
           <div class="cell-name">
             <div
-              class="name overflow"
+              class="name overflow pointer"
               :title="
                 scope.row.alia && scope.row.alia.length > 0 ? scope.row.name + scope.row.alia[0] : scope.row.alias && scope.row.alias.length > 0 ? scope.row.name + scope.row.alias[0] : scope.row.name
               "
@@ -40,7 +50,14 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="singer" label="歌手" class-name="column-item singer pointer" width="160" v-if="showSinger" />
+      <el-table-column prop="singer" label="歌手" class-name="column-item singer pointer" width="160" v-if="showSinger">
+        <template #default="scoped" v-if="addSingerAlias">
+          <div class="singer pointer" v-if="scoped.row.singer">
+            <span class="name">{{ scoped.row.singer[0] }}</span>
+            <span class="alias">({{ scoped.row.singer[1] }})</span>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column prop="al.name" label="专辑" class-name="column-item album pointer" width="180" v-if="showAlbum">
         <template v-slot="scope">
           <div class="al overflow" v-if="scope.row.al && scope.row.al.tns" :title="scope.row.al.tns.length > 0 ? scope.row.al.name + scope.row.al.tns[0] : scope.row.al.name">
@@ -63,7 +80,7 @@
 </template>
 
 <script setup>
-import { defineProps, computed, watch, ref } from 'vue'
+import { defineProps, computed, watch, ref, defineEmits } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { playAndCommit, findItemIndex, fillNum } from '@/utils/plugins'
@@ -117,6 +134,19 @@ const props = defineProps({
     // 是否展示图片
     type: Boolean,
     default: false
+  },
+  showImageIcon: {
+    // 是否展示图片中间icon图标
+    type: Boolean,
+    default: true
+  },
+  sortOrder: {
+    // 排序
+    type: String
+  },
+  addSingerAlias: {
+    type: Boolean,
+    default: false
   }
   // isLoading: {
   //   // 请求状态
@@ -124,6 +154,8 @@ const props = defineProps({
   //   default: false
   // }
 })
+
+const emits = defineEmits(['linkToAlbum'])
 
 const store = useStore()
 const activeIndex = computed(() => {
@@ -139,6 +171,7 @@ const setClassName = ({ rowIndex }) => {
   }
 }
 
+// 默认歌曲 ，双击播放
 const playMusic = (row) => {
   const { id } = row
   const { showMusicList } = props
@@ -146,10 +179,17 @@ const playMusic = (row) => {
   playAndCommit({ musicList: showMusicList, index })
 }
 
+// 点击mv图标
 const router = useRouter()
 const playMv = (row) => {
   const { mvid, mv } = row
   router.push({ name: 'video-detail', query: { mvid: mvid || mv } })
+}
+
+const linkToAlbum = (row) => {
+  // console.log(row)
+  emits('linkToAlbum', row)
+  // router.push({name:'song-list-package', params:{pId:}})
 }
 
 const isLoading = ref(false)
@@ -237,6 +277,7 @@ div.music-list {
       width: inherit;
       height: inherit;
       border-radius: 5px;
+      box-shadow: 0 0 5px #ccc;
     }
     span.icon {
       position: absolute;
