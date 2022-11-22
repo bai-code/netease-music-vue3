@@ -42,14 +42,13 @@ const store = createStore({
     currentPlayIndex: -1 // 当前播放歌曲索引
   },
   getters: {
+    // 返回总时长百分比
     setPrecentage(state) {
       const { currentTime, durationTime } = state
-      const precentage = Math.round((currentTime / durationTime) * 100)
-      if (isNaN(precentage)) {
-        return 0
-      }
-      return precentage
+      const precentage = currentTime / durationTime
+      return isNaN(precentage) ? 0 : precentage
     },
+    // 设置footer进度条时间
     setCurrentTime(state) {
       const { currentTime } = state
       const startTime = transformTime(Math.round(currentTime), false)
@@ -59,15 +58,6 @@ const store = createStore({
         return startTime
       }
     },
-    // setDurationTime(state) {
-    //   const { durationTime } = state
-    //   const endTime = transformTime(Math.round(durationTime), false)
-    //   if (/NaN/.test(endTime)) {
-    //     return '88:88'
-    //   } else {
-    //     return endTime
-    //   }
-    // },
     findCurrentPageIndex(state) {
       // 计算当前页面是否存在播放的歌曲 添加类名
       return function (list = []) {
@@ -129,6 +119,7 @@ const store = createStore({
     },
     // 歌曲进度跳转
     seekTime(state, { time }) {
+      state.currentTime = time // 解决拖动播放进度条拖动，抖动问题
       $audio.seekTime(time)
     },
     DOMClick(state, { flag }) {

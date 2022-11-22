@@ -49,7 +49,7 @@
 import HomeNav from '@/views/Home/home-nav.vue'
 import { useStore } from 'vuex'
 import { watch, ref, onBeforeUnmount, onActivated, onDeactivated, defineEmits, computed } from 'vue'
-import { playAndCommit } from '@/utils/plugins.js'
+import { playAndCommit, loopFilterAdd } from '@/utils/plugins.js'
 import LyricCmp from '@/components/lyric-cmp.vue'
 
 // defineProps({
@@ -113,14 +113,11 @@ const packUp = () => {
 const simiMusicList = ref([])
 const getSimiMusicList = async (id) => {
   const { songs = [] } = await store.dispatch('getInfo', { path: `/simi/song?id=${id}` })
-  simiMusicList.value = songs
-  // console.log(songs)
+  simiMusicList.value = loopFilterAdd({ musicList: songs })
 }
 
 const playMusic = (info) => {
-  // store.dispatch('getMusicInfo', { musicInfo: info })
-  // console.log(info)
-  playAndCommit({ store, musicInfo: info })
+  playAndCommit({ musicInfo: info })
 }
 
 watch(

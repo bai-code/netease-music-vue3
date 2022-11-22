@@ -53,9 +53,19 @@
         <div class="start-time overflow">
           <span v-if="musicInfo.durationTime">{{ currentTime }}</span>
         </div>
-        <div class="progress">
-          <!-- <progress class="progress" :value="musicInfo.progressPrecentage" max="100"></progress> -->
-          <el-progress :stroke-width="8" :show-text="false" :percentage="precentage" />
+        <div class="progress-content">
+          <div class="progress-bar" @mousedown="mousedown" ref="domRef">
+            <!-- <progress class="progress" :value="musicInfo.progressPrecentage" max="100"></progress> -->
+            <!-- <el-progress :stroke-width="8" :show-text="false" :percentage="precentage" @mousedown="mousedown" ref="progressRef"> -->
+            <!-- </el-progress> -->
+            <div class="guage" :style="{ width: domW + 'px' }">
+              <div class="current-time-dot" @mousedown.stop="dotMousedown">
+                <el-icon class="is-loading" v-if="isPlay">
+                  <Loading />
+                </el-icon>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="end-time">{{ musicInfo.durationTime }}</div>
         <!-- <span class="dots"></span> -->
@@ -66,24 +76,19 @@
 </template>
 
 <script setup>
-import { computed, ref, shallowRef, h, onDeactivated } from 'vue'
+import { computed, ref, shallowRef, h, onDeactivated, watchEffect, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import audio from '@/utils/audio.js'
-// import { useRoute } from 'vue-router'
 import MusicDetailContent from '@/views/views-package/music-detail-content.vue'
 
-const showCmp = shallowRef(h('div'))
+const tempCmp = h('div') // 创建一个空组件
+const showCmp = shallowRef(tempCmp)
 const isDetail = ref(false)
 const store = useStore()
-// const isFirstClick = ref(true)
 
 const isPlay = computed(() => {
   return store.state.isPlay
 })
-
-// const isPlayFm = computed(() => {
-//   return store.state.isPlayFm
-// })
 
 const isNotChange = computed(() => {
   return store.getters.isNotChange
@@ -102,9 +107,6 @@ const musicInfo = computed(() => {
   return store.state.musicInfo
 })
 
-const precentage = computed(() => {
-  return store.getters.setPrecentage
-})
 const currentTime = computed(() => {
   return store.getters.setCurrentTime
 })
@@ -119,22 +121,82 @@ const changeMusic = (params) => {
   // console.log(isPlayFm)
 }
 
+// 播放结束下一首
 audio.addEventListener('ended', function () {
   changeMusic('next')
 })
 
-const domBottom = ref(0)
+const domBottom = ref(0) // 点击歌曲图片展示歌词页面，点击部分下移距离
 
 const goBackPage = () => {
   domBottom.value = 0
   isDetail.value = false
-  showCmp.value = h('div')
+  showCmp.value = tempCmp
 }
 const goMusicDetailPage = () => {
   isDetail.value = true
   domBottom.value = '-70px'
   showCmp.value = MusicDetailContent
 }
+
+const precentage = computed(() => {
+  return store.getters.setPrecentage
+})
+
+const domRef = ref() // dom元素
+const domWidth = ref(0)
+
+// 获取并设置progres宽度
+nextTick(() => {
+  domWidth.value = domRef.value.offsetWidth
+})
+const seekTime = (num) => {
+  const time = parseInt((num / domWidth.value) * durationTime.value)
+  // console.log(time)
+  if (!isPlay.value) {
+    store.commit('play')
+  }
+  store.commit('seekTime', { time })
+}
+
+const durationTime = computed(() => {
+  return store.state.durationTime
+})
+
+// 进度条区域
+const domW = ref(0) // dom 宽度
+// 点击进度条跳转
+const mousedown = (e) => {
+  domW.value = e.offsetX
+  seekTime(e.offsetX)
+}
+const isDrag = ref(false) // 判定是否在拖动状态
+// 进度条拖动
+const dotMousedown = (e) => {
+  isDrag.value = true
+  const offsetL = e.currentTarget.offsetLeft
+  const dotL = e.pageX - offsetL
+  const domWidth = domRef.value.offsetWidth
+  document.onmousemove = (e) => {
+    const l = e.pageX - dotL + 6
+    domW.value = l > domWidth ? domWidth : l
+    document.onmouseup = () => {
+      document.onmousemove = null
+      document.onmouseup = null
+      isDrag.value = false
+      // console.log(precentage)
+      // domRef.value.style.transition = ' all 0.5s ease-in'
+      seekTime(domW.value)
+    }
+  }
+}
+
+// 监听 并设置进度条宽度
+watchEffect(() => {
+  if (isDrag.value) return
+  domW.value = precentage.value * domWidth.value
+  // domW.value = precentage.value * domWidth.value
+})
 
 // 用于视频播放页面，暂停音乐播放
 onDeactivated(() => {
@@ -295,14 +357,43 @@ onDeactivated(() => {
           text-align: center;
           color: @singerColor;
         }
-        &.progress {
-          width: calc(100% - 120px);
-          .flex(center,center);
-          progress.progress {
+        &.progress-content {
+          position: relative;
+          width: 270px;
+          height: 6px;
+          & > .progress-bar {
             width: 100%;
-          }
-          .el-progress {
-            width: 100%;
+            // .flex(flex-start,center);
+            position: relative;
+            // progress.progress {
+            //   width: 100%;
+            // }
+            // .el-progress {
+            //   width: 100%;
+            // }
+            height: 100%;
+            background: #ddd;
+            border-radius: 6px;
+            div.guage {
+              background: @bgColor;
+              height: 100%;
+              border-radius: 6px;
+              position: relative;
+              .flex(flex-end, center);
+              div.current-time-dot {
+                position: absolute;
+                right: 0;
+                height: 12px;
+                width: 12px;
+                background: rgba(236, 65, 65, 0.9);
+                transform: translateX(50%);
+                border-radius: 50%;
+                .flex(center,center);
+                .el-icon {
+                  color: #fff;
+                }
+              }
+            }
           }
         }
       }
