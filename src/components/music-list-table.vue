@@ -44,13 +44,15 @@
               <span class="alia" v-if="scope.row.alia && scope.row.alia.length > 0">({{ scope.row.alia[0] }})</span>
               <span class="alia" v-else-if="scope.row.alias && scope.row.alias.length > 0">({{ scope.row.alias[0] }})</span>
             </div>
-            <span class="show-sq" v-if="showIcon && scope.row.sq"> SQ </span>
-            <span class="show-mv" v-if="showIcon && (scope.row.mv || scope.row.mvid)" @click="playMv(scope.row)"> MV </span>
+            <span class="show-hires" v-if="showIcon && scope.row.privilege && scope.row.privilege.playMaxBrLevel === 'hires'"> Hi-Res </span>
+            <span class="show-sq" v-else-if="showIcon && scope.row.sq && scope.row.privilege.playMaxBrLevel !== 'hires'"> SQ </span>
+
+            <span class="show-mv" v-if="showIcon && scope.row.mv && scope.row.mvid" @click="playMv(scope.row)"> MV </span>
           </div>
         </template>
       </el-table-column>
 
-      <el-table-column prop="singer" label="歌手" class-name="column-item singer pointer" width="160" v-if="showSinger">
+      <el-table-column prop="singer" label="歌手" class-name="column-item singer pointer" width="150" v-if="showSinger">
         <template #default="scoped" v-if="addSingerAlias">
           <div class="singer pointer" v-if="scoped.row.singer">
             <span class="name">{{ scoped.row.singer[0] }}</span>
@@ -58,7 +60,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="al.name" label="专辑" class-name="column-item album pointer" width="180" v-if="showAlbum">
+      <el-table-column prop="al.name" label="专辑" class-name="column-item album pointer" width="150" v-if="showAlbum">
         <template v-slot="scope">
           <div class="al overflow" v-if="scope.row.al && scope.row.al.tns" :title="scope.row.al.tns.length > 0 ? scope.row.al.name + scope.row.al.tns[0] : scope.row.al.name">
             <span>{{ scope.row.al.name }}</span>
@@ -303,12 +305,13 @@ div.music-list {
       }
     }
     span.show-sq,
-    span.show-mv {
+    span.show-mv,
+    span.show-hires {
       flex: 0 0 auto;
       color: #f00;
       border: 1px solid #f00;
       border-radius: 3px;
-      padding: 0 2px;
+      padding: 0 1px;
       display: inline-block;
       font-size: 12px;
       height: 14px;
@@ -330,6 +333,12 @@ div.music-list {
         right: -3px;
         top: 4px;
       }
+    }
+    span.show-hires {
+      width: 37px;
+      padding: 0;
+      letter-spacing: -0.5px;
+      font-weight: 500;
     }
   }
   div.loading {
