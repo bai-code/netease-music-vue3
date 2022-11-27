@@ -50,7 +50,8 @@
 import { shallowReactive, ref, watchEffect } from 'vue'
 import { useStore } from 'vuex'
 import NavTitleSlot from '@/components/nav-title-slot.vue'
-import { loopFilterAdd, playAndCommit } from '@/utils/plugins.js'
+import { loopFilterAdd } from '@/utils/plugins.js'
+import { playAndCommit } from '@/utils/playAndCommit.js'
 import MusicListTable from '@/components/music-list-table.vue'
 
 const store = useStore()

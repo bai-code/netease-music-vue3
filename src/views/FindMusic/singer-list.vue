@@ -267,8 +267,8 @@ watch(
     const { area } = val[0].children[val[0].activeIndex]
     const { type } = val[1].children[val[1].activeIndex]
     const { name } = val[2].children[val[2].activeIndex]
-    getSingerList(area, type, name)
     singerList.value = []
+    getSingerList(area, type, name)
     tempCategory.value = { area, type, name }
   },
   { immediate: true, deep: true }

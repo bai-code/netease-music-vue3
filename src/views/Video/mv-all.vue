@@ -1,7 +1,7 @@
 <template>
   <div class="mv-all">
     <h2 class="title" ref="h2Ref">全部MV</h2>
-    <el-row class="type-container">
+    <!-- <el-row class="type-container">
       <el-col class="area">
         <TitleCategory :categoryList="areaList" :activeIndex="areaIndex" @changeCategory="areaIndex = $event">
           <template #left>
@@ -23,7 +23,9 @@
           </template>
         </TitleCategory></el-col
       >
-    </el-row>
+    </el-row> -->
+    <TitleCategoryMore :titleCategory="titleCategory" @changeCategory="changeCategory" />
+
     <el-row class="mv-list">
       <el-col :span="8" v-for="info in showMvList" :key="info.id">
         <ShowMvItem :mvInfo="info" :textOverflow="true" />
@@ -40,80 +42,102 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
 import { watch, ref } from 'vue'
-import TitleCategory from '@/components/title-category.vue'
+import TitleCategoryMore from '@/components/title-category-more.vue'
 import { useStore } from 'vuex'
 import ShowMvItem from '@/components/show-mv-item.vue'
 import { loopFilterAdd, findItemIndex } from '@/utils/plugins.js'
 
-const areaList = [
+const titleCategory = ref([
   {
     id: 0,
-    name: '全部'
+    categoryIndex: 0,
+    activeIndex: 0,
+    categoryName: '地区',
+    children: [
+      {
+        id: 0,
+        name: '全部'
+      },
+      {
+        id: 1,
+        name: '内地'
+      },
+      {
+        id: 2,
+        name: '港台'
+      },
+      {
+        id: 3,
+        name: '欧美'
+      },
+      {
+        id: 4,
+        name: '韩国'
+      },
+      {
+        id: 5,
+        name: '日本'
+      }
+    ]
   },
   {
     id: 1,
-    name: '内地'
+    categoryIndex: 1,
+    activeIndex: 0,
+    categoryName: '类型',
+    children: [
+      {
+        id: 0,
+        name: '全部'
+      },
+      {
+        id: 1,
+        name: '官方版'
+      },
+      {
+        id: 2,
+        name: '原声'
+      },
+      {
+        id: 3,
+        name: '现场版'
+      },
+      {
+        id: 4,
+        name: '网易出品'
+      }
+    ]
   },
   {
     id: 2,
-    name: '港台'
-  },
-  {
-    id: 3,
-    name: '欧美'
-  },
-  {
-    id: 4,
-    name: '韩国'
-  },
-  {
-    id: 5,
-    name: '日本'
+    categoryIndex: 2,
+    activeIndex: 2,
+    categoryName: '排序',
+    children: [
+      {
+        id: 0,
+        name: '上升最快'
+      },
+      {
+        id: 1,
+        name: '最热'
+      },
+      {
+        id: 2,
+        name: '最新'
+      }
+    ]
   }
-]
-const areaIndex = ref(0)
-const typeList = [
-  {
-    id: 0,
-    name: '全部'
-  },
-  {
-    id: 1,
-    name: '官方版'
-  },
-  {
-    id: 2,
-    name: '原声'
-  },
-  {
-    id: 3,
-    name: '现场版'
-  },
-  {
-    id: 4,
-    name: '网易出品'
-  }
-]
-const typeIndex = ref(0)
-const orderList = [
-  {
-    id: 0,
-    name: '上升最快'
-  },
-  {
-    id: 1,
-    name: '最热'
-  },
-  {
-    id: 2,
-    name: '最新'
-  }
-]
-const orderIndex = ref(2)
+])
+
+const changeCategory = (val) => {
+  const { categoryIndex, activeIndex } = val
+  titleCategory.value[categoryIndex].activeIndex = activeIndex
+}
 
 const store = useStore()
 
-const oldObj = ref({
+const routeQuery = ref({
   area: '全部',
   type: '全部',
   order: '最热'
@@ -128,7 +152,7 @@ const isLoading = ref(false)
 const getMvList = async ({ area = '全部', type = '全部', order = '最热' }) => {
   isLoading.value = true
   showMvList.value = []
-  const oldVal = JSON.stringify(oldObj.value)
+  const oldVal = JSON.stringify(routeQuery.value)
   const newVal = JSON.stringify({ area, type, order })
   if (oldVal !== newVal) {
     currentPage.value = 1
@@ -136,7 +160,7 @@ const getMvList = async ({ area = '全部', type = '全部', order = '最热' })
   }
   const offset = (currentPage.value - 1) * pageSize.value
   const { count, data } = await store.dispatch('getInfo', { path: `/mv/all?area=${area}&type=${type}&order=${order}&offset=${offset}&limit=${pageSize.value}` })
-  const newestList = loopFilterAdd({ musicList: data, str: 'author' })
+  const newestList = loopFilterAdd({ musicList: data, str: 'author', isTransPlayCount: true })
   if (count) {
     total.value = count
   }
@@ -144,16 +168,6 @@ const getMvList = async ({ area = '全部', type = '全部', order = '最热' })
   showMvList.value = newestList
   isLoading.value = false
   // console.log(mvList)
-}
-
-const routeQuery = ref({})
-
-const setName = (areaIndex, typeIndex, orderIndex) => {
-  const area = areaList[areaIndex].name
-  const type = typeList[typeIndex].name
-  const order = orderList[orderIndex].name
-  routeQuery.value = { area, type, order }
-  return { area, type, order }
 }
 
 const route = useRoute()
@@ -164,27 +178,44 @@ watch(
   (newVal) => {
     if (newVal && newVal.area) {
       const { area, type, order } = newVal
-      areaIndex.value = findItemIndex({ musicList: areaList, params: area })
-      typeIndex.value = findItemIndex({ musicList: typeList, params: type })
-      orderIndex.value = findItemIndex({ musicList: orderList, params: order })
+      const areaIndex = findItemIndex({ musicList: titleCategory.value[0].children, params: area })
+      const typeIndex = findItemIndex({ musicList: titleCategory.value[1].children, params: type })
+      const orderIndex = findItemIndex({ musicList: titleCategory.value[2].children, params: order })
+      titleCategory.value[0].activeIndex = areaIndex
+      titleCategory.value[1].activeIndex = typeIndex
+      titleCategory.value[2].activeIndex = orderIndex
+
+      mvList.value = []
+      showMvList.value = []
       getMvList(newVal)
-      setName(areaIndex.value, typeIndex.value, orderIndex.value)
-      oldObj.value = { area, type, order }
+      console.log(1)
+      routeQuery.value = { area, type, order }
     }
   },
   { immediate: true, deep: true }
 )
 
-watch([areaIndex, typeIndex, orderIndex], (val) => {
-  // const area = areaList[val[0]].name
-  // const type = typeList[val[1]].name
-  // const order = orderList[val[2]].name
-  // routeQuery.value = { area, type, order }
-  const query = setName(val[0], val[1], val[2])
-  router.replace({ name: 'mv-all', query })
-})
+watch(
+  titleCategory,
+  (val) => {
+    const name1 = val[0].children[val[0].activeIndex].name
+    const name2 = val[1].children[val[1].activeIndex].name
+    const name3 = val[2].children[val[2].activeIndex].name
+    const tempCategory = { area: name1, type: name2, order: name3 }
+    let flag = false
+    for (const prop in routeQuery) {
+      if (routeQuery[prop] !== tempCategory[prop]) {
+        flag = true
+      }
+    }
+    console.log(2)
+    if (!flag) return
+    router.replace({ name: 'mv-all', query: tempCategory })
+    // getMvList(tempCategory)
+  },
+  { immediate: true, deep: true }
+)
 
-// const scrollbarRef = ref()
 const currentChange = (val) => {
   currentPage.value = val
   const offset = (val - 1) * pageSize.value
@@ -194,12 +225,7 @@ const currentChange = (val) => {
   } else {
     getMvList(routeQuery.value)
   }
-  // scrollbarRef.value.setScrollTop(0)
 }
-
-// const nextChange = (val) => {
-//   console.log(val)
-// }
 </script>
 
 <style lang="less" scoped>

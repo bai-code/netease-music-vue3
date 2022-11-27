@@ -6,7 +6,7 @@
   </transition>
 
   <el-row type="flex" justify="space-between" align="middle" class="footer-container">
-    <el-col :span="6" class="info">
+    <el-col :span="7" class="info">
       <div class="container" :style="{ bottom: domBottom }">
         <div class="arrow-down pointer" @click="goBackPage">
           <i class="iconfont icon-arrow-down"></i>
@@ -26,13 +26,16 @@
             </div>
           </div>
           <div class="music-name">
-            <span class="overflow name">{{ musicInfo.name }}</span>
-            <span class="overflow singer">{{ musicInfo.singer }}</span>
+            <div class="name">
+              <span class="name overflow" :title="musicInfo.name">{{ musicInfo.name }}</span>
+              <span class="icon iconStyle" v-if="musicInfo.fee === 1"> VIP </span>
+            </div>
+            <span class="overflow singer" :title="musicInfo.singer">{{ musicInfo.singer }}</span>
           </div>
         </div>
       </div>
     </el-col>
-    <el-col :span="10" class="controls-container">
+    <el-col :span="11" class="controls-container">
       <div class="controls">
         <div class="prev pointer" :class="{ disabled: isNotChange || musicInfo.isFmMusic }" @click="changeMusic('prev')">
           <i class="iconfont icon-prev"></i>
@@ -55,9 +58,6 @@
         </div>
         <div class="progress-content">
           <div class="progress-bar" @mousedown="mousedown" ref="domRef">
-            <!-- <progress class="progress" :value="musicInfo.progressPrecentage" max="100"></progress> -->
-            <!-- <el-progress :stroke-width="8" :show-text="false" :percentage="precentage" @mousedown="mousedown" ref="progressRef"> -->
-            <!-- </el-progress> -->
             <div class="guage" :style="{ width: domW + 'px' }">
               <div class="current-time-dot" @mousedown.stop="dotMousedown">
                 <el-icon class="is-loading" v-if="isPlay">
@@ -68,11 +68,37 @@
           </div>
         </div>
         <div class="end-time">{{ musicInfo.durationTime }}</div>
-        <!-- <span class="dots"></span> -->
       </div>
     </el-col>
-    <el-col :span="4"> 音质 播放列表 </el-col>
+    <!-- 音质 -->
+    <el-col :span="4" class="other-select">
+      <div class="quality-content">
+        <QualitySelect :qualityList="musicInfo.privilege && musicInfo.privilege.chargeInfoList" @changeQuality="changeQuality" />
+      </div>
+      <div class="loopStatus">
+        <LoopStatusSelect :list="loopList" spreadDirection="top" @selectItem="selectItem" />
+      </div>
+      <div class="list" title="播放列表">
+        <el-icon class="pointer" :size="18" @click="changeDrawerStatus"><Expand /></el-icon>
+      </div>
+    </el-col>
   </el-row>
+  <Teleport to="#main-teleport-body">
+    <el-dialog v-model="dialogVisible" title="Tips" width="400px" :show-close="false" :modal="false" custom-class="dialog-content">
+      <template #header>
+        <div class="header">
+          <h3 class="title">当前播放</h3>
+          <el-row class="show-other" type="flex" justify="space-between">
+            <span class="show-count">总{{ musicList.length }}首</span>
+            <span class="clear-list pointer" @click="clearPlayList">清空列表</span>
+          </el-row>
+        </div>
+      </template>
+      <el-scrollbar height="330px">
+        <MusicListTable :showMusicList="musicList" :isShowHeader="false" :showIndex="false" :showAlbum="false" :drawerMode="true" />
+      </el-scrollbar>
+    </el-dialog>
+  </Teleport>
 </template>
 
 <script setup>
@@ -80,6 +106,11 @@ import { computed, ref, shallowRef, h, onDeactivated, watchEffect, nextTick } fr
 import { useStore } from 'vuex'
 import audio from '@/utils/audio.js'
 import MusicDetailContent from '@/views/views-package/music-detail-content.vue'
+import QualitySelect from './home-footer/quality-select.vue'
+import { playAndCommit } from '@/utils/playAndCommit.js'
+import { Expand } from '@element-plus/icons-vue'
+import LoopStatusSelect from './home-footer/loopStatus-select.vue'
+import MusicListTable from '@/components/music-list-table.vue'
 
 const tempCmp = h('div') // 创建一个空组件
 const showCmp = shallowRef(tempCmp)
@@ -106,19 +137,21 @@ const changePlayStatus = () => {
 const musicInfo = computed(() => {
   return store.state.musicInfo
 })
-
+const musicList = computed(() => {
+  return store.state.musicList
+})
+// 转换后的该歌曲总时长 00 ： 00
 const currentTime = computed(() => {
   return store.getters.setCurrentTime
 })
 
 const changeMusic = (params) => {
-  if ((isNotChange.value && !musicInfo.value.isFmMusic) || (musicInfo.value.isFmMusic && params === 'prev')) return
+  if (musicInfo.value.isFmMusic && params === 'prev') return
   if (musicInfo.value.isFmMusic) {
     store.dispatch('personalFm/getFm', { isPlay: true })
   } else {
     store.dispatch('changeMusic', { params })
   }
-  // console.log(isPlayFm)
 }
 
 // 播放结束下一首
@@ -152,10 +185,6 @@ nextTick(() => {
 })
 const seekTime = (num) => {
   const time = parseInt((num / domWidth.value) * durationTime.value)
-  // console.log(time)
-  if (!isPlay.value) {
-    store.commit('play')
-  }
   store.commit('seekTime', { time })
 }
 
@@ -198,6 +227,67 @@ watchEffect(() => {
   // domW.value = precentage.value * domWidth.value
 })
 
+// 子组件传递   切换播放音质
+const oldVal = ref('')
+const changeQuality = async (val) => {
+  if (oldVal.value === val) return
+  const time = audio.currentTime || 0
+  await playAndCommit({ musicInfo: musicInfo.value, level: val, isPlay: isPlay.value })
+  store.commit('seekTime', { time })
+  oldVal.value = val
+}
+const dialogVisible = ref(false)
+
+const changeDrawerStatus = () => {
+  dialogVisible.value = !dialogVisible.value
+}
+
+// 清除播放列表
+const clearPlayList = () => {
+  store.commit('saveMusicList', { musicList: [] })
+}
+
+const loopList = shallowRef([
+  {
+    id: 0,
+    text: '单曲播放',
+    icon: 'icon-single',
+    loopStatus: 'single'
+  },
+  {
+    id: 1,
+    text: '单曲循环',
+    icon: 'icon-single-cycle',
+    loopStatus: 'singleCycle'
+  },
+  {
+    id: 2,
+    text: '列表播放',
+    icon: 'icon-order',
+    loopStatus: 'list'
+  },
+  {
+    id: 3,
+    text: '列表循环',
+    icon: 'icon-list-loop',
+    loopStatus: 'list-loop'
+  },
+  {
+    id: 4,
+    text: '随机播放',
+    icon: 'icon-random',
+    loopStatus: 'random'
+  }
+])
+
+const oldLoopStatus = ref()
+const selectItem = (val) => {
+  const { loopStatus } = val
+  if (loopStatus === oldLoopStatus.value) return
+  store.commit('changeLoopStatus', { loopStatus })
+  oldLoopStatus.value = loopStatus
+}
+
 // 用于视频播放页面，暂停音乐播放
 onDeactivated(() => {
   store.commit('pause')
@@ -205,6 +295,11 @@ onDeactivated(() => {
 </script>
 
 <style lang="less" scoped>
+.drawer-container {
+  height: 420px;
+  top: 60px;
+}
+
 .content-enter-active,
 .content-leave-active {
   transition: all 0.5s ease-in;
@@ -241,21 +336,23 @@ onDeactivated(() => {
       div.music-info {
         height: 50%;
         box-sizing: border-box;
-        padding: 10px 0;
+        padding: 11px 1px;
         width: 100%;
         .flex(flex-start,center);
+
         div.music-img {
           flex: 0 0 auto;
           height: 100%;
           width: 50px;
           border-radius: 3px;
           position: relative;
+          box-shadow: 0px 0 5px #ccc;
+
           .el-image {
             position: absolute;
             width: 100%;
             height: 100%;
             border-radius: 5px;
-            box-shadow: 0 0 5px #ccc;
           }
           div.mask-layer {
             position: absolute;
@@ -295,13 +392,27 @@ onDeactivated(() => {
         div.music-name {
           flex: 0 0 auto;
           width: calc(100% - 65px);
-          padding-left: 10px;
           height: 100%;
           .flex(space-between, flex-start);
           flex-direction: column;
-          padding: 3px;
+          padding: 3px 3px 3px 10px;
           box-sizing: border-box;
-          span {
+          div.name {
+            flex: 0 0 auto;
+            width: 100%;
+            white-space: nowrap;
+            .flex(flex-start,center);
+            span.name {
+              padding-right: 5px;
+              // flex: 0 0 auto;
+              // display: inline-block;
+              // width: calc(100% - 30px);
+            }
+            span.icon {
+              flex: 0 0 auto;
+            }
+          }
+          & > span {
             display: inline-block;
             width: 100%;
             &.singer {
@@ -363,14 +474,7 @@ onDeactivated(() => {
           height: 6px;
           & > .progress-bar {
             width: 100%;
-            // .flex(flex-start,center);
             position: relative;
-            // progress.progress {
-            //   width: 100%;
-            // }
-            // .el-progress {
-            //   width: 100%;
-            // }
             height: 100%;
             background: #ddd;
             border-radius: 6px;
@@ -397,16 +501,62 @@ onDeactivated(() => {
           }
         }
       }
-
-      // span.dots{
-      //   position: absolute;
-      //   width: 10px;
-      //   height: 10px;
-      //   background: @bgColor;
-      //   left: 0;
-
-      // }
     }
+  }
+  .el-col.other-select {
+    .flex(space-between,center);
+    div.quality-content {
+      flex: 0 0 auto;
+      min-width: 35px;
+    }
+    div.loopStatus {
+      .flex(space-between,center);
+      :deep(.m-select) {
+        div.show-title {
+          i.iconfont {
+            font-size: 16px;
+          }
+        }
+      }
+    }
+    div.list {
+      .flex(center,center);
+    }
+  }
+}
+</style>
+
+<style lang="less">
+/* 用于解决teleprot添加到el-main中的样式 */
+.dialog-content {
+  position: absolute !important;
+  width: 400px;
+  margin: 0 !important;
+  right: 0;
+  height: 420px;
+  top: 60px;
+  box-shadow: 0 0 3px #ccc;
+  .el-dialog__header {
+    padding: 0 0 10px 10px;
+    div.header {
+      h3.title {
+        margin-bottom: 10px;
+      }
+      .el-row.show-other {
+        & > span {
+          font-size: 12px;
+          &.show-count {
+            color: #ccc;
+          }
+          &.clear-list {
+            color: @blueColor;
+          }
+        }
+      }
+    }
+  }
+  .el-dialog__body {
+    padding: 0;
   }
 }
 </style>

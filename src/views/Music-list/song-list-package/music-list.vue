@@ -16,7 +16,6 @@
 <script setup>
 import { defineEmits, defineProps, computed } from 'vue'
 import { fillNum } from '@/utils/plugins.js'
-// import { computed } from '@vue/reactivity'
 import { useStore } from 'vuex'
 const props = defineProps({
   mId: {
@@ -31,24 +30,6 @@ const props = defineProps({
 })
 
 const emits = defineEmits(['playMusic'])
-// const activeIndex = ref(0)
-
-// const showMusicList = ref([])
-// const musicList = ref([])
-// const store = useStore()
-// const getMusicList = async (mId) => {
-//   const { songs } = await store.dispatch('getInfo', { path: `/playlist/track/all?id=${mId}` })
-//   showMusicList.value = musicList.value = jointSinger({ musicList: songs, artists: 'ar', transTime: true, timeName: 'dt' })
-// }
-
-// watch(
-//   () => props.mId,
-//   (mId) => {
-//     if (!mId) return
-//     getMusicList(mId)
-//   },
-//   { immediate: true }
-// )
 
 const store = useStore()
 const activeIndex = computed(() => {

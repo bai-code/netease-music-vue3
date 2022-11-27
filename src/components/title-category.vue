@@ -8,7 +8,7 @@
       </li>
     </ul>
     <!-- </div> -->
-    <slot name="right" ></slot>
+    <slot name="right"></slot>
   </el-row>
 </template>
 
@@ -18,6 +18,14 @@ const props = defineProps({
   categoryList: {
     type: Array,
     required: true
+    // 参考
+    //   {
+    // id: 0,
+    // categoryIndex: 0, //必传
+    // activeIndex: 0, // 必传
+    // categoryName: '地区',
+    // children:[]
+    // }
   },
   activeIndex: {
     type: Number,

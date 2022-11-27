@@ -36,7 +36,8 @@ import { defineProps, watch, ref, computed } from 'vue'
 import image from '@/static/top50.jpg'
 import MusicListTable from '@/components/music-list-table'
 import { useStore } from 'vuex'
-import { playAndCommit, fillNum } from '@/utils/plugins.js'
+import { fillNum } from '@/utils/plugins.js'
+import { playAndCommit } from '@/utils/playAndCommit.js'
 
 const props = defineProps({
   albumList: {

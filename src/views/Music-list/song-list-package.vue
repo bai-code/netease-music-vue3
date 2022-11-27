@@ -1,130 +1,132 @@
 <!-- 包装组件歌单 -->
 <!-- 歌单组件 -->
 <template>
-  <el-scrollbar>
-    <div class="song-list-package paddingRight">
-      <el-row class="music-info" type="flex">
-        <el-col :span="7"> <el-image :src="musicInfo.coverImgUrl || musicInfo.blurPicUrl || musicInfo.pucUrl"></el-image></el-col>
-        <el-col :span="17">
-          <div class="name">
-            <span class="tag-name">{{ isalbum ? '专辑' : '歌单' }}</span>
-            <h2 class="playlist-name overflow" :title="musicInfo.name" v-if="!isalbum">
-              {{ musicInfo.name }}
-            </h2>
-            <h2 class="playlist-name album" :title="musicInfo.name" v-else>
-              <span class="name">{{ musicInfo.name }}</span>
-              <span class="transName" v-if="musicInfo.transNames">({{ musicInfo.transNames[0] }})</span>
-            </h2>
+  <!-- <el-scrollbar> -->
+  <div class="song-list-package">
+    <el-row class="music-info" type="flex">
+      <el-col :span="7"> <el-image :src="musicInfo.coverImgUrl || musicInfo.blurPicUrl || musicInfo.pucUrl"></el-image></el-col>
+      <el-col :span="17">
+        <div class="name">
+          <span class="tag-name">{{ isalbum ? '专辑' : '歌单' }}</span>
+          <h2 class="playlist-name overflow" :title="musicInfo.name" v-if="!isalbum">
+            {{ musicInfo.name }}
+          </h2>
+          <h2 class="playlist-name album" :title="musicInfo.name" v-else>
+            <span class="name">{{ musicInfo.name }}</span>
+            <span class="transName" v-if="musicInfo.transNames">({{ musicInfo.transNames[0] }})</span>
+          </h2>
+        </div>
+        <el-col class="creator">
+          <div class="container" v-if="musicInfo.creator && !isalbum">
+            <div class="avatar">
+              <el-image :src="musicInfo.creator.avatarUrl"></el-image>
+              <el-image v-if="musicInfo.creator.avatarDetail" :src="musicInfo.creator.avatarDetail.identityIconUrl" class="tag"></el-image>
+            </div>
+            <span class="create-user pointer">{{ musicInfo.creator.nickname }}</span>
+            <span class="create-date default">{{ createTime }} 创建</span>
           </div>
-          <el-col class="creator">
-            <div class="container" v-if="musicInfo.creator && !isalbum">
-              <div class="avatar">
-                <el-image :src="musicInfo.creator.avatarUrl"></el-image>
-                <el-image v-if="musicInfo.creator.avatarDetail" :src="musicInfo.creator.avatarDetail.identityIconUrl" class="tag"></el-image>
-              </div>
-              <span class="create-user pointer">{{ musicInfo.creator.nickname }}</span>
-              <span class="create-date default">{{ createTime }} 创建</span>
+        </el-col>
+        <el-col class="controls">
+          <div class="play-all pointer">
+            <div class="play" @click="playMusic('all')">
+              <i class="iconfont icon-hover"></i>
+              <span class="text">播放全部</span>
             </div>
-          </el-col>
-          <el-col class="controls">
-            <div class="play-all pointer">
-              <div class="play" @click="playMusic('all')">
-                <i class="iconfont icon-hover"></i>
-                <span class="text">播放全部</span>
-              </div>
-              <el-tooltip content="建设中..." placement="top-end">
-                <div class="add">
-                  <i class="iconfont icon-add"></i>
-                </div>
-              </el-tooltip>
-            </div>
-            <el-tooltip content="建设中..." placement="top">
-              <div class="collect pointer">
-                <i class="iconfont icon-folder"></i>
-                <span class="c">收藏 ({{ subscribedCount }})</span>
+            <el-tooltip content="建设中..." placement="top-end">
+              <div class="add">
+                <i class="iconfont icon-add"></i>
               </div>
             </el-tooltip>
-            <el-tooltip content="建设中..." placement="top">
-              <div class="collect pointer" :style="{ order: isalbum ? 1 : 0 }">
-                <i class="iconfont icon-share"></i>
-                <span class="c">分享 ({{ shareCount }})</span>
-              </div>
-            </el-tooltip>
-            <el-tooltip content="建设中..." placement="top">
-              <div class="collect pointer">
-                <i class="iconfont icon-download"></i>
-                <span class="c">下载全部</span>
-              </div>
-            </el-tooltip>
-          </el-col>
-          <el-col class="tag" v-if="musicInfo.tags && musicInfo.tags.length > 0 && !isalbum">
-            <div>标签：</div>
-            <div v-for="(tag, index) in musicInfo.tags" :key="index">
-              <span class="pointer tag">{{ tag }}</span>
-              <span v-if="index != musicInfo.tags.length - 1" class="symbol">/</span>
+          </div>
+          <el-tooltip content="建设中..." placement="top">
+            <div class="collect pointer">
+              <i class="iconfont icon-folder"></i>
+              <span class="c">收藏 ({{ subscribedCount }})</span>
             </div>
-          </el-col>
-          <el-col class="playCount" v-if="!isalbum">
-            <span>歌曲：</span>
-            <span class="show-num" v-if="musicInfo.trackIds">{{ musicInfo.trackIds.length }}</span>
-            <span class="gutter">播放：</span>
-            <span class="show-num">{{ playCount }}</span>
-          </el-col>
-          <el-col class="playCount info" v-else>
-            <p class="singer info">
-              <span>歌手：</span>
-              <span class="s" v-if="musicInfo.singer">{{ musicInfo.singer }}</span>
-            </p>
-            <p class="time info">
-              <span class="tt">时间：</span>
-              <span class="pt">{{ musicInfo._publishTime }}</span>
-            </p>
-          </el-col>
-          <el-col class="description" v-if="!isalbum">
-            <el-row>
-              <el-col :span="22" class="description-content">
-                <div class="content">
-                  <span class="title">简介：</span>
-                  <span class="content" :class="[isSpread ? '' : 'overflow']" ref="domRef">{{ musicInfo.description }}</span>
-                </div>
-              </el-col>
-              <el-col :span="2" @click="spreadContext" v-if="true">
-                <i class="iconfont icon-pull-up" v-if="isSpread" key="up"></i>
-                <i class="iconfont icon-pull-down" key="down" v-else></i>
-              </el-col>
-            </el-row>
-          </el-col>
+          </el-tooltip>
+          <el-tooltip content="建设中..." placement="top">
+            <div class="collect pointer" :style="{ order: isalbum ? 1 : 0 }">
+              <i class="iconfont icon-share"></i>
+              <span class="c">分享 ({{ shareCount }})</span>
+            </div>
+          </el-tooltip>
+          <el-tooltip content="建设中..." placement="top">
+            <div class="collect pointer">
+              <i class="iconfont icon-download"></i>
+              <span class="c">下载全部</span>
+            </div>
+          </el-tooltip>
         </el-col>
-      </el-row>
-      <el-row class="title-search" type="flex" justify="space-between">
-        <el-col :span="12">
-          <ul class="select-item">
-            <li v-for="(select, index) in selectList" :class="[{ select: index === selectIndex }, 'pointer']" :key="select.id" @click="changeSelectItem(index)">
-              {{ select.text }}
-              <span v-if="select.commentCount || select.commentCount === 0">({{ select.commentCount }})</span>
-            </li>
-          </ul>
+        <el-col class="tag" v-if="musicInfo.tags && musicInfo.tags.length > 0 && !isalbum">
+          <div>标签：</div>
+          <div v-for="(tag, index) in musicInfo.tags" :key="index">
+            <span class="pointer tag">{{ tag }}</span>
+            <span v-if="index != musicInfo.tags.length - 1" class="symbol">/</span>
+          </div>
         </el-col>
-        <el-col :span="5" v-if="!isalbum">
-          <el-input :suffix-icon="Search" v-model="inputValue" placeholder="歌名/歌手"></el-input>
+        <el-col class="playCount" v-if="!isalbum">
+          <span>歌曲：</span>
+          <span class="show-num" v-if="musicInfo.trackIds">{{ musicInfo.trackIds.length }}</span>
+          <span class="gutter">播放：</span>
+          <span class="show-num">{{ playCount }}</span>
         </el-col>
-      </el-row>
-      <el-row class="music-list">
-        <component :is="showCmp" :mId="mId" @playMusic="playMusic" :showMusicList="showMusicList" />
-      </el-row>
-    </div>
-  </el-scrollbar>
+        <el-col class="playCount info" v-else>
+          <p class="singer info">
+            <span>歌手：</span>
+            <span class="s" v-if="musicInfo.singer">{{ musicInfo.singer }}</span>
+          </p>
+          <p class="time info">
+            <span class="tt">时间：</span>
+            <span class="pt">{{ musicInfo._publishTime }}</span>
+          </p>
+        </el-col>
+        <el-col class="description" v-if="!isalbum">
+          <el-row>
+            <el-col :span="22" class="description-content">
+              <div class="content">
+                <span class="title">简介：</span>
+                <span class="content" :class="[isSpread ? '' : 'overflow']" ref="domRef">{{ musicInfo.description }}</span>
+              </div>
+            </el-col>
+            <el-col :span="2" @click="spreadContext" v-if="true">
+              <i class="iconfont icon-pull-up" v-if="isSpread" key="up"></i>
+              <i class="iconfont icon-pull-down" key="down" v-else></i>
+            </el-col>
+          </el-row>
+        </el-col>
+      </el-col>
+    </el-row>
+    <el-row class="title-search" type="flex" justify="space-between">
+      <el-col :span="12">
+        <ul class="select-item">
+          <li v-for="(select, index) in selectList" :class="[{ select: index === selectIndex }, 'pointer']" :key="select.id" @click="changeSelectItem(index)">
+            {{ select.text }}
+            <span v-if="select.commentCount || select.commentCount === 0">({{ select.commentCount }})</span>
+          </li>
+        </ul>
+      </el-col>
+      <el-col :span="5" v-if="!isalbum">
+        <el-input :suffix-icon="Search" v-model="inputValue" placeholder="歌名/歌手"></el-input>
+      </el-col>
+    </el-row>
+    <el-row class="music-list">
+      <component :is="showCmp" :mId="mId" @playMusic="playMusic" :showMusicList="showMusicList" />
+    </el-row>
+  </div>
+  <!-- </el-scrollbar> -->
 </template>
 
 <script setup>
 import { watch, ref, computed, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
-import { computedCount, loopFilterAdd, findItemIndex, playAndCommit, filterMusicList } from '@/utils/plugins.js'
+import { loopFilterAdd, findItemIndex, filterMusicList } from '@/utils/plugins.js'
+import { playAndCommit } from '@/utils/playAndCommit.js'
 import { Search } from '@element-plus/icons-vue'
 import Comment from './song-list-package/comment.vue'
 import Collector from './song-list-package/collector.vue'
 import MusicList from '@/components/music-list-table.vue'
+import useComputedCount from '@/hooks/useComputedCount'
 
 const showCmp = shallowRef(MusicList)
 const mId = ref(0)
@@ -212,6 +214,7 @@ watch(
   async (val) => {
     const [pId, isAlbum] = val
     if (!pId) return
+    isSpread.value = false
     mId.value = pId
     isalbum.value = isAlbum
     if (isAlbum) {
@@ -231,17 +234,11 @@ const createTime = computed(() => {
   return 0
 })
 
-const subscribedCount = computed(() => {
-  return computedCount(musicInfo.value.subscribedCount || musicInfo.value.commentCount)
-})
+const subscribedCount = useComputedCount(musicInfo.value.subscribedCount || musicInfo.value.commentCount)
 
-const shareCount = computed(() => {
-  return computedCount(musicInfo.value.shareCount)
-})
+const shareCount = useComputedCount(musicInfo.value.shareCount)
 
-const playCount = computed(() => {
-  return computedCount(musicInfo.value.playCount)
-})
+const playCount = useComputedCount(musicInfo.value.playCount)
 
 // 是否展开专辑简介
 const spreadContext = () => {
@@ -280,16 +277,6 @@ watch(
   { immediate: true }
 )
 
-// const descRef = ref()
-// const isShowSpreadBtn = computed(() => {
-//   const h = descRef.value && descRef.value.offsetHeight
-//   if (h <= 25) {
-//     return false
-//   } else {
-//     return true
-//   }
-// })
-// console.log(isShowSpreadBtn)
 </script>
 <style lang="less" scoped>
 div.song-list-package {

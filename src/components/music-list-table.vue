@@ -1,7 +1,7 @@
 <template>
-  <div class="music-list" v-if="showMusicList.length > 0">
+  <div class="music-list" v-if="musicList.length > 0">
     <el-table
-      :data="showMusicList"
+      :data="musicList"
       style="width: 100%"
       header-row-class-name="headerRowStyle"
       @row-dblclick="playMusic"
@@ -10,13 +10,22 @@
       stripe
       order="sortOrder"
       @row-click="linkToAlbum"
+      v-loading="isLoading"
+      :style="[drawerMode ? 'font-size:12px' : '']"
     >
-      <el-table-column width="50" prop="index">
+      <el-table-column :width="drawerMode ? 40 : 50" prop="index">
         <template v-slot="scope">
           <div class="index">
-            <span v-if="activeIndex !== scope.$index" :class="['index', { mark: isMark && scope.$index < 3 }]">{{ fillIndex ? fillNum(scope.$index + 1) : scope.$index + 1 }}</span>
-            <span class="index" v-else>
+            <span v-if="activeIndex !== scope.$index && showIndex" :class="['index', { mark: isMark && scope.$index < 3 }]">{{ fillIndex ? fillNum(scope.$index + 1) : scope.$index + 1 }}</span>
+            <span class="index" v-if="(activeIndex === scope.$index && showIndex) || (activeIndex === scope.$index && !drawerMode)">
               <i class="iconfont icon-yangshengqi"></i>
+            </span>
+            <span class="index" v-if="activeIndex === scope.$index && drawerMode && !isPlay">
+              <i class="iconfont icon-stop"></i>
+            </span>
+
+            <span class="index" v-if="activeIndex === scope.$index && drawerMode && isPlay">
+              <i class="iconfont icon-start"></i>
             </span>
           </div>
         </template>
@@ -31,7 +40,7 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="标题" class-name="column-item title-name default">
+      <el-table-column prop="name" label="标题" class-name="column-item title-name default" :width="drawerMode ? '200' : ''">
         <template v-slot="scope">
           <div class="cell-name">
             <div
@@ -44,15 +53,17 @@
               <span class="alia" v-if="scope.row.alia && scope.row.alia.length > 0">({{ scope.row.alia[0] }})</span>
               <span class="alia" v-else-if="scope.row.alias && scope.row.alias.length > 0">({{ scope.row.alias[0] }})</span>
             </div>
+            <!-- vip  mv sq 图标 -->
+            <span class="show-vip" v-if="showIcon && scope.row.fee === 1"> VIP </span>
             <span class="show-hires" v-if="showIcon && scope.row.privilege && scope.row.privilege.playMaxBrLevel === 'hires'"> Hi-Res </span>
-            <span class="show-sq" v-else-if="showIcon && scope.row.sq && scope.row.privilege.playMaxBrLevel !== 'hires'"> SQ </span>
+            <span class="show-sq" v-else-if="showIcon && (scope.row.sq || (scope.row.privilege && scope.row.privilege.playMaxBrLevel !== 'hires'))"> SQ </span>
 
-            <span class="show-mv" v-if="showIcon && scope.row.mv && scope.row.mvid" @click="playMv(scope.row)"> MV </span>
+            <span class="show-mv" v-if="showIcon && (scope.row.mv || scope.row.mvid)" @click="playMv(scope.row)"> MV </span>
           </div>
         </template>
       </el-table-column>
 
-      <el-table-column prop="singer" label="歌手" class-name="column-item singer pointer" width="150" v-if="showSinger">
+      <el-table-column prop="singer" label="歌手" class-name="column-item singer pointer" :width="drawerMode ? 150 / 2 : 150" v-if="showSinger">
         <template #default="scoped" v-if="addSingerAlias">
           <div class="singer pointer" v-if="scoped.row.singer">
             <span class="name">{{ scoped.row.singer[0] }}</span>
@@ -72,20 +83,18 @@
         </template>
       </el-table-column>
 
-      <el-table-column v-if="showMusicList[0].durationTime" prop="durationTime" label="时间" class-name=" column-item durationTime" width="80" />
+      <el-table-column v-if="showMusicList[0].durationTime" prop="durationTime" label="时间" class-name=" column-item durationTime" :width="drawerMode ? 65 : 80" />
     </el-table>
-    <slot v-if="showLoading">
-      <div class="loading" v-loading="isLoading"></div>
-    </slot>
     <slot name="look-more"> </slot>
   </div>
 </template>
 
 <script setup>
-import { defineProps, computed, watch, ref, defineEmits } from 'vue'
+import { defineProps, computed, watch, ref, defineEmits, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import { playAndCommit, findItemIndex, fillNum } from '@/utils/plugins'
+import { findItemIndex, fillNum } from '@/utils/plugins'
+import { playAndCommit } from '@/utils/playAndCommit'
 
 const props = defineProps({
   showMusicList: {
@@ -95,6 +104,10 @@ const props = defineProps({
     }
   },
   isShowHeader: {
+    type: Boolean,
+    default: true
+  },
+  showIndex: {
     type: Boolean,
     default: true
   },
@@ -147,11 +160,17 @@ const props = defineProps({
     type: String
   },
   addSingerAlias: {
+    // 添加歌手别名
+    type: Boolean,
+    default: false
+  },
+  drawerMode: {
+    // 抽屉模式（缩小版）
     type: Boolean,
     default: false
   }
   // isLoading: {
-  //   // 请求状态
+  //   // loading效果
   //   type: Boolean,
   //   default: false
   // }
@@ -195,16 +214,21 @@ const linkToAlbum = (row) => {
 }
 
 const isLoading = ref(false)
+const musicList = ref([])
 watch(
   () => props.showMusicList,
   (list) => {
-    if (list.length === 0) {
-      isLoading.value = true
-    } else {
-      isLoading.value = false
-    }
-  }
+    musicList.value = []
+    nextTick(() => {
+      musicList.value = list
+    })
+  },
+  { immediate: true }
 )
+
+const isPlay = computed(() => {
+  return store.state.isPlay
+})
 </script>
 
 <style lang="less" scoped>
@@ -304,6 +328,7 @@ div.music-list {
         margin-left: 5px;
       }
     }
+    span.show-vip,
     span.show-sq,
     span.show-mv,
     span.show-hires {
@@ -320,6 +345,11 @@ div.music-list {
       margin-left: 3px;
       transform: scale(0.9);
       width: 18px;
+    }
+    span.show-vip {
+      width: 20px;
+      padding: 0 2px;
+      letter-spacing: 0;
     }
     span.show-mv {
       width: 27px;

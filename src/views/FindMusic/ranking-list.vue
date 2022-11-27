@@ -21,7 +21,8 @@
 import { useStore } from 'vuex'
 import { onMounted, ref } from 'vue'
 import RankingListCmp from '@/components/ranking-list-cmp'
-import { loopFilterAdd, playAndCommit } from '@/utils/plugins.js'
+import { loopFilterAdd } from '@/utils/plugins.js'
+import { playAndCommit } from '@/utils/playAndCommit.js'
 import ShowMusicInfo from '@/components/show-music-info.vue'
 
 const store = useStore()

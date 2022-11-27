@@ -30,6 +30,7 @@
 <script setup>
 import { defineProps } from 'vue'
 import { useRouter } from 'vue-router'
+// import useComputedCount from '@/hooks/useComputedCount'
 
 const props = defineProps({
   mvInfo: {
@@ -53,8 +54,6 @@ const props = defineProps({
     default: false
   }
 })
-
-// const emits = defineEmits(['playMv'])
 
 const router = useRouter()
 const playMv = () => {

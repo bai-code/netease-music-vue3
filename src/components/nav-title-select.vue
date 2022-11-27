@@ -16,11 +16,6 @@ defineProps({
     type: Number,
     default: 0
   }
-  // isTopFill: {
-  //   // 是否需要标题上面遮挡
-  //   type: Boolean,
-  //   default: true
-  // }
 })
 
 const emits = defineEmits(['changeIndex'])

@@ -38,7 +38,7 @@
             专辑：<span class="pointer" :title="showFm.album.name">{{ showFm.album.name }}</span>
           </el-col>
           <el-col class="singer overflow" :span="11" :offset="1"
-            >歌手：<span class="s pointer">{{ showFm.artists[0].name }}</span>
+            >歌手：<span class="s pointer" @click="searchResult(showFm.artists[0].name)">{{ showFm.artists[0].name }}</span>
           </el-col>
         </el-row>
         <div class="lyric">
@@ -54,9 +54,10 @@
 <script>
 import { defineComponent, ref, computed, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
-import { playAndCommit } from '@/utils/plugins.js'
+import { playAndCommit } from '@/utils/playAndCommit.js'
 import { ElMessage } from 'element-plus'
 import LyricCmp from '@/components/lyric-cmp.vue'
+import { useRouter } from 'vue-router'
 
 export default defineComponent({
   components: {
@@ -151,6 +152,10 @@ export default defineComponent({
         playNext()
       }
     }
+    const router = useRouter()
+    const searchResult = (val) => {
+      router.push({ name: 'search-result', query: { s: val } })
+    }
 
     onMounted(async () => {
       // 初始渲染，下一个用于加载图片
@@ -167,7 +172,8 @@ export default defineComponent({
       playMusic,
       deleteFm,
       musicInfo,
-      isLoading
+      isLoading,
+      searchResult
     }
   },
   beforeRouteEnter(to, from, next) {

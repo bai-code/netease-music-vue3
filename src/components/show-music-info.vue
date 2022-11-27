@@ -38,11 +38,11 @@
 </template>
 
 <script setup>
-import { ref, defineProps, computed, watch } from 'vue'
+import { ref, defineProps, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import { getPlaylist } from '@/utils/plugins'
-// import getPlaylist from '@/hooks/useGetPlaylist.vue'
+import { getPlaylist } from '@/utils/playAndCommit'
+import useComputedCount from '@/hooks/useComputedCount.js'
 
 const props = defineProps({
   musicInfo: {
@@ -91,15 +91,7 @@ watch(
   { immediate: true, deep: true }
 )
 
-const showPlayCount = computed(() => {
-  const playCount = props.musicInfo.playCount
-  if (playCount > 100000000) {
-    return Math.floor(playCount / 100000000) + '亿'
-  } else if (playCount > 10000) {
-    return Math.floor(playCount / 10000) + '万'
-  }
-  return playCount
-})
+const showPlayCount = useComputedCount(props.musicInfo.playCount)
 
 const router = useRouter()
 const playMusic = () => {
@@ -119,7 +111,7 @@ const playMusic = () => {
       router.push({ name: 'music-list', params: { id }, query: { argu: 'playlist' } })
     }
   }
-  console.log(props.musicInfo)
+  // console.log(props.musicInfo)
 }
 
 const playOver = () => {

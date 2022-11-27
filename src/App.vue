@@ -1,13 +1,5 @@
 <template>
   <div class="home-container">
-    <!-- <keep-alive>
-      <div class="container">
-        <router-view name="nav"></router-view>
-        <router-view name="content"></router-view>
-        <router-view name="footer" />
-      </div>
-    </keep-alive> -->
-
     <router-view v-slot="{ Component }" name="nav">
       <keep-alive>
         <component :is="Component" />
@@ -41,19 +33,6 @@ const initMusicResource = () => {
   store.dispatch('getMusicInfo', { musicInfo, isPlay: false })
 }
 
-// const isFmMusic = computed(() => {
-// return store.state.musicInfo.isFmMusic
-// })
-
-// audio.addEventListener('ended', async function () {
-//   // console.log('播放结束', isFmMusic.value)
-//   if (isFmMusic.value) {
-//     await store.dispatch('personalFm/getFm', { isPlay: true })
-//   } else {
-//     store.dispatch('changeMusic', { params: 'next' })
-//   }
-// })
-
 audio.addEventListener('timeupdate', function () {
   // 减少提交mutation
   const time = parseInt(this.currentTime)
@@ -72,8 +51,6 @@ document.onclick = function () {
 onMounted(() => {
   initMusicResource()
 })
-
-// initMusicResource()
 </script>
 
 <style lang="less">
@@ -85,5 +62,12 @@ div.home-container {
   color: @fontColor;
   box-shadow: 0 5px 10px @boxShadowColor, 5px 0 10px @boxShadowColor, 0 -5px 10px @boxShadowColor, -5px 0 10px @boxShadowColor;
   user-select: none;
+}
+//歌曲获取资源失败 弹窗类名
+span.el-message-next {
+  color: @blueColor;
+  &:hover {
+    text-decoration: underline;
+  }
 }
 </style>

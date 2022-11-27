@@ -2,7 +2,7 @@
   <el-row type="flex" justify="space-between" align="middle" class="home-nav">
     <el-col :span="5">
       <slot name="logo">
-        <div class="logo pointer"></div>
+        <div class="logo pointer" @click="$router.push({ name: 'home' })"></div>
       </slot>
     </el-col>
     <el-col :span="10">
@@ -25,11 +25,15 @@
             :placeholder="placeholder"
             @select="handleSelect"
             value-key="searchWord"
+            @change="changeSearch"
+            ref="autocompleteRef"
           >
+            <template #prefix>
+              <el-icon class="icon">
+                <Search />
+              </el-icon>
+            </template>
             <template v-slot="scope" v-if="!showSearchResult">
-              <!-- <div class="hot-content"> -->
-              <!-- <h4 class="title">热搜榜</h4> -->
-              <!-- <ul class="content"> -->
               <li class="s-item" :class="{ hot: scope.item._index <= 3, notContent: !scope.item.content }">
                 <span class="h-index"> {{ scope.item._index }}</span>
                 <div class="h-content">
@@ -46,8 +50,6 @@
                   </p>
                 </div>
               </li>
-              <!-- </ul> -->
-              <!-- </div> -->
             </template>
             <template #default="scope" v-else>
               <div class="h-content">
@@ -82,6 +84,7 @@ import { ref, onMounted, computed, onBeforeUnmount } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { Search } from '@element-plus/icons-vue'
 
 const store = useStore()
 const isSpread = ref(false) // 是否展开
@@ -136,7 +139,6 @@ const oldList = ref([]) // 旧的搜索结果
 // const result = ref([])
 const querySearch = async (queryString, cb) => {
   // const results = [{}]
-  console.log(queryString)
   if (queryString) {
     showSearchResult.value = true
     if (oldValue.value !== queryString) {
@@ -185,19 +187,23 @@ const getSearchHotDetail = async () => {
   return data
 }
 
-// 搜索框选中的值
+// 搜索值 string
+const autocompleteRef = ref()
+const changeSearch = (val) => {
+  autocompleteRef.value.close() // 手动回车不会折叠建议列表
+  router.push({ name: 'search-result', query: { s: val } })
+}
+
+// 搜索框选中的值（对象）
 const handleSelect = (item) => {
+  console.log(item)
   const { searchWord } = item
   inputValue.value = searchWord
-
-  router.push({ name: 'search-result', query: { s: searchWord } })
-  // console.log(item)
+  changeSearch(searchWord)
 }
 
 onMounted(() => {
   getPlaceHolderText()
-  // getSearchHotDetail()
-  // restaurants.value = loadAll()
 })
 </script>
 
@@ -293,6 +299,7 @@ li.s-item {
       }
     }
     :deep(.el-autocomplete.inline-input) {
+      @placeholdColor: #fff;
       .el-input__wrapper {
         border-radius: 30px !important;
         background-color: rgba(100, 100, 100, 0.1);
@@ -301,12 +308,15 @@ li.s-item {
           color: @contrastColor;
           font-size: 12px;
           &::placeholder {
-            color: #ddd;
+            color: @placeholdColor;
           }
         }
         .el-input__suffix {
           color: @contrastColor;
         }
+      }
+      .el-icon.icon {
+        color: @placeholdColor;
       }
     }
 

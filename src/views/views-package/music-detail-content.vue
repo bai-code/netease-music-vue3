@@ -49,7 +49,8 @@
 import HomeNav from '@/views/Home/home-nav.vue'
 import { useStore } from 'vuex'
 import { watch, ref, onBeforeUnmount, onActivated, onDeactivated, defineEmits, computed } from 'vue'
-import { playAndCommit, loopFilterAdd } from '@/utils/plugins.js'
+import { loopFilterAdd } from '@/utils/plugins.js'
+import { playAndCommit } from '@/utils/playAndCommit.js'
 import LyricCmp from '@/components/lyric-cmp.vue'
 
 // defineProps({

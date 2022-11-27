@@ -1,5 +1,5 @@
 <template>
-  <el-scrollbar>
+  <!-- <el-scrollbar> -->
     <!-- // 每日歌曲推荐 -->
     <slot v-if="isDaily">
       <el-row class="daily-content">
@@ -40,13 +40,14 @@
     <div class="table-list" v-if="musicList.length">
       <musicListTable :showMusicList="musicList" :isLoading="isLoading" />
     </div>
-  </el-scrollbar>
+  <!-- </el-scrollbar> -->
 </template>
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useStore } from 'vuex'
-import { loopFilterAdd, playAndCommit } from '@/utils/plugins.js'
+import { loopFilterAdd } from '@/utils/plugins.js'
+import { playAndCommit } from '@/utils/playAndCommit.js'
 import musicListTable from '@/components/music-list-table.vue'
 
 const musicList = reactive([])

@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Nav from '@/views/Home/home-nav.vue'
 import Content from '@/views/Home/home-content.vue'
 import Footer from '@/views/Home/home-footer.vue'
-import { accessToken } from '@/utils/plugins.js'
+// import { accessData } from '@/utils/plugins.js'
 
 // const musicDetailContent = import('@/views/views-package/music-detail-content.vue')
 
@@ -84,8 +84,9 @@ const routes = [
         component: () => import('@/views/PersonalFM/personal-fm.vue')
       },
       {
-        path: 'music-list/:id?',
+        path: 'music-list/:id?', // 包含每日推荐页面
         name: 'music-list',
+        meta: { requiredAuth: true },
         component: () => import('@/views/Music-list/music-list.vue')
       },
       {
@@ -149,7 +150,9 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const info = accessToken({ tokenName: 'userinfo', isObj: true })
+  // const info = accessData({ dataName: 'userinfo', dataType: 'object' })
+  const userinfo = localStorage.getItem('userinfo')
+  const info = userinfo && JSON.parse(userinfo)
   if (to.meta.requiredAuth && (!info || (info && !info.token))) {
     next({ name: 'login' })
   } else {

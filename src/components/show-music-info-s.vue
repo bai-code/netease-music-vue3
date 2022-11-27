@@ -19,7 +19,7 @@
 <script setup>
 import { defineProps } from 'vue'
 import { useStore } from 'vuex'
-import { playAndCommit } from '@/utils/plugins'
+import { playAndCommit } from '@/utils/playAndCommit'
 const props = defineProps({
   musicInfo: {
     type: Object,

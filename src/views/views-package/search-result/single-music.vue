@@ -31,7 +31,8 @@
 <script setup>
 import MusicListTable from '@/components/music-list-table.vue'
 import { reactive, ref, defineProps, watch, defineExpose } from 'vue'
-import { loopFilterAdd, playAndCommit } from '@/utils/plugins.js'
+import { loopFilterAdd } from '@/utils/plugins.js'
+import { playAndCommit } from '@/utils/playAndCommit.js'
 import { useStore } from 'vuex'
 
 const props = defineProps({
@@ -73,13 +74,16 @@ const getMusicList = async (txt) => {
 const currentChange = (index) => {
   currentPage.value = index
   getMusicList(props.searchText)
-  console.log(index)
+  // console.log(index)
 }
 
 watch(
   () => props.searchText,
   (txt) => {
     if (!txt) return
+    singleList.length = 0
+    showList.value = []
+    currentPage.value = 1
     getMusicList(txt)
   },
   { immediate: true }

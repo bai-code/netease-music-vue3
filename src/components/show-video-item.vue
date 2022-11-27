@@ -17,8 +17,8 @@
 </template>
 
 <script setup>
-import { defineProps, computed, ref, watch, defineEmits } from 'vue'
-import { computedCount } from '@/utils/plugins'
+import { defineProps, ref, watch, defineEmits } from 'vue'
+import useComputedCount from '@/hooks/useComputedCount'
 
 const props = defineProps({
   videoInfo: {
@@ -28,17 +28,7 @@ const props = defineProps({
 })
 const emits = defineEmits(['playVideo'])
 
-const filterTime = computed(() => {
-  const praisedCount = props.videoInfo.data && props.videoInfo.data.praisedCount
-  // if (praisedCount > 100000000) {
-  //   return parseInt(praisedCount / 100000000) + '亿'
-  // } else if (praisedCount > 100000) {
-  //   return parseInt(praisedCount / 100000) + '万'
-  // } else {
-  //   return praisedCount
-  // }
-  return computedCount(praisedCount)
-})
+const filterTime = useComputedCount(props.videoInfo.data && props.videoInfo.data.praisedCount)
 
 const showIcon = ref(false)
 const timer = ref(null)

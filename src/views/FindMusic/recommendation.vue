@@ -55,7 +55,8 @@ import ShowMusicInfo from '@/components/show-music-info.vue'
 import datePng from '@/static/tempDateBg.png'
 import ShowMusicInfoS from '@/components/show-music-info-s.vue'
 import ShowMvItem from '@/components/show-mv-item.vue'
-import { loopFilterAdd, playAndCommit } from '@/utils/plugins.js'
+import { loopFilterAdd } from '@/utils/plugins.js'
+import { playAndCommit } from '@/utils/playAndCommit.js'
 import { useRouter } from 'vue-router'
 import ExclusiveTemplate from '@/components/exclusive-template.vue'
 
@@ -94,19 +95,6 @@ async function getprivatecontent() {
   // console.log(privatecontent)
 }
 
-// const playExclusive = (item) => {
-//   if (item.id) {
-//     router.push({ name: 'video-detail', query: { mvid: item.id } })
-//   }
-//   // console.log(item)
-// }
-
-// 计算图片原始尺寸对应高度
-// const domH = computed(() => {
-//   const domW = containerRef.value.offsetWidth * 0.33
-//   return parseInt((399 * domW) / 1080) + 30 + 'px'
-// })
-
 const mvList = ref([])
 async function getMVList() {
   const { result } = await store.dispatch('getInfo', { path: '/personalized/mv' })
@@ -142,17 +130,12 @@ const playMusic = async (info) => {
       router.push({ name: 'music-list', params: { id: info.targetId } })
     }
   }
-  console.log(info)
+  // console.log(info)
 }
 
 const linkPage = (name) => {
   router.push({ name })
 }
-
-// const playMv = (info) => {
-//   router.push({ name: 'video-detail', query: { mvid: info.id } })
-//   console.log(info)
-// }
 
 onMounted(() => {
   requestBannerList()

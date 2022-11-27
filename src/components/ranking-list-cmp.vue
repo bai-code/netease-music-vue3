@@ -13,8 +13,16 @@
       </div>
     </el-col>
     <el-col :span="18" v-if="rankingInfo.trackList">
-      <MusicListTable :showMusicList="rankingInfo.trackList" :isShowHeader="false" :showIcon="false" :fillIndex="false" :isMark="true" :showLoading="false" :showAlbum="false"
-      :showCurrentStyle="false">
+      <MusicListTable
+        :showMusicList="rankingInfo.trackList"
+        :isShowHeader="false"
+        :showIcon="false"
+        :fillIndex="false"
+        :isMark="true"
+        :showLoading="false"
+        :showAlbum="false"
+        :showCurrentStyle="false"
+      >
         <template #look-more>
           <div class="look-more" @click="linkTo">
             <span class="fontHover pointer">查看全部</span>
@@ -28,7 +36,8 @@
 
 <script setup>
 import { defineProps, computed } from 'vue'
-import { fillNum, playAndCommit } from '@/utils/plugins.js'
+import { fillNum } from '@/utils/plugins.js'
+import { playAndCommit } from '@/utils/playAndCommit.js'
 import MusicListTable from '@/components/music-list-table'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'

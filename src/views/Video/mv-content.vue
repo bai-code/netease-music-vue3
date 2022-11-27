@@ -13,7 +13,7 @@
 
     <NavTitle titleText="热播mv" class="title" @linkPage="linkPage('热播mv')" />
 
-    <el-row class="show-hot-mv mv-content" :gutter="10" type="flex" justify="space-between">
+    <el-row class="show-hot-mv mv-content" :gutter="10" type="flex" >
       <el-col :span="8" v-for="mv in hotMvList" :key="mv.id">
         <ShowMvItem :mvInfo="mv" />
       </el-col>
@@ -166,7 +166,7 @@ const linkPage = (query) => {
       params.order = '最热'
       break
   }
-  router.push({ name: 'mv-all', query: { ...params } })
+  router.push({ name: 'mv-all', query: params })
   // console.log(params)
 }
 

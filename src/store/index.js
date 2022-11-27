@@ -1,34 +1,37 @@
 import { createStore } from 'vuex'
 import userinfo from './userInfo'
 import $axios from '@/Axios/index.js'
-// import { transformTime } from '@/utils/plugins.js'
 import { $audio } from '@/utils/audio.js'
-import { transformTime } from '@/utils/plugins.js'
+import { transformTime, deepClone, accessData } from '@/utils/plugins.js'
 import comment from './comment.js'
 import personalFm from './personal-fm'
 import { ElMessage } from 'element-plus'
-// import { ref } from 'vue'
+import { ref } from 'vue'
 
-// const timer = ref(null)
+const timer = ref(null)
+const count = ref(3)
 
-const info = localStorage.getItem('musicInfo')
-// const isPlayFm = localStorage.getItem('isPlayFm') || false
+const info = JSON.parse(localStorage.getItem('musicInfo'))
+// const info = accessData({dataName:'musicInfo',dataType:'object', placeholder:{}})
 
 const tempMusicInfo = {
   id: '',
   url: '',
-  level: 'standard',
   singer: '',
   name: '',
   picUrl: '',
   durationTime: '',
   time: '', // 用于歌词部分会有时间超出，对比使用
-  isFmMusic: false
+  isFmMusic: false, // 是否是Fm 页面歌曲
+  privilege: {}, // 展示音质等级
+  fee: ''
 }
-const musicInfo = Object.assign({}, tempMusicInfo, (info && JSON.parse(info)) || {})
+const musicInfo = Object.assign({}, tempMusicInfo, info)
 
 const list = localStorage.getItem('musicList')
 const musicList = (list && JSON.parse(list)) || []
+const _level = accessData({ dataName: '_level', placeholder: 'standard' })
+const loopStatus = accessData({ dataName: 'loopStatus', placeholder: 'listLoop' })
 
 const store = createStore({
   state: {
@@ -37,9 +40,13 @@ const store = createStore({
     currentTime: 0, // 播放到哪
     precentage: 0, // 进度条
     durationTime: 100,
-    isPlay: false,
-    isClick: false,
-    currentPlayIndex: -1 // 当前播放歌曲索引
+    isPlay: false, // 播放状态
+    isClick: false, // fm页面，防止未点击直接播放=》导致无效
+    currentPlayIndex: -1, // 当前播放歌曲索引,
+    _level, // 播放音质
+    loopStatus, // 循环状态 single(单曲) singleCycle（单循）  list（列表）  listLoop（列循） random （随机）
+    tempMusicList: deepClone(musicList), // 缓存数据，用于缓存随机播放列表
+    countDown: 3
   },
   getters: {
     // 返回总时长百分比
@@ -62,9 +69,15 @@ const store = createStore({
       // 计算当前页面是否存在播放的歌曲 添加类名
       return function (list = []) {
         const { id } = state.musicInfo
-        return list.findIndex((item) => {
+        const index = list.findIndex((item) => {
           return item.id === id
         })
+        const referList = JSON.stringify(state.musicList)
+        const currentList = JSON.stringify(list)
+        if (referList === currentList) {
+          return index
+        }
+        return -1
       }
     },
     isNotChange(state) {
@@ -95,9 +108,18 @@ const store = createStore({
     },
     // 保存播放列表
     saveMusicList(state, payload) {
-      const { musicList } = payload
+      const { musicList, isClean, tempMusicList, isDeepClone, isSaveMusicList = true } = payload
+      if (tempMusicList) {
+        // 只是单纯保存tempMusicList
+        state.tempMusicList = isDeepClone ? deepClone(musicList) : tempMusicList
+      }
+      if (!isSaveMusicList) return
       localStorage.setItem('musicList', JSON.stringify(musicList))
       state.musicList = musicList
+      if (isClean) {
+        state.musicInfo = tempMusicInfo
+        localStorage.setItem('musiciInfo', JSON.stringify({}))
+      }
     },
     saveUpdateTime(state, payload) {
       const { durationTime, currentTime } = payload
@@ -107,6 +129,7 @@ const store = createStore({
       state.currentTime = currentTime
     },
     changePlayStatus(state, { isPlay }) {
+      // 单纯改变播放状态
       state.isPlay = isPlay
     },
     play(state) {
@@ -124,6 +147,21 @@ const store = createStore({
     },
     DOMClick(state, { flag }) {
       state.isClick = flag
+    },
+    // 改变播放音质
+    changeQuality(state, payload) {
+      const { level } = payload
+      state._level = level
+      localStorage.setItem('_level', level)
+      // accessData({ tokenName: 'level', isSet: true, data: level })
+    },
+    // 改变循环方式
+    changeLoopStatus(state, { loopStatus }) {
+      state.loopStatus = loopStatus
+      accessData({ dataName: 'loopStatus', isSet: true, data: loopStatus })
+    },
+    cloneMusicList(state, { musicList }) {
+      state.tempMusicList = deepClone(musicList)
     }
   },
   actions: {
@@ -139,28 +177,31 @@ const store = createStore({
      *
      * @param {isFm} 是不是播放fm页面
      * @param {mp3Url} 部分数据中自带url
+     * @param {isNext} 对于下一首，不用这里处理
      * @returns
      */
-    async getMusicInfo({ commit, state }, { musicInfo = {}, isPlay = true /* 默认播放 */, isNext = false, isFm = false }) {
-      const { id, level = 'standard' } = musicInfo
+    async getMusicInfo({ commit, state }, { musicInfo = {}, isPlay = true /* 默认播放 */, isNext = false, isFm = false, level }) {
+      const { id } = musicInfo
+      const _level = level || state._level
       // console.log(id, musicInfo)
       if (!id) return
-      const { code, data = [] } = await $axios.get(`/song/url/v1?id=${id}&level=${level}`)
-      // console.log(data, musicInfo)
+      const { code, data = [] } = await $axios.get(`/song/url/v1?id=${id}&level=${_level}`)
+
+      // console.log(data, musicInfo, level, state.level)
       if (code === 200) {
-        const { url } = data[0]
+        const { url, level } = data[0]
         if (!url) {
           if (!isNext) {
             let msg = ''
             switch (musicInfo.fee) {
               case 0:
-                msg = '免费或无版权'
+                msg = '获取资源失败---无版权'
                 break
               case 1:
-                msg = 'VIP歌曲'
+                msg = '获取资源失败---VIP歌曲'
                 break
               case 4:
-                msg = '该专辑为付费专辑'
+                msg = '获取资源失败---该专辑为付费专辑'
                 break
               case 8:
                 msg = '非会员可免费播放低音质，会员可播放高音质及下载'
@@ -175,33 +216,34 @@ const store = createStore({
         }
         const { time } = data[0]
         const durationTime = transformTime(time, true)
-        // let oldTime = 0
         const newMusicInfo = Object.assign({}, musicInfo, { url, durationTime, time, isFmMusic: isFm })
         $audio.giveAddress(url, isPlay)
         // 状态改变再提交
         if (state.isPlay !== isPlay) {
           commit('changePlayStatus', { isPlay })
         }
+        const _le = level || _level // 如果选择最高，部分歌曲不支持，所以从请求结果中获取
+        if (state._level !== _le) {
+          commit('changeQuality', { level: _le })
+        }
         commit('savePlayMusicInfo', newMusicInfo)
         commit('saveUpdateTime', { durationTime: parseInt(data[0].time / 1000) })
+
         return true
       }
-      // console.log('获取歌曲地址', data[0], id)
+      // console.log('获取歌曲地址', data[0])
     },
-    async changeMusic({ state, getters, dispatch }, { params = 'next' }) {
-      const { musicList } = state
-      let index = getters.findCurrentPageIndex(musicList)
+    async changeMusic({ state, getters, commit, dispatch }, { params = 'next' }) {
+      const { musicList, loopStatus, tempMusicList } = state
+      let index = 0
+      let useRequestList = musicList // 默认使用musicList
+      if (loopStatus !== 'random') {
+        index = getters.findCurrentPageIndex(musicList)
+      }
       const len = musicList.length
-      // console.log(index)
-      // let flag = true
-
       const _get = async () => {
         if (params === 'next') {
-          if (index + 1 >= len) {
-            index = 0
-          } else {
-            index += 1
-          }
+          index += 1
         } else {
           if (index - 1 < 0) {
             index = len - 1
@@ -209,13 +251,53 @@ const store = createStore({
             index -= 1
           }
         }
-        const res = await dispatch('getMusicInfo', { musicInfo: musicList[index], isNext: true })
+        if (loopStatus === 'single') {
+          // 单曲播放
+          commit('changePlayStatus', { isPlay: false }) // 播放结束默认pause(),所以只用改变状态就好
+          return
+        } else if (loopStatus === 'singleCycle') {
+          // 单曲循环
+          commit('seekTime', { time: 0 })
+          commit('play', { isPlay: true })
+          return
+        } else if (loopStatus === 'list' && index === len) {
+          commit('changePlayStatus', { isPlay: false })
+          return
+        } else if (loopStatus === 'listLoop' && index >= len) {
+          index = 0
+        } else if (loopStatus === 'random') {
+          const _len = tempMusicList.length
+          index = parseInt(Math.random() * _len)
+          useRequestList = tempMusicList
+        }
+
+        const res = await dispatch('getMusicInfo', { musicInfo: useRequestList[index], isNext: true })
+        if (loopStatus === 'random') {
+          useRequestList.splice(index, 1)
+          // 当使用的数组 删完，重新克隆一次
+          commit('saveMusicList', { tempMusicList: useRequestList, isDeepClone: useRequestList.length === 0, musicList, isSaveMusicList: false })
+        }
         if (!res) {
+          commit('pause')
           ElMessage({
-            type: 'error',
-            message: '获取资源失败，自动下一首'
+            type: 'warning',
+            message: '<p>获取资源失败，稍后自动下一首',
+            duration: 3000,
+            dangerouslyUseHTMLString: true
           })
-          return _get()
+          timer.value = setInterval(() => {
+            count.value -= 1
+            if (count.value <= 0) {
+              clearInterval(timer.value)
+              _get()
+            }
+            console.log(count.value)
+          }, 1000)
+
+          // timeoutTimer.value = setTimeout(() => {
+          //   clearTimeout(timeoutTimer.value)
+          //   _get()
+          // }, 3000)
         }
       }
       _get()

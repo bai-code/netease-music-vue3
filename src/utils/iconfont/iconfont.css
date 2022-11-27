@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3541824 */
-  src: url('iconfont.woff2?t=1667481315010') format('woff2'),
-       url('iconfont.woff?t=1667481315010') format('woff'),
-       url('iconfont.ttf?t=1667481315010') format('truetype');
+  src: url('iconfont.woff2?t=1669478633091') format('woff2'),
+       url('iconfont.woff?t=1669478633091') format('woff'),
+       url('iconfont.ttf?t=1669478633091') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,42 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-single:before {
+  content: "\e621";
+}
+
+.icon-random:before {
+  content: "\e60a";
+}
+
+.icon-single-cycle:before {
+  content: "\e66d";
+}
+
+.icon-list-loop:before {
+  content: "\e649";
+}
+
+.icon-order:before {
+  content: "\e802";
+}
+
+.icon-start:before {
+  content: "\ea81";
+}
+
+.icon-stop:before {
+  content: "\e622";
+}
+
+.icon-duihao:before {
+  content: "\e60b";
+}
+
+.icon-xihuan:before {
+  content: "\e86f";
 }
 
 .icon-question-mark:before {

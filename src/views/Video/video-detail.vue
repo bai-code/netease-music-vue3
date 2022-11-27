@@ -1,5 +1,5 @@
 <template>
-  <div class="video-detail">
+  <div class="video-detail" v-loading="isLoading">
     <el-scrollbar>
       <ShowVideoInfo :videoInfo="videoInfo" :videoSrc="videoSrc" :recommendVideoList="recommendVideoList" :hotCommentList="hotCommentList" :commentList="commentList" :isMv="isMv" />
     </el-scrollbar>
@@ -11,7 +11,8 @@ import { watch, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import ShowVideoInfo from '@/components/show-video-info.vue'
-import { loopFilterAdd, jointSinger, computedCount } from '@/utils/plugins.js'
+import { loopFilterAdd, jointSinger } from '@/utils/plugins.js'
+import useComputedCount from '@/hooks/useComputedCount'
 
 const routes = useRoute()
 const store = useStore()
@@ -26,7 +27,7 @@ const getVideoDetail = async (vid) => {
   if (isMv.value && data.artists) {
     data.mvCreator = jointSinger(data.artists)
   }
-  data._playCount = computedCount(data.playCount)
+  data._playCount = useComputedCount(data.playCount)
   videoInfo.value = data || {}
   // console.log(data)
 }
@@ -70,11 +71,12 @@ const getRecommendVideo = async (vid) => {
     // console.log(recommendList)
   }
 }
-
+const isLoading = ref(false)
 // 监听 视频
 watch(
   () => routes.query,
-  (query = {}) => {
+  async (query = {}) => {
+    isLoading.value = true
     const { vid, mvid } = query
     if (!vid && !mvid) return
     const id = vid || mvid
@@ -83,10 +85,11 @@ watch(
     } else {
       isMv.value = true
     }
-    getVideoDetail(id)
-    getVideoSrc(id)
-    getCommentData(id)
+    await getVideoDetail(id)
+    await getVideoSrc(id)
+    isLoading.value = false
     getRecommendVideo(id)
+    getCommentData(id)
   },
   {
     immediate: true,
@@ -97,9 +100,14 @@ watch(
 
 <style lang="less" scoped>
 div.video-detail {
-  padding: 10px 20px;
+  padding: 10px 0 10px 20px;
   box-sizing: border-box;
+  min-height: 50px;
   height: calc(100% - 60px);
   width: 100%;
+  .el-scrollbar {
+    padding-right: 10px;
+    box-sizing: border-box;
+  }
 }
 </style>

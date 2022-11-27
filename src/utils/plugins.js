@@ -1,4 +1,5 @@
-import store from '@/store/index.js'
+// import store from '@/store/index.js'
+// import useComputedCount from '@/hooks/useComputedCount'
 /**
  *
  * @param {*} list  传入数组
@@ -58,10 +59,10 @@ export const transformLocalTime = (t) => {
 }
 
 export const computedCount = (count = 0) => {
-  if (count / 100000000 >= 1) {
-    return parseInt(count / 100000000) + '亿'
+  if (count >= 100000000) {
+    return Math.trunc(count / 100000000) + '亿'
   } else if (count >= 100000) {
-    return parseInt(count / 10000) + '万'
+    return Math.trunc(count / 10000) + '万'
   } else {
     return count
   }
@@ -135,19 +136,19 @@ export const returnNeedInfo = (info = {}) => {
   }
 }
 
-// index   musicInfo 二选一
-export const playAndCommit = async ({ musicList = [], /* 传递的数组 */ index /*  当前播放索引 */, musicInfo, isPlay = true, isFm = false }) => {
-  let flag = false
-  if (index === 0 || index) {
-    flag = await store.dispatch('getMusicInfo', { musicInfo: musicList[index], isFm })
-  } else {
-    flag = await store.dispatch('getMusicInfo', { musicInfo, isPlay, isFm })
-  }
-  if (!isFm && musicList.length > 0) {
-    store.commit('saveMusicList', { musicList })
-  }
-  return flag
-}
+// // index   musicInfo 二选一
+// export const playAndCommit = async ({ musicList = [], /* 传递的数组 */ index /*  当前播放索引 */, musicInfo, isPlay = true, isFm = false, level }) => {
+//   let flag = false
+//   if (index === 0 || index) {
+//     flag = await store.dispatch('getMusicInfo', { musicInfo: musicList[index], isFm, level })
+//   } else {
+//     flag = await store.dispatch('getMusicInfo', { musicInfo, isPlay, isFm, level })
+//   }
+//   if (!isFm && musicList.length > 0) {
+//     store.commit('saveMusicList', { musicList })
+//   }
+//   return flag
+// }
 
 /**
  * query  遍历对象需要匹配的某个属性
@@ -184,32 +185,39 @@ export const filterMusicList = ({ musicList = [], query, params, params1 = 'name
       return new RegExp(params, 'i').test(item[query])
     }
   })
-  // console.log(judgeType('sfsdf'), musicList, params, query)
-  // return musicList.filter((item) => {
-
-  // })
 }
 
 /**
  *  存取数据
  * @param {*} tokenName 需要获取存储数据名
- * @param {*} isSet 是不是存储数据
- * @param {*} isObg  是不是复杂数据类型
+ * @param {*} isSet 是不是存数据
+ * @param {*} isObj  是不是复杂数据类型 object array
  * @returns
  */
-export const accessToken = ({ tokenName, isSet = false, isObj = false, data }) => {
+export const accessData = ({ dataName, isSet = false, dataType, data, placeholder /* 占位替代 */ }) => {
   if (isSet) {
+    const res = judgeType(data)
     let packData = data
-    if (isObj) {
+    if (res === 'array' || res === 'object') {
       packData = JSON.stringify(data)
     }
-    localStorage.setItem(tokenName, packData)
+    localStorage.setItem(dataName, packData)
   } else {
-    const argu = localStorage.getItem(tokenName)
-    if (isObj) {
+    const argu = localStorage.getItem(dataName)
+    const res = judgeType(argu)
+    if (res === 'undefined') {
+      if (dataType === 'array') {
+        return placeholder || []
+      } else if (dataType === 'object') {
+        return placeholder || {}
+      } else {
+        return placeholder || ''
+      }
+    } else if (dataType === 'object' || dataType === 'array') {
       return JSON.parse(argu)
+    } else {
+      return argu
     }
-    return argu
   }
 }
 
@@ -219,20 +227,27 @@ export const accessToken = ({ tokenName, isSet = false, isObj = false, data }) =
  * @param {path}  个别请求路径
  * @param {isPlay}  自动播放
  */
-export const getPlaylist = async ({ id, path, isPlay = false }) => {
-  let list = []
-  if (!id) {
-    const { data, code } = await store.dispatch('getInfo', { path: '/recommend/songs' })
-    if (code === 200) {
-      list = loopFilterAdd({ musicList: data.dailySongs, artists: 'ar', transTime: true })
-    }
-  } else {
-    const p = path || `/playlist/track/all?id=${id}`
-    const { songs } = await store.dispatch('getInfo', { path: p })
-    list = loopFilterAdd({ musicList: songs, artists: 'ar', transTime: true, timeName: 'dt' })
-  }
-  if (isPlay) {
-    playAndCommit({ musicList: list, index: 0 })
-  }
-  return list
+// export const getPlaylist = async ({ id, path, isPlay = false }) => {
+//   let list = []
+//   if (!id) {
+//     const { data, code } = await store.dispatch('getInfo', { path: '/recommend/songs' })
+//     if (code === 200) {
+//       list = loopFilterAdd({ musicList: data.dailySongs, artists: 'ar', transTime: true })
+//     }
+//   } else {
+//     const p = path || `/playlist/track/all?id=${id}`
+//     const { songs } = await store.dispatch('getInfo', { path: p })
+//     list = loopFilterAdd({ musicList: songs, artists: 'ar', transTime: true, timeName: 'dt' })
+//   }
+//   if (isPlay) {
+//     playAndCommit({ musicList: list, index: 0 })
+//   }
+//   return list
+// }
+
+/**
+ * 深度克隆数据  ，只拷贝数据，  使用json方法足以
+ */
+export const deepClone = (data) => {
+  return JSON.parse(JSON.stringify(data))
 }

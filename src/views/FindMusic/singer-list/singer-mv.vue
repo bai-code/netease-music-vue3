@@ -14,7 +14,7 @@
 import { watch, defineProps, reactive, ref } from 'vue'
 import { useStore } from 'vuex'
 import showMvItem from '@/components/show-mv-item.vue'
-import { computedCount } from '@/utils/plugins'
+import useComputedCount from '@/hooks/useComputedCount'
 
 const props = defineProps(['singerId'])
 const isLoading = ref(false)
@@ -33,7 +33,7 @@ const getSingerMv = async (id) => {
     noHasMore.value = true
   }
   mvs.forEach((item) => {
-    item._playCount = computedCount(item.playCount)
+    item._playCount = useComputedCount(item.playCount)
   })
   mvList.push(...mvs)
   isLoading.value = false

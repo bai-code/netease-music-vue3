@@ -15,7 +15,7 @@
               <span class="en" v-if="info.alias"> ({{ info.alias[0] }})</span>
             </div>
             <div class="other">
-              <span class="fans-num">粉丝：{{ computedCount(info.fansSize) }},</span>
+              <span class="fans-num">粉丝：{{ useComputedCount(info.fansSize) }},</span>
               <span clas="music-n"> 歌曲：{{ info.musicSize }}</span>
             </div>
           </div>
@@ -39,7 +39,7 @@
 import { watch, ref, shallowRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { computedCount } from '@/utils/plugins.js'
+import useComputedCount from '@/hooks/useComputedCount'
 import NavTitleSlot from '@/components/nav-title-slot.vue'
 import SingleList from './search-result/single-music'
 import Singer from './search-result/singer.vue'
@@ -119,9 +119,11 @@ const getSearchResult = async (val) => {
   artistInfoList.value = artist
 }
 
+const oldSearchText = ref('')
 watch(
   () => [route.query.s, route.query.c],
   (val) => {
+    if (!val[0] || oldSearchText.value === val[0]) return
     searchText.value = val[0]
     getSearchResult(val[0])
     const index = val[1] || 0
@@ -143,8 +145,10 @@ div.search-result {
     font-weight: 500;
   }
   ul.show-singer {
+    .flex(flex-start,center);
     li {
-      width: 33%;
+      flex: 0 0 auto;
+      min-width: 33%;
       display: flex;
       height: 70px;
       padding: 15px;
