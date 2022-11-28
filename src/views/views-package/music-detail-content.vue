@@ -1,15 +1,16 @@
 <template>
+  <!-- 点击footer头像，歌词页面 -->
   <div class="music-detail-content" :style="{ height: containerHeight }">
     <div class="music-detail__content" ref="domRef">
-      <HomeNav>
+      <HomeNav @handleChange="handleChange">
         <template v-slot:logo>
-          <div class="arrow-down pointer" @click="packUp">
+          <div class="arrow-down pointer logo" @click="packUp">
             <i class="iconfont icon-arrow-down"></i>
           </div>
         </template>
-        <template v-slot:search>
-          <div class="isShow" v-if="true">2222</div>
-        </template>
+        <!-- <template v-slot:search> -->
+        <!-- <searchBox @handleChange="handleChange" /> -->
+        <!-- </template> -->
         <template v-slot:avatar>
           <span></span>
         </template>
@@ -52,15 +53,7 @@ import { watch, ref, onBeforeUnmount, onActivated, onDeactivated, defineEmits, c
 import { loopFilterAdd } from '@/utils/plugins.js'
 import { playAndCommit } from '@/utils/playAndCommit.js'
 import LyricCmp from '@/components/lyric-cmp.vue'
-
-// defineProps({
-//   musicDetail: {
-//     type: Object,
-//     default: () => {
-//       return {}
-//     }
-//   }
-// })
+// import searchBox from '@/views/Home/home-nav/search-box.vue'
 
 const emits = defineEmits(['packUp'])
 
@@ -69,14 +62,12 @@ const discDeg = ref(0)
 const timer = ref(null)
 
 const store = useStore()
-// const musicInfo = ref([])
 
 const containerHeight = ref(0)
 
 const domRef = ref()
 onActivated(() => {
   const h = getComputedStyle(domRef.value, null).height
-  // console.log(h)
   containerHeight.value = `calc(100% - 70px + ${h})`
 })
 onDeactivated(() => {
@@ -132,6 +123,10 @@ watch(
   }
 )
 
+const handleChange = () => {
+  packUp()
+}
+
 onBeforeUnmount(() => {
   clearInterval(timer.value)
   timer.value = null
@@ -142,7 +137,7 @@ onBeforeUnmount(() => {
 div.music-detail-content {
   position: absolute;
   bottom: 70px;
-  width: 100% !important;
+  width: 100%;
   box-sizing: border-box;
   height: 0;
   z-index: 888;
@@ -157,6 +152,9 @@ div.music-detail-content {
   }
   .home-nav {
     background: transparent !important;
+    .logo {
+      width: 50px;
+    }
   }
   .el-row.content {
     height: calc(100% - 70px);

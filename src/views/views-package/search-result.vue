@@ -15,7 +15,7 @@
               <span class="en" v-if="info.alias"> ({{ info.alias[0] }})</span>
             </div>
             <div class="other">
-              <span class="fans-num">粉丝：{{ useComputedCount(info.fansSize) }},</span>
+              <span class="fans-num">粉丝：{{ computedCount(info.fansSize) }},</span>
               <span clas="music-n"> 歌曲：{{ info.musicSize }}</span>
             </div>
           </div>
@@ -39,7 +39,8 @@
 import { watch, ref, shallowRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import useComputedCount from '@/hooks/useComputedCount'
+import { computedCount } from '@/utils/plugins'
+// import useComputedCount from '@/hooks/useComputedCount'
 import NavTitleSlot from '@/components/nav-title-slot.vue'
 import SingleList from './search-result/single-music'
 import Singer from './search-result/singer.vue'

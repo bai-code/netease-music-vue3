@@ -66,9 +66,6 @@ watch(
 const isPlay = computed(() => {
   return store.state.isPlay
 })
-// const musicInfo = computed(() => {
-//   return store.state.musicInfo
-// })
 
 const domContainerRef = ref()
 const lyricRef = ref([])

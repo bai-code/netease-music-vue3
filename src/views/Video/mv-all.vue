@@ -188,7 +188,6 @@ watch(
       mvList.value = []
       showMvList.value = []
       getMvList(newVal)
-      console.log(1)
       routeQuery.value = { area, type, order }
     }
   },
@@ -208,7 +207,6 @@ watch(
         flag = true
       }
     }
-    console.log(2)
     if (!flag) return
     router.replace({ name: 'mv-all', query: tempCategory })
     // getMvList(tempCategory)

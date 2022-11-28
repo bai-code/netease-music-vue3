@@ -1,15 +1,23 @@
 <template>
+  <!-- 独家放送 -->
   <div class="exclusive" v-if="isMounted">
-    <!-- <el-scrollbar height="420px"> -->
     <el-scrollbar height="380px">
-      <el-row class="container-container" type="flex" justify="space-between" :gutter="20" v-infinite-scroll="loadMore" infinite-scroll-delay="500" infinite-scroll-distance="200" :infinite-scroll-immediate="false">
+      <el-row
+        class="container-container"
+        type="flex"
+        justify="space-between"
+        :gutter="20"
+        v-infinite-scroll="loadMore"
+        infinite-scroll-delay="500"
+        infinite-scroll-distance="200"
+        :infinite-scroll-immediate="false"
+      >
         <el-col :span="12" class="item" v-for="exclusive in exclusiveList" :key="exclusive.id">
           <ExclusiveTemplate :videoInfo="exclusive" />
         </el-col>
       </el-row>
     </el-scrollbar>
     <div class="loading" v-loading="isLoading"></div>
-    <!-- </el-scrollbar> -->
   </div>
 </template>
 

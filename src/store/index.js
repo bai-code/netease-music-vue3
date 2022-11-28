@@ -46,7 +46,7 @@ const store = createStore({
     _level, // 播放音质
     loopStatus, // 循环状态 single(单曲) singleCycle（单循）  list（列表）  listLoop（列循） random （随机）
     tempMusicList: deepClone(musicList), // 缓存数据，用于缓存随机播放列表
-    countDown: 3
+    countDown: 3 // 三秒倒计时
   },
   getters: {
     // 返回总时长百分比
