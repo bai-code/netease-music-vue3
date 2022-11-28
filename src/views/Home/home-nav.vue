@@ -15,10 +15,10 @@
         <div class="avatar-bg">
           <img :src="userInfo.avatarUrl" alt="" />
         </div>
-        <div class="userInfo">
+        <div class="userInfo" ref="domRef">
           <p class="overflow pointer" @click="spreadControls" v-if="userInfo.token">{{ userInfo.nickname }}</p>
           <p class="overflow pointer" @click="loginIn" v-else>{{ userInfo.nickname }}</p>
-          <input type="text" @focus="inputFocus" @blur="inputBlur" ref="inputRef" class="_useIsSpread" />
+          <!-- <input type="text" @focus="inputFocus" @blur="inputBlur" ref="inputRef" class="_useIsSpread" /> -->
           <ul class="control" v-if="userInfo.token && isSpread">
             <li class="pointer">用户信息</li>
             <li class="pointer" @click="logout">退出登录</li>
@@ -30,7 +30,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onBeforeUnmount, defineEmits } from 'vue'
+import { ref, computed, defineEmits } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
@@ -40,47 +40,42 @@ const emits = defineEmits(['handleChange'])
 
 const store = useStore()
 const isSpread = ref(false) // 是否展开
-const inputRef = ref()
-const timer = ref()
 
 const userInfo = computed(() => {
   return store.state.userinfo.userInfo
 })
 
-const inputFocus = () => {
-  isSpread.value = true
-}
-const inputBlur = () => {
-  timer.value = setTimeout(() => {
-    isSpread.value = false
-  }, 150)
-}
-
 const router = useRouter()
 const loginIn = () => {
   router.push({ name: 'login' })
 }
-const spreadControls = () => {
-  if (isSpread.value) {
-    inputBlur()
-  } else {
-    inputRef.value.focus()
-  }
-}
-
-onBeforeUnmount(() => {
-  clearTimeout(timer.value)
-  timer.value = null
-})
 
 const logout = async () => {
   const flag = await store.dispatch('userinfo/userLogout')
+  isSpread.value = false
   ElMessage({
     type: flag ? 'success' : 'error',
     message: flag ? '退出登录成功' : '退出登录失败'
   })
-  // console.log(flag)
 }
+
+const documentClick = (e) => {
+  const flag = domRef.value.contains(e.target)
+  console.log(flag)
+  if (!flag) {
+    isSpread.value = false
+    document.removeEventListener('click', documentClick)
+  }
+}
+
+const domRef = ref()
+const spreadControls = () => {
+  isSpread.value = !isSpread.value
+  if (isSpread.value) {
+    document.addEventListener('click', documentClick)
+  }
+}
+
 const handleChange = () => {
   emits('handleChange')
 }

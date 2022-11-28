@@ -107,16 +107,18 @@ const emit = defineEmits(['changeQuality'])
 const isSpread = ref(false)
 const domRef = ref() // dom元素
 
+const documentClick = (e) => {
+  const flag = domRef.value.contains(e.target)
+  if (!flag) {
+    isSpread.value = false
+    document.removeEventListener('click', documentClick)
+  }
+}
+
 const spreadItem = () => {
   isSpread.value = !isSpread.value
   if (isSpread.value) {
-    document.addEventListener('click', (e) => {
-      const flag = domRef.value.contains(e.target)
-      if (!flag) {
-        isSpread.value = false
-        document.onclick = null
-      }
-    })
+    document.addEventListener('click', documentClick)
   }
 }
 

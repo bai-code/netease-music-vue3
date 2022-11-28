@@ -1,10 +1,10 @@
 <template>
   <div class="search">
     <div class="move-back">
-      <span class="pointer" @click="$router.go(-1)">
+      <span class="pointer" @click="routerGo(-1)">
         <i class="iconfont icon-arrow-left"></i>
       </span>
-      <span class="pointer" @click="$router.go(1)">
+      <span class="pointer" @click="routerGo(1)">
         <i class="iconfont icon-arrow-right"></i>
       </span>
     </div>
@@ -62,6 +62,11 @@ const emits = defineEmits(['handleChange'])
 
 const store = useStore()
 const router = useRouter()
+const routerGo = (val) => {
+  emits('handleChange')
+  router.go(val)
+}
+
 const inputValue = ref('')
 
 const timeout = ref(null) // 异步定时器
@@ -135,6 +140,7 @@ const getPlaceHolderText = async () => {
   }
 }
 
+// 打开歌词页面搜索，home-nav组建中搜索框值无法同步
 const route = useRoute()
 watch(
   () => route.query.s,
