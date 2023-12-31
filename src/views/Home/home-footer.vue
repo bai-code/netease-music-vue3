@@ -279,8 +279,8 @@ const loopList = shallowRef([
     loopStatus: 'random'
   }
 ])
-
-const oldLoopStatus = ref()
+const _loopStatus = store.state.loopStatus
+const oldLoopStatus = ref(_loopStatus)
 const selectItem = (val) => {
   const { loopStatus } = val
   if (loopStatus === oldLoopStatus.value) return

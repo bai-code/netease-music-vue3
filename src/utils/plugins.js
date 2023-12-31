@@ -191,7 +191,7 @@ export const accessData = ({ dataName, isSet = false, dataType, data, placeholde
   } else {
     const argu = localStorage.getItem(dataName)
     const res = judgeType(argu)
-    if (res === 'undefined') {
+    if (res) {
       if (dataType === 'array') {
         return placeholder || []
       } else if (dataType === 'object') {

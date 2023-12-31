@@ -31,7 +31,7 @@ const musicInfo = Object.assign({}, tempMusicInfo, info)
 const list = localStorage.getItem('musicList')
 const musicList = (list && JSON.parse(list)) || []
 const _level = accessData({ dataName: '_level', placeholder: 'standard' })
-const loopStatus = accessData({ dataName: 'loopStatus', placeholder: 'listLoop' })
+const loopStatus = accessData({ dataName: 'loopStatus', placeholder: 'list' })
 
 const store = createStore({
   state: {
